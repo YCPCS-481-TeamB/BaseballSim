@@ -10,12 +10,13 @@ CREATE TABLE players (
 	technique INTEGER, pitch_speed INTEGER, endurance INTEGER,
 	contact INTEGER, swing_speed INTEGER, bat_power INTEGER,
 	catching INTEGER, throwing INTEGER, awareness INTEGER,
-	speed INTEGER, clutch INTEGER, arm dominant_arm
+	speed INTEGER, clutch INTEGER, arm dominant_arm,
+	team_id INTEGER
 );
 
-CREATE TABLE teams (id SERIAL, name VARCHAR(255));
+CREATE TABLE teams (id SERIAL, name VARCHAR(255), league_id INTEGER);
 
---CREATE TABLE leagues;
+CREATE TABLE leagues (id PRIMARY KEY, name VARCHAR(255));
 
 --CREATES PERMISSIONS TABLE FOR OWNERSHIP AND VIEW RIGHTS FOR FIELDS (ALLOWS CO-OWNERSHIP OF ITEMS)
 CREATE TABLE permissions (id SERIAL, user_id INTEGER, item_type VARCHAR(255) NOT NULL, item_id INTEGER NOT NULL);
