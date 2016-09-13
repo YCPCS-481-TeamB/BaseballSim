@@ -9,6 +9,17 @@ router.get('/', function(req, res, next) {
     }).catch(function(err){
         res.status(200).json({success: false, message:""+ err});
     });
+
+    next();
+});
+
+router.get('/:id', function(req, res, next){
+    var id = req.params.id;
+    PlayersController.getPlayersById(id).then(function(data){
+        res.status(200).json({id: id, player: data});
+    }).catch(function(err){
+        res.status(200).json({success: false,id: id, message:""+ err});
+    });
 });
 
 module.exports = router;

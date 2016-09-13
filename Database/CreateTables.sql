@@ -5,7 +5,7 @@ CREATE TYPE player_position AS ENUM ('pitcher', 'catcher', 'first_baseman', 'sec
 CREATE TYPE dominant_arm AS ENUM ('left', 'right');
 
 CREATE TABLE players (
-	id SERIAL, firstname VARCHAR (255), lastname VARCHAR(255), position player_position, team_id INTEGER
+	id SERIAL, firstname VARCHAR (255), lastname VARCHAR(255), position player_position, team_id INTEGER, date_created TIMESTAMP DEFAULT NOW()
 );
 
 CREATE TABLE attributes (
@@ -33,9 +33,9 @@ CREATE TABLE stats (
 	earned_run_average DOUBLE, strikeouts_thrown INTEGER, saves INTEGER
 );
 
-CREATE TABLE teams (id SERIAL, name VARCHAR(255), league_id INTEGER);
+CREATE TABLE teams (id SERIAL, name VARCHAR(255), league_id INTEGER, date_created TIMESTAMP DEFAULT NOW());
 
-CREATE TABLE leagues (id PRIMARY KEY, name VARCHAR(255));
+CREATE TABLE leagues (id PRIMARY KEY, name VARCHAR(255), date_created TIMESTAMP DEFAULT NOW());
 
 --CREATES PERMISSIONS TABLE FOR OWNERSHIP AND VIEW RIGHTS FOR FIELDS (ALLOWS CO-OWNERSHIP OF ITEMS)
-CREATE TABLE permissions (id SERIAL, user_id INTEGER, item_type VARCHAR(255) NOT NULL, item_id INTEGER NOT NULL);
+CREATE TABLE permissions (id SERIAL, user_id INTEGER, item_type VARCHAR(255) NOT NULL, item_id INTEGER NOT NULL, date_created TIMESTAMP DEFAULT NOW());
