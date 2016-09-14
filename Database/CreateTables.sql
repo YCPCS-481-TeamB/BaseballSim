@@ -33,6 +33,8 @@ CREATE TABLE stats (
 	earned_run_average DOUBLE, strikeouts_thrown INTEGER, saves INTEGER
 );
 
+CREATE TABLE player_names (id SERIAL, name VARCHAR(255), isLast BOOLEAN);
+
 CREATE TABLE teams (id SERIAL, name VARCHAR(255), league_id INTEGER, date_created TIMESTAMP DEFAULT NOW());
 
 CREATE TABLE leagues (id PRIMARY KEY, name VARCHAR(255), date_created TIMESTAMP DEFAULT NOW());

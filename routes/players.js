@@ -10,7 +10,14 @@ router.get('/', function(req, res, next) {
         res.status(200).json({success: false, message:""+ err});
     });
 
-    next();
+});
+
+router.post('/', function(req, res, next){
+    PlayersController.createRandomPlayer("Brandon", "Walton", 'pitcher', 0).then(function(data){
+        res.status(200).json(data);
+    }).catch(function(err){
+       res.status(200).json(err);
+    });
 });
 
 router.get('/:id', function(req, res, next){
