@@ -12,14 +12,26 @@ router.get('/', function(req, res, next) {
 
 });
 
+/**
+ * POST for adding a random player to the database
+ * @body team_id (Optional) - the id of the team for the player, otherwise 
+ * @Returning the json data for the database tables
+ */
 router.post('/', function(req, res, next){
-    PlayersController.createRandomPlayer("Brandon", "Walton", 'pitcher', 0).then(function(data){
-        res.status(200).json(data);
+    var team_id = req.body.team_id;
+    PlayersController.createRandomPlayer(team_id).then(function(data){
+        //Returns the first and last name for the created player
+        res.status(200).json(data.rows[0]);
     }).catch(function(err){
        res.status(200).json(err);
     });
 });
 
+
+/**
+ * Retrieves the player from the database with the given id value
+ * @params id - The id of the player
+ */
 router.get('/:id', function(req, res, next){
     var id = req.params.id;
     PlayersController.getPlayersById(id).then(function(data){

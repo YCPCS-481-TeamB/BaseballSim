@@ -12,6 +12,7 @@ exports.query = function(query, args){
                     }else{
                         resolve(result);
                     }
+                   done();
                });
            });
        });
