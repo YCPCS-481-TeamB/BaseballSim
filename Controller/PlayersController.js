@@ -30,6 +30,10 @@ exports.createRandomPlayer = function(team_id){
     });
 }
 
+function createRandomAttr(player_id){
+
+}
+
 /**
  * Deletes the player from the database
  * @param id
