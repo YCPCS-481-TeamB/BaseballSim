@@ -3,8 +3,14 @@ var router = express.Router();
 
 var LeaguesController = require('./../Controller/LeaguesController');
 
-/* GET home page. */
+/**
+ * GET for getting all leagues from database
+ * @query limit - limit on the number of record pulled
+ * @query offset - offset on pulling items
+ */
 router.get('/', function(req, res, next) {
+	var limit = req.query.limit;
+	var offset = req.query.offset;
 	LeaguesController.getLeagues().then(function(data){
 		res.status(200).json({leagues: data});
 	}).catch(function(err){
@@ -13,7 +19,7 @@ router.get('/', function(req, res, next) {
 });
 
 
-/*
+/**
  * Retrieves the league from the database with the given id value
  * @params id - the id of the league
  */
