@@ -1,0 +1,33 @@
+var DatabaseController = require('./DatabaseController');
+
+exports.getGames = function(limit, offset){
+    return new Promise(function(resolve, reject){
+        DatabaseController.query("SELECT * from games LIMIT = $1 OFFSET $2", [limit | 1000, offset | 0]).then(function(data){
+            resolve(data.rows);
+        });
+    });
+}
+
+exports.createGame = function(team1_id, team2_id, field_id, league_id){
+    return new Promise(function(resolve, reject){
+        DatabaseController.query("INSERT INTO games ()", [limit | 1000, offset | 0, game_id]).then(function(data){
+            resolve(data.rows);
+        });
+    });
+}
+
+exports.getActionsByGameId = function(game_id, limit, offset){
+    return new Promise(function(resolve, reject){
+        DatabaseController.query("SELECT * from game_actions WHERE game_id=$3 LIMIT = $1 OFFSET = $2", [limit | 1000, offset | 0, game_id]).then(function(data){
+            resolve(data.rows);
+        });
+    });
+}
+
+exports.getGameById = function(id){
+    return new Promise(function(resolve, reject){
+        DatabaseController.query("SELECT * from games WHERE id = $1", [id]).then(function(data){
+            resolve(data.rows);
+        });
+    });
+}
