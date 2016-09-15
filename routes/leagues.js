@@ -5,12 +5,11 @@ var LeaguesController = require('./../Controller/LeaguesController');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-	LeaguesController.getLeagues().then(function(data)){
+	LeaguesController.getLeagues().then(function(data){
 		res.status(200).json({leagues: data});
 	}).catch(function(err){
 		res.status(200).json({success: false, message:""+ err});
 	});
-    //res.status(200).json({success: true, message: "Leagues"});
 });
 
 

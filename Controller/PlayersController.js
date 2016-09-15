@@ -1,10 +1,22 @@
 var DatabaseController = require('./DatabaseController');
 
-
+/**
+ * Creates the player with the given parameters
+ * @param firstname
+ * @param lastname
+ * @param position
+ * @param team_id
+ * @Returning Promise.<Object> Returns a promise containing the returned player data
+ */
 exports.createPlayer = function(firstname, lastname, position, team_id){
     return DatabaseController.query("INSERT INTO players (firstname,lastname,position,team_id) VALUES($1, $2, $3, $4)", [firstname, lastname, position, team_id]);
 }
 
+/**
+ * Creates a randomised player with random first and last name from the database
+ * @param team_id
+ * @returns {Promise}
+ */
 exports.createRandomPlayer = function(team_id){
     var team_id = team_id || 0;
     return new Promise(function(resolve, reject){
@@ -18,18 +30,33 @@ exports.createRandomPlayer = function(team_id){
     });
 }
 
+/**
+ * Deletes the player from the database
+ * @param id
+ */
 exports.deletePlayer = function(id){
 
 }
 
-exports.getPlayers = function() {
+/**
+ * Returns a Promise of an array of players based on the limit and offset
+ * @param limit
+ * @param offset
+ * @returns {Promise}
+ */
+exports.getPlayers = function(limit, offset) {
     return new Promise(function(resolve, reject){
-        DatabaseController.query("SELECT * from players").then(function(data){
-            resolve(data.rows);
+        DatabaseController.query("SELECT * from players LIMIT $1 OFFSET $2", [limit || 1000, offset || 0]).then(function(data){
+            resolve({limit: limit, offset: offset, players: data.rows});
         });
     });
 }
 
+/**
+ * Returns a promise that contains an array of the players with the requested id
+ * @param id
+ * @returns {Promise}
+ */
 exports.getPlayersById = function(id){
     return new Promise(function(resolve, reject){
         DatabaseController.query("SELECT * from players WHERE id = $1", [id]).then(function(data){

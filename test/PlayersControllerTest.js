@@ -4,7 +4,7 @@ var PlayersController = require('../Controller/PlayersController');
 //Run Tests
 test_create_player();
 test_create_random_player();
-test_delete_player();
+//test_delete_player();
 test_get_players();
 test_get_players_by_id();
 
@@ -34,6 +34,7 @@ function test_delete_player()
 function test_get_players()
 {
     var players = PlayersController.getPlayers();
+    console.log(players);
     assert.notEqual(null, players);
 }
 
