@@ -34,7 +34,6 @@ function test_delete_player()
 function test_get_players()
 {
     var players = PlayersController.getPlayers();
-    console.log(players);
     assert.notEqual(null, players);
 }
 
