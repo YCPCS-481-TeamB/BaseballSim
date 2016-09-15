@@ -19,7 +19,7 @@ exports.createRandomField = function(team_id){
     var team_id = team_id || 0;
     return new Promise(function(resolve, reject){
         DatabaseController.query("SELECT name FROM field_names WHERE isLast = 'n' OFFSET floor(random()*4) LIMIT 1").then(function(name_data){
-            var firstname = firstname_data.rows[0].name;
+            var name = name_data.rows[0].name;
                 resolve(DatabaseController.query("INSERT INTO fields (name,team_id) VALUES($1, $2) RETURNING *", [name, team_id]));
             });
     	});
