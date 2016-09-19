@@ -27,5 +27,5 @@ exports.deleteLeagueById = function(id) {
 		}).catch(function (err) {
 			reject(err);
 		});
-	}
+	});
 }

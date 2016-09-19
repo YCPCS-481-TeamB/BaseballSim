@@ -22,7 +22,9 @@ exports.buildRandomTeam = function(team_name, league_id){
 				players.push(PlayerController.createRandomPlayer(response.rows[0].id));
 			}
 			Promise.all(players).then(function(data){
-				resolve(data);
+				var object = response.rows[0];
+				object.players = data.map(function(item){return item.rows[0]});
+				resolve(object);
 			});
 		});
 	});
@@ -51,5 +53,5 @@ exports.deleteTeamById = function(id) {
 		}).catch(function (err) {
 			reject(err);
 		});
-	}
+	});
 }

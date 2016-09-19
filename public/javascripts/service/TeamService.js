@@ -4,8 +4,8 @@ var TeamService = App.service('TeamService', function($http){
         return $http.get('/api/teams');
     }
 
-    this.create= function(){
-        return $http.post('/api/teams');
+    this.create = function(teamname, league_id){
+        return $http.post('/api/teams', {teamname: teamname, league_id: league_id});
     }
 
     this.getPlayers = function(team_id){

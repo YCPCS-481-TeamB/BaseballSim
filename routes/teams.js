@@ -10,7 +10,6 @@ router.get('/', function(req, res, next) {
 	}).catch(function(err){
 		res.status(200).json({success: false, message:""+ err});
 	});
-    /* res.status(200).json({success: true, message: "Teams"}); */
 });
 
 router.post('/', function(req, res, next){
@@ -36,6 +35,20 @@ router.post('/', function(req, res, next){
 		 res.status(200).json({success: false, id: id, message:""+ err});
 	 });
  });
+
+/**
+ * Deleted the team from the database with the given id value
+ * @params id - The id of the team
+ * @Returning list of teams matching that id
+ */
+router.delete('/:id', function(req, res, next){
+	var id = req.params.id;
+	TeamsController.deleteTeamById(id).then(function(data){
+		res.status(200).json({id: id, player: data});
+	}).catch(function(err){
+		res.status(200).json({success: false,id: id, message:""+ err});
+	});
+});
 
 /*
  * Retrieves the team from the database with the given id value

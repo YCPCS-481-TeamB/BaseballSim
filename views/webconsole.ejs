@@ -76,7 +76,7 @@
                     </table>
                 </div>
 
-                <div class="display-rect"  ng-if="showTeamList">
+                <div class="display-rect" ng-if="showTeamList">
                     <table class="table table-striped">
                         <thead>
                         <tr>
@@ -84,11 +84,11 @@
                         </tr>
                         </thead>
                         <tr ng-repeat="team in teams">
-                            <td>{{user}}</td>
+                            <td>{{team}}</td>
                             <td><button class="btn btn-danger" ng-click="deleteTeam(team)">X</button></td>
                         </tr>
                         <tr>
-                            <button class="btn btn-success form-control"ng-click="createTeam()">Add Team</button>
+                            <button class="btn btn-success form-control"ng-click="createTeam('Name', 0)">Add Team</button>
                         </tr>
                     </table>
                 </div>

@@ -1,4 +1,4 @@
-var ConsoleController = App.controller('ConsoleController', function($scope,$document,PlayerService, UserService){
+var ConsoleController = App.controller('ConsoleController', function($scope,$document,PlayerService, UserService, TeamService){
     console.log('Console Controller');
 
     $scope.shiftKeyDown = false;
@@ -62,6 +62,28 @@ var ConsoleController = App.controller('ConsoleController', function($scope,$doc
     $scope.loadTeams = function(){
         var teams = TeamService.getAll().then(function(response){
             $scope.teams = response.data.teams;
+            console.log($scope.teams);
         });
+    }
+
+    $scope.createTeam = function(teamname, league_id){
+        TeamService.create(teamname, league_id).then(function(response){
+            console.log(response.data);
+            if(response.data.id){
+                $scope.teams.push(response.data);
+            }else{
+                alert(response.data);
+                console.log(response.data);
+            }
+        });
+    }
+
+    $scope.deleteTeam = function(team){
+        if(team && team.id){
+            TeamService.deleteById(team.id).then(function(response){
+                var index = $scope.teams.indexOf(team);
+                $scope.teams.splice(index, 1);
+            });
+        }
     }
 });
