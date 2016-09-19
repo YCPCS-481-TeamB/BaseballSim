@@ -20,12 +20,14 @@ exports.createPlayer = function(firstname, lastname, position, team_id){
 exports.createRandomPlayer = function(team_id){
     var team_id = team_id || 0;
     return new Promise(function(resolve, reject){
-        DatabaseController.query("SELECT name FROM player_names WHERE isLast = 'n' OFFSET floor(random()*4) LIMIT 1").then(function(firstname_data){
+        DatabaseController.query("SELECT name FROM player_names WHERE isLast = 'n' OFFSET floor(random()*(SELECT COUNT(name) FROM player_names WHERE isLast = 'n')) LIMIT 1").then(function(firstname_data){
             var firstname = firstname_data.rows[0].name;
-            DatabaseController.query("SELECT name FROM player_names WHERE isLast = 'y' OFFSET floor(random()*4) LIMIT 1").then(function(lastname_data){
+            DatabaseController.query("SELECT name FROM player_names WHERE isLast = 'y' OFFSET floor(random()*(SELECT COUNT(name) FROM player_names WHERE isLast = 'y')) LIMIT 1").then(function(lastname_data){
                 var lastname = lastname_data.rows[0].name;
                 resolve(DatabaseController.query("INSERT INTO players (firstname,lastname,position,team_id) VALUES($1, $2, $3, $4) RETURNING *", [firstname, lastname, 'pitcher', team_id]));
             });
+        }).catch(function(err){
+            reject("" + err);
         });
     });
 }
@@ -38,8 +40,14 @@ function createRandomAttr(player_id){
  * Deletes the player from the database
  * @param id
  */
-exports.deletePlayer = function(id){
-
+exports.deletePlayersById = function(id){
+    return new Promise(function(resolve, reject){
+        DatabaseController.query("DELETE FROM players WHERE id = $1 RETURNING *;", [id]).then(function(data){
+            resolve({player: data.rows});
+        }).catch(function(err){
+            reject(err);
+        });
+    });
 }
 
 /**

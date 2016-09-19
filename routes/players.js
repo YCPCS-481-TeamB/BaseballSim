@@ -28,6 +28,7 @@ router.post('/', function(req, res, next){
     var team_id = req.body.team_id;
     PlayersController.createRandomPlayer(team_id).then(function(data){
         //Returns the first and last name for the created player
+        console.log(data);
         res.status(200).json(data.rows[0]);
     }).catch(function(err){
        res.status(200).json(err);
@@ -43,6 +44,20 @@ router.post('/', function(req, res, next){
 router.get('/:id', function(req, res, next){
     var id = req.params.id;
     PlayersController.getPlayersById(id).then(function(data){
+        res.status(200).json({id: id, player: data});
+    }).catch(function(err){
+        res.status(200).json({success: false,id: id, message:""+ err});
+    });
+});
+
+/**
+ * Deleted the player from the database with the given id value
+ * @params id - The id of the player
+ * @Returning list of players matching that id
+ */
+router.delete('/:id', function(req, res, next){
+    var id = req.params.id;
+    PlayersController.deletePlayersById(id).then(function(data){
         res.status(200).json({id: id, player: data});
     }).catch(function(err){
         res.status(200).json({success: false,id: id, message:""+ err});
