@@ -43,3 +43,13 @@ exports.getTeamById = function(id){
 		});
 	});
 }
+
+exports.deleteTeamById = function(id) {
+	return new Promise(function(resolve, reject){
+		DatabaseController.query("DELETE FROM teams WHERE id = $1 RETURNING *;", [id]).then(function(data) {
+			resolve({team: data.rows});
+		}).catch(function (err) {
+			reject(err);
+		});
+	}
+}
