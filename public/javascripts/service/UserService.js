@@ -4,8 +4,8 @@ var UserService = App.service('UserService', function($http){
         return $http.get('/api/users');
     }
 
-    this.create = function(){
-        return $http.post('/api/users');
+    this.create = function(username, password){
+        return $http.post('/api/users', {username: username, password: password});
     }
 
     this.deleteById = function(id){

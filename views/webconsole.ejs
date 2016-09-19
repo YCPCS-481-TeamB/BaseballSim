@@ -35,7 +35,7 @@
             <div class="inner-container">
                 <div ng-class="{selected: showPlayerList}" class="display-box" ng-click="showPlayerList = !showPlayerList; loadPlayers()">Players</div>
                 <div ng-class="{selected: showUserList}" class="display-box" ng-click="showUserList = !showUserList; loadUsers()">Users</div>
-                <div ng-class="{selected: shiftKeyDown}" class="display-box">Teams</div>
+                <div ng-class="{selected: showTeamList}" class="display-box" ng-click="showTeamList = !showTeamList; loadTeams()">Teams</div>
                 <div ng-class="{selected: shiftKeyDown}" class="display-box">Teams</div>
 
                 <div class="display-rect"  ng-if="showPlayerList">
@@ -50,7 +50,7 @@
                             <td><button class="btn btn-danger" ng-click="deletePlayer(player)">X</button></td>
                         </tr>
                         <tr>
-                            <button class="btn btn-success" ng-click="createPlayer()">Add Player</button>
+                            <button class="btn btn-success" ng-click="createPlayer()">Add Random Player</button>
                         </tr>
                     </table>
                 </div>
@@ -64,10 +64,31 @@
                         </thead>
                         <tr ng-repeat="user in users">
                             <td>{{user}}</td>
-                            <td><button class="btn btn-danger" ng-click="deleteUser(player)">X</button></td>
+                            <td><button class="btn btn-danger" ng-click="deleteUser(user)">X</button></td>
+                        </tr>
+                        <tr class="form-inline">
+                            <div class="form-group">
+                                <input type="text" style="width: 30%; display:inline;" class="form-control input" ng-model="tempUsername" placeholder="Username"/>
+                                <input type="text" style="width: 30%; display:inline;" class="form-control" ng-model="tempPassword" placeholder="Password"/>
+                                <button class="btn btn-success form-control" style="width: 30%; display:inline;"ng-click="createUser(tempUsername, tempPassword)">Add User</button>
+                            </div>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="display-rect"  ng-if="showTeamList">
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>Teams</th>
+                        </tr>
+                        </thead>
+                        <tr ng-repeat="team in teams">
+                            <td>{{user}}</td>
+                            <td><button class="btn btn-danger" ng-click="deleteTeam(team)">X</button></td>
                         </tr>
                         <tr>
-                            <button class="btn btn-success" ng-click="createUser()">Add User</button>
+                            <button class="btn btn-success form-control"ng-click="createTeam()">Add Team</button>
                         </tr>
                     </table>
                 </div>
@@ -80,6 +101,7 @@
     <script src="angular/angular.min.js"></script>
     <script src="javascripts/app.js"></script>
     <script src="javascripts/service/UserService.js"></script>
+    <script src="javascripts/service/TeamService.js"></script>
     <script src="javascripts/service/PlayerService.js"></script>
     <script src="javascripts/controller/ConsoleController.js"></script>
 </html>

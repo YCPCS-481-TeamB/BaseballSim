@@ -7,7 +7,7 @@ var DatabaseController = require('./DatabaseController');
  */
 exports.deleteUserById = function(id){
     return new Promise(function(resolve, reject){
-        DatabaseController.query("DELETE FROM players WHERE id = $1 RETURNING *;", [id]).then(function(data){
+        DatabaseController.query("DELETE FROM users WHERE id = $1 RETURNING *;", [id]).then(function(data){
             resolve({player: data.rows});
         }).catch(function(err){
             reject(err);
@@ -16,7 +16,7 @@ exports.deleteUserById = function(id){
 }
 
 exports.createUser = function(username, password, firstname, lastname, email){
-    return DatabaseController.query("INSERT INTO users (username, password, firstname,lastname,email) VALUES($1, $2, $3, $4, $5) RETURNING username, firstname, lastname, email, date_created", [username, password, firstname, lastname, email]);
+    return DatabaseController.query("INSERT INTO users (username, password, firstname,lastname,email) VALUES($1, $2, $3, $4, $5) RETURNING id, username, firstname, lastname, email, date_created", [username, password, firstname, lastname, email]);
 }
 
 /**

@@ -40,4 +40,18 @@ router.post('/', function(req, res, next){
   }
 });
 
+/**
+ * Deleted the user from the database with the given id value
+ * @params id - The id of the user
+ * @Returning list of users matching that id
+ */
+router.delete('/:id', function(req, res, next){
+  var id = req.params.id;
+  UserController.deleteUserById(id).then(function(data){
+    res.status(200).json({id: id, user: data});
+  }).catch(function(err){
+    res.status(200).json({success: false,id: id, message:""+ err});
+  });
+});
+
 module.exports = router;
