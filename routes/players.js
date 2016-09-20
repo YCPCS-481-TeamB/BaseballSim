@@ -29,9 +29,9 @@ router.post('/', function(req, res, next){
     PlayersController.createRandomPlayer(team_id).then(function(data){
         //Returns the first and last name for the created player
         console.log(data);
-        res.status(200).json(data.rows[0]);
+        res.status(200).json(data);
     }).catch(function(err){
-       res.status(200).json(err);
+       res.status(200).json("" + err);
     });
 });
 
@@ -45,6 +45,20 @@ router.get('/:id', function(req, res, next){
     var id = req.params.id;
     PlayersController.getPlayersById(id).then(function(data){
         res.status(200).json({id: id, player: data});
+    }).catch(function(err){
+        res.status(200).json({success: false,id: id, message:""+ err});
+    });
+});
+
+/**
+ * Retrieves the player attributes from the database with the given id value
+ * @params id - The id of the player
+ * @Returning list of players matching that id
+ */
+router.get('/:id/attributes', function(req, res, next){
+    var id = req.params.id;
+    PlayersController.getPlayerAttributesById(id).then(function(data){
+        res.status(200).json({id: id, attributes: data});
     }).catch(function(err){
         res.status(200).json({success: false,id: id, message:""+ err});
     });

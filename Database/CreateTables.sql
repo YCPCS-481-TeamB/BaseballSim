@@ -20,7 +20,7 @@ CREATE TABLE attributes (
 		--Fielding attributes
 	catching INTEGER, throwing INTEGER, awareness INTEGER,
 		--Misc attributes
-	speed INTEGER, clutch INTEGER, arm dominant_arm
+	speed INTEGER, clutch INTEGER, arm dominant_arm,
 );
 
 CREATE TABLE stats (
