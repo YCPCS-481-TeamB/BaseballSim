@@ -40,13 +40,14 @@
 
                 <div class="display-rect"  ng-if="showPlayerList">
                     <table class="table table-striped">
+                        <caption>Players</caption>
                         <thead>
                         <tr>
-                            <th>Players</th>
+                            <th>ID</th><th>Name</th><th>Position</th><th>Team ID</th><th>Date Created</th><th>Del</th>
                         </tr>
                         </thead>
                         <tr ng-repeat="player in players">
-                            <td>{{player}}</td>
+                            <td>{{player.id}}</td><td>{{player.firstname}} {{player.lastname}}</td><td>{{player.position}}</td><td>{{player.team_id}}</td><td>{{player.date_created | date: 'medium'}}</td>
                             <td><button class="btn btn-danger" ng-click="deletePlayer(player)">X</button></td>
                         </tr>
                         <tr>
@@ -57,13 +58,17 @@
 
                 <div class="display-rect"  ng-if="showUserList">
                     <table class="table table-striped">
+                        <caption>Users</caption>
                         <thead>
                         <tr>
-                            <th>Users</th>
+                            <th>ID</th><th>Name</th><th>Email</th><th>Date Created</th><th>Del</th>
                         </tr>
                         </thead>
                         <tr ng-repeat="user in users">
-                            <td>{{user}}</td>
+                            <td>{{user.id}}</td>
+                            <td>{{user.firstname}} {{user.lastname}}</td>
+                            <td>{{user.email}}</td>
+                            <td>{{user.date_created}}</td>
                             <td><button class="btn btn-danger" ng-click="deleteUser(user)">X</button></td>
                         </tr>
                         <tr class="form-inline">
@@ -78,15 +83,33 @@
 
                 <div class="display-rect" ng-if="showTeamList">
                     <table class="table table-striped">
+                        <caption>Teams</caption>
                         <thead>
                         <tr>
-                            <th>Teams</th>
+                            <th>ID</th><th>Name</th><th>League ID</th><th>Date Created</th><th>Del</th>
                         </tr>
                         </thead>
-                        <tr ng-repeat="team in teams">
-                            <td>{{team}}</td>
-                            <td><button class="btn btn-danger" ng-click="deleteTeam(team)">X</button></td>
-                        </tr>
+                        <tbody ng-repeat="team in teams">
+                            <tr ng-click="loadTeamPlayers(team); team.showPlayers = !team.showPlayers">
+                                <td>{{team.id}}</td>
+                                <td>{{team.name}}</td>
+                                <td>{{team.league_id}}</td>
+                                <td>{{team.date_created}}</td>
+                                <td><button class="btn btn-danger" ng-click="deleteTeam(team)">X</button></td>
+                            </tr>
+                            <tr ng-if="team.showPlayers">
+                                <td colspan="5">
+                                    <table class="table-striped table-condensed" style="width: 100%">
+                                        <tr>
+                                            <th>ID</th><th>Name</th><th>Position</th><th>Team ID</th><th>Date Created</th>
+                                        </tr>
+                                        <tr ng-repeat="player in team.players">
+                                            <td>{{player.id}}</td><td>{{player.firstname}} {{player.lastname}}</td><td>{{player.position}}</td><td>{{player.team_id}}</td><td>{{player.date_created}}</td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </tbody>
                         <tr>
                             <button class="btn btn-success form-control"ng-click="createTeam('Name', 0)">Add Team</button>
                         </tr>
