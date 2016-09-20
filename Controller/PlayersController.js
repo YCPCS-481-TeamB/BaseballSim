@@ -51,6 +51,20 @@ exports.deletePlayersById = function(id){
 }
 
 /**
+ * Deletes the player from the database
+ * @param team_id
+ */
+exports.deletePlayerByTeamId = function(team_id){
+    return new Promise(function(resolve, reject){
+        DatabaseController.query("DELETE FROM players WHERE team_id = $1 RETURNING *;", [team_id]).then(function(data){
+            resolve({player: data.rows});
+        }).catch(function(err){
+            reject(err);
+        });
+    });
+}
+
+/**
  * Returns a Promise of an array of players based on the limit and offset
  * @param limit
  * @param offset

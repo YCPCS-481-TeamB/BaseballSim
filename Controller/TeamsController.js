@@ -2,6 +2,8 @@ var bluebird = require('bluebird');
 var DatabaseController = require('./DatabaseController');
 var PlayerController = require('./PlayersController');
 
+const TEAM_SIZE = 25;
+
 exports.getTeams = function() {
 	return new Promise(function(resolve, reject){
 		DatabaseController.query("SELECT * from teams").then(function(data){
@@ -18,7 +20,7 @@ exports.buildRandomTeam = function(team_name, league_id){
 	return new Promise(function(resolve, reject){
 		DatabaseController.query("INSERT INTO teams (name,league_id) VALUES($1, $2) RETURNING *", [team_name, league_id]).then(function(response){
 			var players = [];
-			for(var i = 0;i<25;i++){
+			for(var i = 0;i<TEAM_SIZE;i++){
 				players.push(PlayerController.createRandomPlayer(response.rows[0].id));
 			}
 			Promise.all(players).then(function(data){

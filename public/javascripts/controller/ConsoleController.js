@@ -66,9 +66,15 @@ var ConsoleController = App.controller('ConsoleController', function($scope,$doc
         });
     }
 
+    $scope.loadTeamPlayers = function(team){
+        console.log("Loading Players for Team " + team.id);
+        TeamService.getPlayers(team.id).then(function(data){
+            team.players = data.data.team;
+        });
+    }
+
     $scope.createTeam = function(teamname, league_id){
         TeamService.create(teamname, league_id).then(function(response){
-            console.log(response.data);
             if(response.data.id){
                 $scope.teams.push(response.data);
             }else{
