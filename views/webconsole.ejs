@@ -46,10 +46,24 @@
                             <th>ID</th><th>Name</th><th>Position</th><th>Team ID</th><th>Date Created</th><th>Del</th>
                         </tr>
                         </thead>
-                        <tr ng-repeat="player in players">
-                            <td>{{player.id}}</td><td>{{player.firstname}} {{player.lastname}}</td><td>{{player.position}}</td><td>{{player.team_id}}</td><td>{{player.date_created | date: 'medium'}}</td>
-                            <td><button class="btn btn-danger" ng-click="deletePlayer(player)">X</button></td>
-                        </tr>
+                        <tbody ng-repeat="player in players">
+                            <tr ng-click="player.showAttrs = !player.showAttrs; loadPlayerAttrs(player);">
+                                <td>{{player.id}}</td><td>{{player.firstname}} {{player.lastname}}</td><td>{{player.position}}</td><td>{{player.team_id}}</td><td>{{player.date_created | date: 'medium'}}</td>
+                                <td><button class="btn btn-danger" ng-click="deletePlayer(player)">X</button></td>
+                            </tr>
+                            <tr ng-if="player.showAttrs">
+                                <td colspan="6">
+                                    <table class="table-striped table-condensed" style="width: 100%">
+                                        <tr>
+                                            <th>ID</th><th>technique</th><th>pitch_speed</th><th>endurance</th><th>contact</th><th>swing_speed</th><th>bat_power</th><th>catching</th><th>throwing</th><th>awareness</th><th>speed</th><th>clutch</th><th>arm</th>                                        </tr>
+                                        </tr>
+                                        <tr>
+                                            <td>{{player.attrs.player_id}}</td><td>{{player.attrs.technique}}</td><td>{{player.attrs.pitch_speed}}</td><td>{{player.attrs.endurance}}</td><td>{{player.attrs.contact}}</td><td>{{player.attrs.swing_speed}}</td><td>{{player.attrs.bat_power}}</td><td>{{player.attrs.catching}}</td><td>{{player.attrs.throwing}}</td><td>{{player.attrs.awareness}}</td><td>{{player.attrs.speed}}</td><td>{{player.attrs.clutch}}</td><td>{{player.attrs.arm}}</td>                                        </tr>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </tbody>
                         <tr>
                             <button class="btn btn-success" ng-click="createPlayer()">Add Random Player</button>
                         </tr>

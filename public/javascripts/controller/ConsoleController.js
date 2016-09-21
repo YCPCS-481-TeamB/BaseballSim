@@ -20,6 +20,16 @@ var ConsoleController = App.controller('ConsoleController', function($scope,$doc
         });
     }
 
+    $scope.loadPlayerAttrs = function(player){
+        console.log("loading players");
+        if(player && player.id) {
+            var attrs = PlayerService.getAttrByPlayerId(player.id).then(function (response) {
+                console.log(response.data.attributes);
+                player.attrs = response.data.attributes;
+            });
+        }
+    }
+
     $scope.createPlayer = function(){
         PlayerService.create().then(function(response){
             $scope.players.push(response.data);

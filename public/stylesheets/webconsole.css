@@ -28,7 +28,11 @@ body {
 }
 
 .table{
-  width: 100vw;
+  width: 100%;
+}
+
+.display-rect{
+  width: 100%;
 }
 
 
