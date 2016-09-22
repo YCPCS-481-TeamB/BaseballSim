@@ -83,7 +83,7 @@ function createRandomAttr(player_id, player_position){
                 if (rngBatter <= 2) {
                     rngBatter = Math.floor(Math.random() * 10);
                 }
-                batterAttributes[Object.keys(batterAttributes)[rngBatter]] += 1;
+                totalAttributes[Object.keys(totalAttributes)[rngBatter]] += 1;
 
             }
             points--;
