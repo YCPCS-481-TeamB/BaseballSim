@@ -70,18 +70,18 @@ function createRandomAttr(player_id, player_position){
         while (points > 0) {
             // Player is a Pitcher
             if (player_position == 'pitcher') {
-                var rngPitcher = Math.floor(Math.random() * 10);
+                var rngPitcher = Math.floor(Math.random() * 11);
                 if (rngPitcher >= 3 && rngPitcher <=5) {
-                    rngPitcher = Math.floor(Math.random() * 10);
+                    rngPitcher = Math.floor(Math.random() * 11);
                 }
                 totalAttributes[Object.keys(totalAttributes)[rngPitcher]] += 1;
 
             }
             // Player is a Batter
             else {
-                var rngBatter = Math.floor(Math.random() * 10);
+                var rngBatter = Math.floor(Math.random() * 11);
                 if (rngBatter <= 2) {
-                    rngBatter = Math.floor(Math.random() * 10);
+                    rngBatter = Math.floor(Math.random() * 11);
                 }
                 totalAttributes[Object.keys(totalAttributes)[rngBatter]] += 1;
 
