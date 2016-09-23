@@ -36,7 +36,7 @@
                 <div ng-class="{selected: showPlayerList}" class="display-box" ng-click="showPlayerList = !showPlayerList; loadPlayers()">Players</div>
                 <div ng-class="{selected: showUserList}" class="display-box" ng-click="showUserList = !showUserList; loadUsers()">Users</div>
                 <div ng-class="{selected: showTeamList}" class="display-box" ng-click="showTeamList = !showTeamList; loadTeams()">Teams</div>
-                <div ng-class="{selected: shiftKeyDown}" class="display-box">Teams</div>
+                <div ng-class="{selected: shiftKeyDown}" class="display-box" ng-click="showGameList = !showGameList; loadGames()">Games</div>
 
                 <div class="display-rect"  ng-if="showPlayerList">
                     <table class="table table-striped">
@@ -129,6 +129,21 @@
                         </tr>
                     </table>
                 </div>
+
+                <div class="display-rect" ng-if="showGameList">
+                    <table class="table table-striped">
+                        <caption>Games</caption>
+                        <thead>
+                        <tr>
+                            <th>ID</th><th>Team 1</th><th>Team 2</th><th>Field ID</th><th>League ID</th><th>Date Created</th><th>Del</th>
+                        </tr>
+                        </thead>
+                        <tbody ng-repeat="game in games">
+                            <td>{{game.id}}</td><td>{{game.team1_id}}</td><td>{{game.team2_id}}</td><td>{{game.field_id}}</td><td>{{game.league_id}}</td><td>{{game.date_created}}</td>
+                            <td><button class="btn btn-danger" ng-click="deleteGame(game)">X</button></td>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </body>
@@ -138,6 +153,7 @@
     <script src="angular/angular.min.js"></script>
     <script src="javascripts/app.js"></script>
     <script src="javascripts/service/UserService.js"></script>
+    <script src="javascripts/service/GameService.js"></script>
     <script src="javascripts/service/TeamService.js"></script>
     <script src="javascripts/service/PlayerService.js"></script>
     <script src="javascripts/controller/ConsoleController.js"></script>
