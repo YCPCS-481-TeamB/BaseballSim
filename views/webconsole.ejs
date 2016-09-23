@@ -36,7 +36,7 @@
                 <div ng-class="{selected: showPlayerList}" class="display-box" ng-click="showPlayerList = !showPlayerList; loadPlayers()">Players</div>
                 <div ng-class="{selected: showUserList}" class="display-box" ng-click="showUserList = !showUserList; loadUsers()">Users</div>
                 <div ng-class="{selected: showTeamList}" class="display-box" ng-click="showTeamList = !showTeamList; loadTeams()">Teams</div>
-                <div ng-class="{selected: shiftKeyDown}" class="display-box" ng-click="showGameList = !showGameList; loadGames()">Games</div>
+                <div ng-class="{selected: showGameList}" class="display-box" ng-click="showGameList = !showGameList; loadGames()">Games</div>
 
                 <div class="display-rect"  ng-if="showPlayerList">
                     <table class="table table-striped">
@@ -49,13 +49,13 @@
                         <tbody ng-repeat="player in players">
                             <tr ng-click="player.showAttrs = !player.showAttrs; loadPlayerAttrs(player);">
                                 <td>{{player.id}}</td><td>{{player.firstname}} {{player.lastname}}</td><td>{{player.position}}</td><td>{{player.team_id}}</td><td>{{player.date_created | date: 'medium'}}</td>
-                                <td><button class="btn btn-danger" ng-click="deletePlayer(player)">X</button></td>
+                                <td><button class="btn btn-danger" ng-click="deletePlayer(player); $event.stopPropagation()">X</button></td>
                             </tr>
                             <tr ng-if="player.showAttrs">
                                 <td colspan="6">
                                     <table class="table-striped table-condensed" style="width: 100%">
                                         <tr>
-                                            <th>ID</th><th>technique</th><th>pitch_speed</th><th>endurance</th><th>contact</th><th>swing_speed</th><th>bat_power</th><th>catching</th><th>throwing</th><th>awareness</th><th>speed</th><th>clutch</th><th>arm</th>                                        </tr>
+                                            <th>ID</th><th>Technique</th><th>Pitch Speed</th><th>Endurance</th><th>Contact</th><th>Swing Speed</th><th>Batting Power</th><th>Catching</th><th>Throwing</th><th>Awareness</th><th>Speed</th><th>Clutch</th><th>arm</th>                                        </tr>
                                         </tr>
                                         <tr>
                                             <td>{{player.attrs.player_id}}</td><td>{{player.attrs.technique}}</td><td>{{player.attrs.pitch_speed}}</td><td>{{player.attrs.endurance}}</td><td>{{player.attrs.contact}}</td><td>{{player.attrs.swing_speed}}</td><td>{{player.attrs.bat_power}}</td><td>{{player.attrs.catching}}</td><td>{{player.attrs.throwing}}</td><td>{{player.attrs.awareness}}</td><td>{{player.attrs.speed}}</td><td>{{player.attrs.clutch}}</td><td>{{player.attrs.arm}}</td>                                        </tr>
@@ -134,6 +134,17 @@
                     <table class="table table-striped">
                         <caption>Games</caption>
                         <thead>
+                        <tr>
+                            <td>
+                                <div class="form-inline">
+                                    <div class="form-group">
+                                        <input type="text" class="form-control" ng-bind="tempTeam1Id"/>
+                                        <input type="text" class="form-control" ng-bind="tempTeam2Id"/>
+                                        <button class="btn btn-success form-control" style="display: inline;">Create Game</button>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
                         <tr>
                             <th>ID</th><th>Team 1</th><th>Team 2</th><th>Field ID</th><th>League ID</th><th>Date Created</th><th>Del</th>
                         </tr>
