@@ -2,24 +2,45 @@ var DatabaseController = require('./DatabaseController');
 
 exports.getGames = function(limit, offset){
     return new Promise(function(resolve, reject){
-        DatabaseController.query("SELECT * from games LIMIT = $1 OFFSET $2", [limit | 1000, offset | 0]).then(function(data){
-            resolve(data.rows);
+        DatabaseController.query("SELECT * from games LIMIT $1 OFFSET $2", [limit | 1000, offset | 0]).then(function(data){
+            resolve({games: data.rows});
+        }).catch(function(err){
+            reject(err);
         });
+
     });
 }
 
 exports.createGame = function(team1_id, team2_id, field_id, league_id){
     return new Promise(function(resolve, reject){
-        DatabaseController.query("INSERT INTO games ()", [limit | 1000, offset | 0, game_id]).then(function(data){
-            resolve(data.rows);
-        });
+        if(team1_id && team2_id){
+            DatabaseController.query("INSERT INTO games (team1_id, team2_id, field_id, league_id) VALUES ($1, $2, $3, $4) RETURNING *", [team1_id, team2_id, field_id | 0, league_id | 0]).then(function(data){
+                resolve(data.rows);
+            }).catch(function(err){
+                reject(err);
+            });
+        }else {
+            reject("Must have 2 teams in a game!");
+        }
     });
 }
 
 exports.getActionsByGameId = function(game_id, limit, offset){
     return new Promise(function(resolve, reject){
-        DatabaseController.query("SELECT * from game_actions WHERE game_id=$3 LIMIT = $1 OFFSET = $2", [limit | 1000, offset | 0, game_id]).then(function(data){
+        DatabaseController.query("SELECT * from game_actions WHERE game_id=$3 LIMIT $1 OFFSET $2", [limit | 1000, offset | 0, game_id]).then(function(data){
             resolve(data.rows);
+        }).catch(function(err){
+            reject(err);
+        });
+    });
+}
+
+exports.deleteGamesById = function(id){
+    return new Promise(function(resolve, reject){
+        DatabaseController.query("DELETE FROM games WHERE id = $1 RETURNING *;", [id]).then(function(data){
+            resolve({game: data.rows});
+        }).catch(function(err){
+            reject(err);
         });
     });
 }

@@ -1,4 +1,4 @@
-var ConsoleController = App.controller('ConsoleController', function($scope,$document,PlayerService, UserService, TeamService){
+var ConsoleController = App.controller('ConsoleController', function($scope,$document,PlayerService, UserService, TeamService, GameService){
     console.log('Console Controller');
 
     $scope.shiftKeyDown = false;
@@ -13,6 +13,9 @@ var ConsoleController = App.controller('ConsoleController', function($scope,$doc
 
     $scope.showTeamList = false;
     $scope.teams = [];
+
+    $scope.showGameList = false;
+    $scope.games = [];
 
     $scope.loadPlayers = function(){
         var players = PlayerService.getAll().then(function(response){
@@ -99,6 +102,32 @@ var ConsoleController = App.controller('ConsoleController', function($scope,$doc
             TeamService.deleteById(team.id).then(function(response){
                 var index = $scope.teams.indexOf(team);
                 $scope.teams.splice(index, 1);
+            });
+        }
+    }
+
+    $scope.loadGames = function(){
+        var games = GameService.getAll().then(function(response){
+            $scope.games = response.data.games;
+        });
+    }
+
+    $scope.createGame = function(username, password){
+        GameService.create(team1, team2, field, league).then(function(response){
+            if(response.data.id){
+                $scope.games.push(response.data);
+            }else{
+                alert(response.data);
+                console.log(response.data);
+            }
+        });
+    }
+
+    $scope.deleteGame = function(game){
+        if(game && game.id){
+            GameService.deleteById(game.id).then(function(response){
+                var index = $scope.games.indexOf(game);
+                $scope.games.splice(index, 1);
             });
         }
     }
