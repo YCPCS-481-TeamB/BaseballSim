@@ -53,7 +53,7 @@ exports.isGameStarted = function(game_id){
 
 exports.getPlayerPositionByGameEventId = function(game_event_id){
     return new Promise(function(resolve, reject){
-        DatabaseController.query("SELECT * from game_player_positons WHERE game_action_id = $1", [game_event_id]).then(function(result){
+        DatabaseController.query("SELECT * from game_player_positions WHERE game_action_id = $1", [game_event_id]).then(function(result){
             resolve(result.rows[0]);
         }).catch(function(err){
             reject(err);
@@ -124,11 +124,31 @@ exports.getGameById = function(id){
 exports.doGameEvent = function(game_id, player1_id, player2_id){
     return new Promise(function(resolve, reject){
         basicPlayerEvent(player1_id, player2_id).then(function(result){
-
+            var game_message = generateMessage(player1_id, player2_id, game_id, result);
+            DatabaseController.query("INSERT INTO game_action (game_id, team1_score, team2_score, type, message) VALUES ($1, 0, 0, $2, $3) RETURNING *", [game_id, result, game_message]).then(function(data){
+                resolve(data.rows);
+            }).catch(function(err){
+                reject(err);
+            });
         }).catch(function(err){
             reject(err);
         });
     });
+}
+
+function generateMessage(player1_id, player2_id, game_id, result){
+    return "Player " + player1_id + " got a " + result + " against " + player2_id;
+}
+
+//'home_run', 'walk', 'triple', 'double', 'single', 'ball', 'strike', 'foul'
+function calculateNewPlayerPositions(obj_prev_pos, event){
+    var player_pos = {onfirst_id: 0, onsecond_id: 0, onthird_id: 0};
+
+    if(event == 'home_run'){
+        return player_pos;
+    }else{
+
+    }
 }
 
 //function getNumStrikes(game_id)
@@ -147,8 +167,11 @@ function basicPlayerEvent(player1_id, player2_id){
                 var min = 0;
                 var num = Math.random() * (max - min) + min;
                 var options = ['home_run', 'walk', 'triple', 'double', 'single', 'ball', 'strike', 'foul'];
-                resolve(options[num]);
+                console.log("RAND: " + num);
+                resolve(options[Math.floor(num)]);
             });
+        }).catch(function(err){
+            reject(err);
         });
     });
 }

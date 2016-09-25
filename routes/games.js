@@ -54,16 +54,56 @@ router.post('/:id/start', function(req, res, next){
 });
 
 /**
- * Returns the events from the given games id
+ * Gets the game event positions from the given game id and game event id
+ * @params id - the game's id
+ */
+router.get('/:id/events/:event_id/positions', function(req, res, next){
+    var id = req.params.id;
+    var event_id = req.params.event_id;
+
+    GameController.getPlayerPositionByGameEventId(event_id).then(function(data){
+        res.status(200).json(data);
+    }).catch(function(err){
+        res.status(200).json(err);
+    });
+});
+
+/**
+ * Gets all game events for a game
  * @params id - the game's id
  */
 router.get('/:id/events', function(req, res, next){
     var id = req.params.id;
+
     GameController.getEventsByGameId(id).then(function(data){
         res.status(200).json(data);
     }).catch(function(err){
         res.status(200).json(err);
     });
+});
+
+/**
+ * Tells the game to calculate the next event
+ * @params id - the game's id
+ * @body player1_id the player for team1
+ * @body player2_id the player for team2
+ */
+router.post('/:id/events/next', function(req, res, next){
+    var id = req.params.id;
+    var player1_id = req.body.player1_id;
+    var player2_id = req.body.player2_id;
+
+    if(player1_id && player2_id){
+        GameController.doGameEvent(id, player1_id, player2_id).then(function(data){
+            res.status(200).json(data);
+        }).catch(function(err){
+            res.status(200).json(err);
+        });
+    }else{
+        res.status(200).json("Need 2 Players Selected");
+    }
+
+
 });
 
 
