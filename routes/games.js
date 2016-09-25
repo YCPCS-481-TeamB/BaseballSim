@@ -53,6 +53,19 @@ router.post('/:id/start', function(req, res, next){
     });
 });
 
+/**
+ * Returns the events from the given games id
+ * @params id - the game's id
+ */
+router.get('/:id/events', function(req, res, next){
+    var id = req.params.id;
+    GameController.getEventsByGameId(id).then(function(data){
+        res.status(200).json(data);
+    }).catch(function(err){
+        res.status(200).json(err);
+    });
+});
+
 
 /**
  * Returns he game from the database with the given id value

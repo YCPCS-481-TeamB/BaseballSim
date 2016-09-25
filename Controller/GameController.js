@@ -54,11 +54,16 @@ exports.isGameStarted = function(game_id){
 exports.getPlayerPositionByGameEventId = function(game_event_id){
     return new Promise(function(resolve, reject){
         DatabaseController.query("SELECT * from game_player_positons WHERE game_action_id = $1", [game_event_id]).then(function(result){
-
+            resolve(result.rows[0]);
         }).catch(function(err){
-
+            reject(err);
         });
     });
+}
+
+
+function addPlayerPosition(game_action_id, firstbase_player_id, secondbase_player_id, thirdbase_player_id){
+    return DatabaseController.query("INSERT INTO game_player_positions (game_action_id, onfirst_id, onsecond_id, onthird_id) VALUES ($1, $2, $3, $4)", [game_action_id, firstbase_player_id, secondbase_player_id, thirdbase_player_id]);
 }
 
 exports.startGame = function(game_id){
@@ -67,8 +72,12 @@ exports.startGame = function(game_id){
             exports.isGameStarted(game_id).then(function(data){
                 if(data.started == false){
                     DatabaseController.query("INSERT INTO game_action (game_id, team1_score, team2_score, type, message) VALUES ($1, 0, 0, 'start', 'Game Started!') RETURNING *", [game_id]).then(function(data){
-
-                        resolve(data.rows[0]);
+                        var game_event = data.rows[0];
+                        addPlayerPosition(game_event.id, 0, 0, 0).then(function(data){
+                            resolve(game_event);
+                        }).catch(function(err){
+                           reject(err);
+                        });
                     }).catch(function(err){
                         reject(err);
                     });
