@@ -1,5 +1,7 @@
 var DatabaseController = require('./DatabaseController');
 
+var PlayerController = require('./PlayersController');
+
 exports.getGames = function(limit, offset){
     return new Promise(function(resolve, reject){
         DatabaseController.query("SELECT * from games LIMIT $1 OFFSET $2", [limit | 1000, offset | 0]).then(function(data){
@@ -15,12 +17,69 @@ exports.createGame = function(team1_id, team2_id, field_id, league_id){
     return new Promise(function(resolve, reject){
         if(team1_id && team2_id){
             DatabaseController.query("INSERT INTO games (team1_id, team2_id, field_id, league_id) VALUES ($1, $2, $3, $4) RETURNING *", [team1_id, team2_id, field_id | 0, league_id | 0]).then(function(data){
-                resolve(data.rows);
+                resolve(data.rows[0]);
             }).catch(function(err){
                 reject(err);
             });
         }else {
             reject("Must have 2 teams in a game!");
+        }
+    });
+}
+
+exports.getEventsByGameId = function(game_id){
+    return new Promise(function(resolve, reject){
+        DatabaseController.query("SELECT * FROM game_action WHERE game_id = $1", [game_id]).then(function(data){
+            resolve(data.rows);
+        }).catch(function(err){
+            reject(err);
+        });
+    });
+}
+
+exports.isGameStarted = function(game_id){
+    return new Promise(function(resolve, reject){
+        DatabaseController.query("SELECT * FROM game_action WHERE game_id = $1 AND type = 'start'", [game_id]).then(function(data){
+            if(data.rows.length > 0){
+                resolve({started: true, game_action: data.rows})
+            }else{
+                resolve({started: false});
+            }
+        }).catch(function(err){
+            reject(err);
+        });
+    });
+}
+
+exports.getPlayerPositionByGameEventId = function(game_event_id){
+    return new Promise(function(resolve, reject){
+        DatabaseController.query("SELECT * from game_player_positons WHERE game_action_id = $1", [game_event_id]).then(function(result){
+
+        }).catch(function(err){
+
+        });
+    });
+}
+
+exports.startGame = function(game_id){
+    return new Promise(function(resolve, reject){
+        if(game_id){
+            exports.isGameStarted(game_id).then(function(data){
+                if(data.started == false){
+                    DatabaseController.query("INSERT INTO game_action (game_id, team1_score, team2_score, type, message) VALUES ($1, 0, 0, 'start', 'Game Started!') RETURNING *", [game_id]).then(function(data){
+
+                        resolve(data.rows[0]);
+                    }).catch(function(err){
+                        reject(err);
+                    });
+                }else{
+                    reject("Game \'" + game_id + "\' is already started");
+                }
+            }).catch(function(err){
+                reject(err);
+            })
+        }else{
+            reject("Game ID is Required");
         }
     });
 }
@@ -53,8 +112,40 @@ exports.getGameById = function(id){
     });
 }
 
+exports.doGameEvent = function(game_id, player1_id, player2_id){
+    return new Promise(function(resolve, reject){
+        basicPlayerEvent(player1_id, player2_id).then(function(result){
+
+        }).catch(function(err){
+            reject(err);
+        });
+    });
+}
+
+//function getNumStrikes(game_id)
+
+/**
+ * Should Return any of 'home_run', 'walk', 'triple', 'double', 'single', 'ball', 'strike', 'foul'
+ * @param player1_id
+ * @param player2_id
+ * @returns {Promise}
+ */
+function basicPlayerEvent(player1_id, player2_id){
+    return new Promise(function(resolve, reject){
+        PlayerController.getPlayersById(player1_id).then(function(player1){
+            PlayerController.getPlayersById(player2_id).then(function(player2){
+                var max = 7;
+                var min = 0;
+                var num = Math.random() * (max - min) + min;
+                var options = ['home_run', 'walk', 'triple', 'double', 'single', 'ball', 'strike', 'foul'];
+                resolve(options[num]);
+            });
+        });
+    });
+}
+
 /*
-exports.batterVsPitcherEvent = function(player1, player2) {
+batterVsPitcherEvent = function(player1, player2) {
     // SIMPLE Outcomes
     var outcomes = ['out', 'hit', 'strike', 'ball'];
     // Math giving Pitcher or Batter Adv
@@ -70,7 +161,5 @@ exports.batterVsPitcherEvent = function(player1, player2) {
     else {
         // Outcome favorable to batter
     }
-
-
 }
-    */
+*/

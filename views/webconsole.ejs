@@ -138,9 +138,9 @@
                             <td>
                                 <div class="form-inline">
                                     <div class="form-group">
-                                        <input type="text" class="form-control" ng-bind="tempTeam1Id"/>
-                                        <input type="text" class="form-control" ng-bind="tempTeam2Id"/>
-                                        <button class="btn btn-success form-control" style="display: inline;">Create Game</button>
+                                        <input type="number" class="form-control" ng-model="tempTeam1Id" placeholder="Team 1 ID"/>
+                                        <input type="number" class="form-control" ng-model="tempTeam2Id" placeholder="Team 2 ID"/>
+                                        <button class="btn btn-success form-control" style="display: inline;" ng-click="createGame(tempTeam1Id, tempTeam2Id)">Create Game</button>
                                     </div>
                                 </div>
                             </td>

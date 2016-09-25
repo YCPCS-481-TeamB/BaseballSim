@@ -25,9 +25,13 @@ exports.buildRandomTeam = function(team_name, league_id){
 			}
 			Promise.all(players).then(function(data){
 				var object = response.rows[0];
-				object.players = data.map(function(item){return item.rows[0]});
+				object.players = data;
 				resolve(object);
+			}).catch(function(err){
+				reject(err);
 			});
+		}).catch(function(err){
+			reject(err);
 		});
 	});
 }

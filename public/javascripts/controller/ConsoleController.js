@@ -112,8 +112,9 @@ var ConsoleController = App.controller('ConsoleController', function($scope,$doc
         });
     }
 
-    $scope.createGame = function(username, password){
-        GameService.create(team1, team2, field, league).then(function(response){
+    $scope.createGame = function(team1_id, team2_id){
+        GameService.create(team1_id, team2_id, 0, 0).then(function(response){
+            console.log(response);
             if(response.data.id){
                 $scope.games.push(response.data);
             }else{

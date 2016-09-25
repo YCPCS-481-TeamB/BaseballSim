@@ -33,16 +33,40 @@ router.post('/', function(req, res, next){
     var league_id = req.body.league_id;
 
     GameController.createGame(team1_id, team2_id, field_id, league_id).then(function(data){
-        //Returns the first and last name for the created player
-        console.log(data);
         res.status(200).json(data);
     }).catch(function(err){
         res.status(200).json("" + err);
     });
 });
 
-router.post('/:id/start')
+/**
+ * Creates the game event for start
+ * @params id - The id of the game
+ * @Returning game event for start
+ */
+router.post('/:id/start', function(req, res, next){
+    var game_id = req.params.id;
+    GameController.startGame(game_id).then(function(data){
+        res.status(200).json(data);
+    }).catch(function(err){
+        res.status(200).json("" + err);
+    });
+});
 
+
+/**
+ * Returns he game from the database with the given id value
+ * @params id - The id of the game
+ * @Returning list of games matching that id
+ */
+router.get('/:id', function(req, res, next){
+    var id = req.params.id;
+    GameController.getGameById(id).then(function(data){
+        res.status(200).json({id: id, game: data});
+    }).catch(function(err){
+        res.status(200).json({success: false,id: id, message:""+ err});
+    });
+});
 
 /**
  * Deleted the game from the database with the given id value

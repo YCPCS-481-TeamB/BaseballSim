@@ -144,13 +144,18 @@ exports.getPlayers = function(limit, offset) {
 
 /**
  * Returns a promise that contains an array of the players with the requested id
- * @param id
+ * @param id - The players id
  * @returns {Promise}
  */
 exports.getPlayersById = function(id){
     return new Promise(function(resolve, reject){
         DatabaseController.query("SELECT * from players WHERE id = $1", [id]).then(function(data){
-            resolve(data.rows);
+            if(data.rows[0]){
+                resolve(data.rows[0]);
+            }else{
+                reject("Player " + id + " not found");
+            }
+
         });
     });
 }
