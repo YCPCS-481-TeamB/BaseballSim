@@ -8,6 +8,10 @@ var PlayerService = App.service('PlayerService', function($http){
         return $http.get('/api/players/'+player_id+"/attributes");
     }
 
+    this.getStatsByPlayerId = function(player_id) {
+        return $http.get('/api/players/'+player_id+"/stats");
+    }
+
     this.create= function(){
         return $http.post('/api/players');
     }

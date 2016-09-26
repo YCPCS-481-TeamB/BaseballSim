@@ -33,6 +33,16 @@ var ConsoleController = App.controller('ConsoleController', function($scope,$doc
         }
     }
 
+    $scope.loadPlayerStats = function(player) {
+        console.log("loading player stats");
+        if (player && player.id) {
+            var stats = PlayerService.getStatsByPlayerId(player.id).then(function(response) {
+                console.log(response);
+                player.stats = response.data.stats;
+            });
+        }
+    }
+
     $scope.createPlayer = function(){
         PlayerService.create().then(function(response){
             $scope.players.push(response.data);
