@@ -150,8 +150,21 @@
                         </tr>
                         </thead>
                         <tbody ng-repeat="game in games">
-                            <td>{{game.id}}</td><td>{{game.team1_id}}</td><td>{{game.team2_id}}</td><td>{{game.field_id}}</td><td>{{game.league_id}}</td><td>{{game.date_created}}</td>
-                            <td><button class="btn btn-danger" ng-click="deleteGame(game)">X</button></td>
+                            <tr ng-click="loadGameEvents(game); game.showEvents = !game.showEvents">
+                                <td>{{game.id}}</td><td>{{game.team1_id}}</td><td>{{game.team2_id}}</td><td>{{game.field_id}}</td><td>{{game.league_id}}</td><td>{{game.date_created}}</td>
+                                <td><button class="btn btn-danger" ng-click="deleteGame(game)">X</button></td>
+                            </tr>
+                            <tr ng-if="game.showEvents" ng-repeat="event in game.events">
+                                <td colspan="7">{{event}}</td>
+                            </tr>
+                            <tr ng-if="game.showEvents">
+                                <td colspan="7">
+                                    <button class="btn btn-success" ng-click="startGame(game)">Start Game</button>
+                                    <input type="text" ng-model="team1_player_id" placeholder="Team 1 Player id">
+                                    <input type="text" ng-model="team2_player_id" placeholder="Team 2 Player id">
+                                    <button class="btn btn-success" ng-click="nextGameEvent(game, team1_player_id, team2_player_id)">Next Event</button>
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
