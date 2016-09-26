@@ -1,7 +1,7 @@
 {
     "database" : "d1kdbs28othae9",
     "user" : "oimqizmjtgbntw",
-    "password" : "nxEMxFwg9H0GQ90FslZgMD11ja"
+    "password" : "nxEMxFwg9H0GQ90FslZgMD11ja",
     "host" : "ec2-50-19-239-232.compute-1.amazonaws.com",
     "port" : 5432,
     "max": 10,
