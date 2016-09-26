@@ -52,13 +52,26 @@
                                 <td><button class="btn btn-danger" ng-click="deletePlayer(player); $event.stopPropagation()">X</button></td>
                             </tr>
                             <tr ng-if="player.showAttrs">
-                                <td colspan="6">
+                                <td colspan="6" ng-click="player.showStats = !player.showStats; loadPlayerStats(player);">
                                     <table class="table-striped table-condensed" style="width: 100%">
                                         <tr>
                                             <th>ID</th><th>Technique</th><th>Pitch Speed</th><th>Endurance</th><th>Contact</th><th>Swing Speed</th><th>Batting Power</th><th>Catching</th><th>Throwing</th><th>Awareness</th><th>Speed</th><th>Clutch</th><th>arm</th>                                        </tr>
                                         </tr>
                                         <tr>
                                             <td>{{player.attrs.player_id}}</td><td>{{player.attrs.technique}}</td><td>{{player.attrs.pitch_speed}}</td><td>{{player.attrs.endurance}}</td><td>{{player.attrs.contact}}</td><td>{{player.attrs.swing_speed}}</td><td>{{player.attrs.bat_power}}</td><td>{{player.attrs.catching}}</td><td>{{player.attrs.throwing}}</td><td>{{player.attrs.awareness}}</td><td>{{player.attrs.speed}}</td><td>{{player.attrs.clutch}}</td><td>{{player.attrs.arm}}</td>                                        </tr>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="12">
+                                                <table class="table-striped table-condensed" style="width: 100%">
+                                                    <tr>
+                                                        <th>ID</th><th>H</th><th>2B</th><th>GP</th><th>AB</th><th>R</th><th>3B</th><th>HR</th><th>RBI</th><th>SB</th><th>OBP</th><th>BA</th><th>SO</th><th>BB</th><th>W</th><th>L</th><th>HA</th><th>IP</th><th>RA</th><th>BBA</th><th>ER</th><th>ERA</th><th>Ks</th><th>SV</th>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>{{player.attrs.player_id}}</td><td>{{player.stats.hits}}</td><td>{{player.stats.doubles}}</td><td>{{player.stats.games_played}}</td><td>{{player.stats.at_bats}}</td><td>{{player.stats.runs}}</td><td>{{player.stats.triples}}</td><td>{{player.stats.homeruns}}</td><td>{{player.stats.runs_batted_in}}</td><td>{{player.stats.stolen_bases}}</td><td>{{player.stats.on_base_percentage}}</td><td>{{player.stats.batting_average}}</td><td>{{player.stats.strikeouts}}</td><td>{{player.stats.walks}}</td><td>{{player.stats.wins}}</td><td>{{player.stats.losses}}</td><td>{{player.stats.hits_allowed}}</td><td>{{player.stats.innings_pitched}}</td><td>{{player.stats.runs_allowed}}</td><td>{{player.stats.walks_allowed}}</td><td>{{player.stats.earned_runs}}</td><td>{{player.stats.earned_run_average}}</td><td>{{player.stats.strikeouts_thrown}}</td><td>{{player.stats.saves}}</td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+
                                         </tr>
                                     </table>
                                 </td>
