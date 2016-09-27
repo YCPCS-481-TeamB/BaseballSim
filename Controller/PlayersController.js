@@ -165,6 +165,21 @@ exports.getPlayersById = function(id){
 }
 
 /**
+ * Returns a Promise of an array of players with the requested team id
+ * @param team_id
+ * @returns {Promise}
+ */
+exports.getPlayersByTeamId = function(team_id) {
+    return new Promise(function(resolve, reject){
+        DatabaseController.query("SELECT * from players WHERE team_id = $1", [team_id]).then(function(data){
+            if(data.rows){
+                resolve(data.rows);
+            }
+        });
+    });
+}
+
+/**
  * Returns a promise that contains an array of player's stats with the requested id
  * @param id - the players id
  * @returns {Promise}

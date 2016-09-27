@@ -9,7 +9,7 @@ var team_id = 1;
 var player_id = 1;
 
 var testsComplete = 0;
-var totalTests = 6;
+var totalTests = 8;
 
 //Run Tests
 test_create_player();
@@ -17,8 +17,9 @@ test_create_random_player();
 test_get_player_atrributes_by_id();
 test_get_players();
 test_get_players_by_id();
+test_get_players_by_team_id();
 test_delete_players_by_id();
-//test_delete_player_by_team_id();
+test_delete_players_by_team_id();
 
 //Tests the createPlayer function
 function test_create_player()
@@ -176,18 +177,18 @@ function test_get_players_by_id()
     player.then(
         function(value) {
             //Tests to make sure the returning value is the correct type
-            assert.equal('number', typeof value[0].id);
-            assert.equal('string', typeof value[0].firstname);
-            assert.equal('string', typeof value[0].lastname);
-            assert.equal('string', typeof value[0].position);
-            assert.equal('number', typeof value[0].team_id);
-            assert.equal('Date', value[0].date_created.constructor.name);
+            assert.equal('number', typeof value.id);
+            assert.equal('string', typeof value.firstname);
+            assert.equal('string', typeof value.lastname);
+            assert.equal('string', typeof value.position);
+            assert.equal('number', typeof value.team_id);
+            assert.equal('Date', value.date_created.constructor.name);
             
             //Tests to see if the first player in the database matches the ones created in this file
-            assert.equal(player_id, value[0].id);
-            assert.equal(firstname, value[0].firstname);
-            assert.equal(lastname, value[0].lastname);
-            assert.equal(team_id, value[0].team_id);
+            assert.equal(player_id, value.id);
+            assert.equal(firstname, value.firstname);
+            assert.equal(lastname, value.lastname);
+            assert.equal(team_id, value.team_id);
             
             //Assertions completed
             console.log("Test: test_get_players_by_id completed");
@@ -204,6 +205,46 @@ function test_get_players_by_id()
     });
 }
 
+//Tests the getPlayersByTeamId function
+function test_get_players_by_team_id()
+{
+    var players = PlayersController.getPlayersByTeamId(team_id);
+    //Asserts that the return value is not null
+    assert.notEqual(null, players);
+    //Asserts that it returns a Promise function
+    assert.equal(Promise.name, players.constructor.name);
+    players.then(
+        function(value) {
+            for(var i = 0; i < value.length; i++)
+            {
+                //Tests to make sure the returning value is the correct type
+                assert.equal('number', typeof value[i].id);
+                assert.equal('string', typeof value[i].firstname);
+                assert.equal('string', typeof value[i].lastname);
+                assert.equal('string', typeof value[i].position);
+                assert.equal('number', typeof value[i].team_id);
+                assert.equal('Date', value[i].date_created.constructor.name);
+                
+                //Tests the value of team_id is the correct value
+                assert.equal(team_id, value[i].team_id);
+            }
+            
+            //Assertions completed
+            console.log("Test: test_get_players_by_team_id completed");
+            testsComplete++;
+            if(testsComplete == totalTests)
+            {
+                console.log("All tests completed")
+                process.exit(0);
+            }
+            
+        })
+    .catch(
+        function(reason) {
+            console.log('('+reason+') in test_get_players_by_team_id');
+    });
+}
+
 //Tests the deletePlayersById function
 function test_delete_players_by_id()
 {
@@ -216,7 +257,8 @@ function test_delete_players_by_id()
                     var key = Object.keys(playersValue)[2];
                     var val = playersValue[key];
                     var lastPlayer = val[val.length-1];
-                    var playerId = lastPlayer.id
+                    var playerId = lastPlayer.id;
+                    var getPlayer = PlayersController.getPlayersById(playerId);
                     
                     var deletedPlayer = PlayersController.deletePlayersById(playerId);
                     //Asserts that the return value is not null
@@ -233,6 +275,14 @@ function test_delete_players_by_id()
                             .catch(
                                 function(reason) {
                                     console.log('('+reason+') in test_delete_players_by_id: [getPlayer]');
+                                    //Assertions completed
+                                    console.log("Test: test_delete_players_by_id completed");
+                                    testsComplete++;
+                                    if(testsComplete == totalTests)
+                                    {
+                                        console.log("All tests completed")
+                                        process.exit(0);
+                                    }
                             });
                         })
                     .catch(
@@ -246,14 +296,6 @@ function test_delete_players_by_id()
                     console.log('('+reason+') in test_delete_players_by_id: [players]');
             });
             
-            //Assertions completed
-            console.log("Test: test_delete_players_by_id completed");
-            testsComplete++;
-            if(testsComplete == totalTests)
-            {
-                console.log("All tests completed")
-                process.exit(0);
-            }
         })
     .catch(
         function(reason) {
@@ -263,13 +305,66 @@ function test_delete_players_by_id()
 }
 
 //Tests the deletePlayerByTeamId function
-function test_delete_player_by_team_id()
-{
-    /*
-    var deletedPlayer = PlayersController.deletePlayerByTeamId(null);
+function test_delete_players_by_team_id()
+{   
+    var delete_id = 452;
+    var firstDeletedPlayers = PlayersController.deletePlayerByTeamId(delete_id);
     //Asserts that the return value is not null
-    assert.notEqual(null, deletedPlayer);
+    assert.notEqual(null, firstDeletedPlayers);
     //Asserts that it returns a Promise function
-    assert.equal(Promise.name, deletedPlayer.constructor.name);
-    */
+    assert.equal(Promise.name, firstDeletedPlayers.constructor.name);
+    firstDeletedPlayers.then( 
+        function(firstDeleteValue) {
+            //Tests that there are no players with the team_id
+            assert.equal('', firstDeleteValue.player);
+            var player1 = PlayersController.createRandomPlayer(delete_id);
+            player1.then(
+                function(player1Value) {
+                    var player2 = PlayersController.createRandomPlayer(delete_id);
+                    player2.then(
+                        function(player2Value) {
+                            var secondDeletedPlayers = PlayersController.deletePlayerByTeamId(delete_id);
+                            secondDeletedPlayers.then(
+                                function(secondDeleteValue) {
+                                    //Tests that it returns the players that were deleted
+                                    assert.notEqual('', secondDeleteValue.player[0]);
+                                    assert.notEqual('', secondDeleteValue.player[1]);
+                                    var getDeletedPlayers = PlayersController.getPlayersByTeamId(delete_id);
+                                    getDeletedPlayers.then(
+                                        function(getDeletedValue) {
+                                            //Tests that players have been deleted
+                                            assert.equal('', getDeletedValue);
+                                            //Assertions completed
+                                            console.log("Test: test_delete_players_by_team_id completed");
+                                            testsComplete++;
+                                            if(testsComplete == totalTests)
+                                            {
+                                                console.log("All tests completed")
+                                                process.exit(0);
+                                            }
+                                        })
+                                    .catch(
+                                        function(reason) {
+                                            console.log('('+reason+') in test_delete_players_by_team_id: [getDeletedPlayers]');    
+                                    });
+                                })
+                            .catch(
+                                function(reason) {
+                                    console.log('('+reason+') in test_delete_players_by_team_id: [secondDeleteValue]');
+                            });
+                        })
+                    .catch(
+                        function(reason) {
+                            console.log('('+reason+') in test_delete_players_by_team_id: [player2]');
+                    });
+                })
+            .catch(
+                function(reason) {
+                    console.log('('+reason+') in test_delete_players_by_team_id: [player1]');
+            });
+        })
+    .catch(
+        function(reason) {
+            console.log('('+reason+') in test_delete_players_by_team_id: [firstDeletedPlayers]');
+    });
 }
