@@ -9,7 +9,7 @@ var team_id = 1;
 var player_id = 1;
 
 var testsComplete = 0;
-var totalTests = 8;
+var totalTests = 9;
 
 //Run Tests
 test_create_player();
@@ -20,6 +20,7 @@ test_get_players_by_id();
 test_get_players_by_team_id();
 test_delete_players_by_id();
 test_delete_players_by_team_id();
+test_get_stats_by_player_id();
 
 //Tests the createPlayer function
 function test_create_player()
@@ -366,5 +367,60 @@ function test_delete_players_by_team_id()
     .catch(
         function(reason) {
             console.log('('+reason+') in test_delete_players_by_team_id: [firstDeletedPlayers]');
+    });
+}
+
+function test_get_stats_by_player_id()
+{
+    var player = PlayersController.createRandomPlayer(team_id);
+    player.then(
+        function(playerValue) {
+            var player_id = playerValue.id;
+            var playerStats = PlayersController.getStatsByPlayerId(player_id);
+            //Asserts that the return value is not null
+            assert.notEqual(null, playerStats);
+            //Asserts that it returns a Promise function
+            assert.equal(Promise.name, playerStats.constructor.name);
+            playerStats.then(
+                function(statsValue) {
+                    var key = Object.keys(statsValue);
+                    var i, val;
+                    
+                    //Tests to make sure the value is returning the correct type
+                    for(i = 0; i < key.length; i++)
+                    {
+                        val = statsValue[key[i]];
+                        assert.equal('number', typeof val);
+                    }
+                    
+                    //Tests to make sure player_id matches
+                    assert.equal(player_id, statsValue.player_id);
+                    
+                    //Tests to make sure all stats are initialized with 0 (starts with i=1 so it does not check player_id)
+                    for(i = 1; i < key.length; i++)
+                    {
+                        val = statsValue[key[i]];
+                        assert.equal(0, val);
+                    }
+                    
+                    //Assertions completed
+                    console.log("Test: test_get_stats_by_player_id completed");
+                    testsComplete++;
+                    if(testsComplete == totalTests)
+                    {
+                        console.log("All tests completed")
+                        process.exit(0);
+                    }
+                    
+                    
+                })
+            .catch(
+                function(reason) {
+                    console.log('('+reason+') in test_get_stats_by_player_id: [playerStats]');
+            });
+        })
+    .catch(
+        function(reason) {
+            console.log('('+reason+') in test_get_stats_by_player_id: [player]');
     });
 }
