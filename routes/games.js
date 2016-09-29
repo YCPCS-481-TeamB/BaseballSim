@@ -57,8 +57,7 @@ router.post('/:id/start', function(req, res, next){
  * Gets the game event positions from the given game id and game event id
  * @params id - the game's id
  */
-router.get('/:id/events/:event_id/positions', function(req, res, next){
-    var id = req.params.id;
+router.get('/events/:event_id/positions', function(req, res, next){
     var event_id = req.params.event_id;
 
     GameController.getPlayerPositionByGameEventId(event_id).then(function(data){

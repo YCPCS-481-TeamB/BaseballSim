@@ -1,5 +1,5 @@
 var DatabaseController = require('./DatabaseController');
-
+var SecurityController = require('./SecurityController');
 
 /**
  * Deletes the user from the database
@@ -15,8 +15,33 @@ exports.deleteUserById = function(id){
     });
 }
 
+exports.updateUser = function(id, firstname, lastname, email){
+    return new Promise(function(resolve, reject){
+        DatabaseController.query("UPDATE users SET firstname=$2, lastname=$3, email=$4 WHERE id=$1 RETURNING *", [id, firstname, lastname, email]).then(function(data){
+            console.log(data);
+            resolve(data);
+        }).catch(function(err){
+            reject(err);
+        });
+    });
+}
+
 exports.createUser = function(username, password, firstname, lastname, email){
-    return DatabaseController.query("INSERT INTO users (username, password, firstname,lastname,email) VALUES($1, $2, $3, $4, $5) RETURNING id, username, firstname, lastname, email, date_created", [username, password, firstname, lastname, email]);
+    return new Promise(function(resolve, reject){
+        console.log(username, password, firstname, lastname, email);
+        if(username && password){
+            SecurityController.createSecureUser(username, password).then(function(data){
+                exports.updateUser(data.rows[0].id, firstname, lastname, email).then(function(data2){
+                    resolve(data2);
+                }).catch(function(err){
+                    reject(err);
+                });
+
+            }).catch(function(err){
+                reject(err);
+            });
+        }
+    });
 }
 
 /**

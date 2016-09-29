@@ -146,8 +146,13 @@ var ConsoleController = App.controller('ConsoleController', function($scope,$doc
     $scope.loadGameEvents = function(game){
         if(game && game.id){
             GameService.loadEventsByGameId(game.id).then(function(response){
-                console.log(response);
-                game.events = response.data;
+                if(response.data[0].id) {
+                    console.log(response);
+                    game.events = response.data;
+                }else{
+                    console.log(response.data);
+                    alert(response.data);
+                }
             });
         }
     }
@@ -155,8 +160,27 @@ var ConsoleController = App.controller('ConsoleController', function($scope,$doc
     $scope.nextGameEvent = function(game,team1_player_id, team2_player_id){
         if(game && game.id){
             GameService.nextGameEvent(game.id, team1_player_id, team2_player_id).then(function(response){
+                if(response.data[0].id){
+                    console.log(response);
+                    game.events.push(response.data[0]);
+                }else{
+                    console.log(response.data);
+                    alert(response.data);
+                }
+            });
+        }
+    }
+
+    $scope.loadPositions = function(event){
+        if(event && event.id){
+            GameService.getPositionsByEventId(event.id).then(function(response){
                 console.log(response);
-                game.events.push(response.data);
+                //if(!event.positions){
+                  //  event.positions = [];
+                //}
+                event.positions = [response.data];
+
+                console.log(event.positions);
             });
         }
     }
