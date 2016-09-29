@@ -1,4 +1,4 @@
-var ConsoleController = App.controller('ConsoleController', function($scope,$document,PlayerService, UserService, TeamService, GameService){
+var ConsoleController = App.controller('ConsoleController', function($scope,$document,PlayerService, UserService, TeamService, GameService, UserTokenFactory){
     console.log('Console Controller');
 
     $scope.shiftKeyDown = false;
@@ -17,8 +17,15 @@ var ConsoleController = App.controller('ConsoleController', function($scope,$doc
     $scope.showGameList = false;
     $scope.games = [];
 
+    UserTokenFactory.checkTokenValidity().then(function(data){
+        if(data === false){
+            window.location.assign("/login");
+        }
+    });
+
     $scope.loadPlayers = function(){
         var players = PlayerService.getAll().then(function(response){
+            console.log(response);
             $scope.players = response.data.players;
         });
     }

@@ -45,18 +45,19 @@ router.post('/', function(req, res, next){
 router.post('/token', function(req, res, next){
   var username = req.body.username;
   var password = req.body.password;
-
   if(username && password){
     SecurityController.getToken(username, password).then(function(data){
-      res.status(200).json(data);
+      res.status(200).json({success: true, token: data});
     }).catch(function(err){
-      res.status(200).json("" + err);
+      res.status(200).json({success: false, error: "" + err});
     });
+  }else{
+    res.status(200).json({success: false, message: "Please Enter a Username and Password"});
   }
 });
 
 router.post('/validate', function(req, res, next){
-  var token = req.body.token;
+  var token = req.body.token || req.params.token || req.headers['x-access-token'];
 
   if(token){
     SecurityController.validateToken(token).then(function(data){

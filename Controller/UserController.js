@@ -18,7 +18,6 @@ exports.deleteUserById = function(id){
 exports.updateUser = function(id, firstname, lastname, email){
     return new Promise(function(resolve, reject){
         DatabaseController.query("UPDATE users SET firstname=$2, lastname=$3, email=$4 WHERE id=$1 RETURNING *", [id, firstname, lastname, email]).then(function(data){
-            console.log(data);
             resolve(data);
         }).catch(function(err){
             reject(err);
