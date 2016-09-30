@@ -1,4 +1,9 @@
-var LogoutController = App.controller('LogoutController', function($scope,UserTokenFactory){
+var NavbarController = App.controller('NavbarController', function($scope,UserTokenFactory){
+
+    UserTokenFactory.getUserData().then(function(user){
+        $scope.userdata = user;
+        $scope.$apply();
+    });
 
     $scope.logout = function(){
         UserTokenFactory.logoutUser().then(function(data){

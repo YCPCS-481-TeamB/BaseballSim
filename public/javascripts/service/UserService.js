@@ -1,6 +1,4 @@
 var UserService = App.service('UserService', function($http, UserTokenFactory){
-
-
     this.getAll = function(){
         return $http.get('/api/users',{headers: {"x-access-token" : UserTokenFactory.getToken()}});
     }

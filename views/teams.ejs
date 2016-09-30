@@ -1,0 +1,68 @@
+<html>
+<head>
+    <title><%= title %></title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="stylesheets/style.css">
+</head>
+<body ng-app="app">
+<%include navbar %>
+
+<div class="container" ng-controller="TeamsController">
+
+    <button class="btn btn-success form-control" ng-click="showTeamCreate=true;">Create New Team</button>
+
+    <div class="overlay" ng-show="showTeamCreate === true">
+        <button class="btn btn-danger pull-right" ng-click="showTeamCreate=false;">X</button>
+
+        <form class="form-group">
+            <h2 class="form-signin-heading">Create Team</h2>
+            <label for="teamNameInput">Team Name</label>
+            <input type="text" id="teamNameInput" class="form-control" ng-model="teamNameInput" placeholder="Team Name"/>
+            <label for="LeagueIdInput">Team Name</label>
+            <input type="text" id="LeagueIdInput" class="form-control" ng-model="leagueIdInput" placeholder="League Id"/>
+            <button class="btn btn-success form-control" ng-click="createNewTeam(teamNameInput, leagueIdInput); showTeamCreate=false">Create Team</button>
+        </form>
+    </div>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th><th>Team Name</th><th>League ID</th><th>Del</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="team in teams">
+                <td>{{team.id}}</td><td>{{team.name}}</td><td>{{team.league_id}}</td>
+
+                <td>
+                    <button class="btn btn-danger" ng-click="deleteTeam(team)">X</button>
+                    <button class="btn  btn-primary glyphicon glyphicon-pencil" ng-click="editTeam(team)"></button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+</body>
+
+<script src="jquery/jquery.min.js"></script>
+<script src="bootstrap/js/bootstrap.min.js"></script>
+<script src="angular/angular.min.js"></script>
+<script src="angular-cookies/angular-cookies.min.js"></script>
+<script src="javascripts/app.js"></script>
+<script src="javascripts/service/UserTokenFactory.js"></script>
+<script src="javascripts/service/UserService.js"></script>
+<script src="javascripts/service/GameService.js"></script>
+<script src="javascripts/service/TeamService.js"></script>
+<script src="javascripts/service/PlayerService.js"></script>
+<script src="javascripts/controller/ConsoleController.js"></script>
+<script src="javascripts/controller/NavbarController.js"></script>
+<script src="javascripts/controller/TeamController.js"></script>
+
+</html>

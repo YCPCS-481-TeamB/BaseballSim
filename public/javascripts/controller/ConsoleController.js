@@ -108,7 +108,7 @@ var ConsoleController = App.controller('ConsoleController', function($scope,$doc
             if(response.data.id){
                 $scope.teams.push(response.data);
             }else{
-                alert(response.data);
+                alert(response.data.error);
                 console.log(response.data);
             }
         });

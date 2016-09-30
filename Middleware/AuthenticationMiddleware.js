@@ -5,6 +5,7 @@ exports.validateTokenMiddleware = function(req, res, next){
     console.log(req.headers);
     if(token){
         SecurityController.validateToken(token).then(function(data){
+            req.userdata = data;
             next();
         }).catch(function(err){
             res.status(200).json({success: false, message: "Could Not Authenticate"});
