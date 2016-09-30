@@ -1,4 +1,3 @@
-var assert = require('assert');
 var UserController = require('../../Controller/UserController');
 
 //User Setup
@@ -7,53 +6,52 @@ var password = "toadstool"
 var firstname = 'John';
 var lastname = 'Doe';
 var email = 'john@doe.com';
-var user = UserController.createUser(username, password, firstname, lastname, email);
-
-//Run Tests
-test_create_user();
-test_delete_user_by_id();
-test_get_users();
-test_get_user_by_id();
-console.log("All tests completed");
 
 //Tests the createUser function
-function test_create_user()
+exports['test_create_user'] = function(test)
 {
+    var user = UserController.createUser(username, password, firstname, lastname, email);
     //Asserts that the return value is not null
-    assert.notEqual(null, user);
+    test.notEqual(null, user);
     //Asserts that it returns a Promise function
-    assert.equal(Promise.name, user.constructor.name);
-}
+    test.equal(Promise.name, user.constructor.name);
+    test.done();
+};
 
 //Tests the deleteUserById function
-function test_delete_user_by_id()
+exports['test_delete_user_by_id'] = function(test)
 {
+    var user = UserController.createUser(username, password, firstname, lastname, email);
     var deletedUser = UserController.deleteUserById(user.id);
     
     //Asserts that the return value is not null
-    assert.notEqual(null, deletedUser);
+    test.notEqual(null, deletedUser);
     //Asserts that it returns a Promise function
-    assert.equal(Promise.name, deletedUser.constructor.name);
-}
+    test.equal(Promise.name, deletedUser.constructor.name);
+    test.done();
+};
 
 //Tests the getUsers function
-function test_get_users()
+exports['test_get_users'] = function(test)
 {
     var users = UserController.getUsers(5, 1);
     
     //Asserts that the return value is not null
-    assert.notEqual(null, users);
+    test.notEqual(null, users);
     //Asserts that it returns a Promise function
-    assert.equal(Promise.name, users.constructor.name);
-}
+    test.equal(Promise.name, users.constructor.name);
+    test.done();
+};
 
 //Tests the getUserById function
-function test_get_user_by_id()
+exports['test_get_user_by_id'] = function(test)
 {
+    var user = UserController.createUser(username, password, firstname, lastname, email);
     var returnedUser = UserController.getUserById(user.id);
     
     //Asserts that the return value is not null
-    assert.notEqual(null, returnedUser);
+    test.notEqual(null, returnedUser);
     //Asserts that it returns a Promise function
-    assert.equal(Promise.name, returnedUser.constructor.name);
-}
+    test.equal(Promise.name, returnedUser.constructor.name);
+    test.done();
+};
