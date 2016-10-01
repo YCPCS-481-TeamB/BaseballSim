@@ -13,6 +13,17 @@ exports.getGames = function(limit, offset){
     });
 }
 
+exports.getGameByUserId = function(user_id){
+    return new Promise(function(resolve, reject){
+        DatabaseController.query("SELECT * from games WHERE id in (SELECT item_id FROM permissions WHERE item_type='games' AND user_id=$1)", [user_id]).then(function(data){
+            resolve({games: data.rows});
+        }).catch(function(err){
+            reject(err);
+        });
+
+    });
+}
+
 exports.createGame = function(team1_id, team2_id, field_id, league_id){
     return new Promise(function(resolve, reject){
         if(team1_id && team2_id){

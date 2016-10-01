@@ -4,6 +4,8 @@ CREATE TYPE player_position AS ENUM ('pitcher', 'catcher', 'first_baseman', 'sec
 
 CREATE TYPE dominant_arm AS ENUM ('left', 'right');
 
+CREATE TYPE permission_type AS ENUM ('owner', 'edit', 'view', 'delete');
+
 CREATE TYPE game_action_type AS ENUM ('start', 'end', 'home_run', 'walk', 'triple', 'double', 'single', 'ball', 'strike', 'foul', 'strike_out');
 
 --PLAYERS STUFF
@@ -55,7 +57,7 @@ CREATE TABLE game_action (id SERIAL, game_id INTEGER, team1_score INTEGER DEFAUL
 CREATE TABLE game_player_positions (id SERIAL, game_action_id INTEGER, onfirst_id INTEGER DEFAULT 0, onsecond_id INTEGER DEFAULT 0, onthird_id INTEGER DEFAULT 0, date_created TIMESTAMP DEFAULT NOW());
 
 --CREATES PERMISSIONS TABLE FOR OWNERSHIP AND VIEW RIGHTS FOR FIELDS (ALLOWS CO-OWNERSHIP OF ITEMS)
-CREATE TABLE permissions (id SERIAL, user_id INTEGER, item_type VARCHAR(255) NOT NULL, item_id INTEGER NOT NULL, date_created TIMESTAMP DEFAULT NOW());
+CREATE TABLE permissions (id SERIAL, user_id INTEGER, item_type VARCHAR(255) NOT NULL, item_id INTEGER NOT NULL, type permission_type NOTE NULL, date_created TIMESTAMP DEFAULT NOW());
 
 INSERT INTO player_names (name, isLast) VALUES ('Brandon', 'n');
 INSERT INTO player_names (name, isLast) VALUES ('Walton', 'y');

@@ -1,0 +1,63 @@
+<html>
+    <head>
+        <title><%= title %></title>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+        <meta name="description" content="">
+        <meta name="author" content="">
+        <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+        <link rel="stylesheet" href="stylesheets/style.css">
+    </head>
+    <body ng-app="app">
+        <%include navbar %>
+        <div class="container" ng-controller="LoginController">
+            <form class="form-signin">
+                {{errorMessage}}
+                <h2 class="form-signin-heading">Please sign in</h2>
+                <label for="inputUsername" class="sr-only">Username</label>
+                <input type="text" id="inputUsername" class="form-control" placeholder="Username" ng-bind="usernameInput" ng-model="usernameInput" required autofocus>
+                <label for="inputPassword" class="sr-only">Password</label>
+                <input type="password" id="inputPassword" class="form-control" placeholder="Password" ng-bind="passwordInput" ng-model="passwordInput" required>
+                <div class="checkbox">
+
+                    <label>
+                        <a ng-click="showAccountCreate=true">Create Account</a>
+                    </label>
+                </div>
+                <button class="btn btn-lg btn-primary btn-block" ng-click="login(usernameInput, passwordInput)">Sign in</button>
+            </form>
+
+            <div ng-show="showAccountCreate" class="overlay">
+                <button class="btn btn-danger pull-right" ng-click="showAccountCreate=false">X</button>
+
+                <form>
+                    {{errorMessage}}
+                    <h2 class="form-signin-heading">Create Your Account</h2>
+                    <label for="createInputUsername" >Username</label>
+                    <input type="text" id="createInputUsername" class="form-control" placeholder="Username" ng-model="createInputUsername">
+                    <label for="createInputPassword" >Password</label>
+                    <input type="password" id="createInputPassword" class="form-control" placeholder="Password" ng-model="createInputPassword">
+                    <label for="createInputFirstname" >First Name</label>
+                    <input type="text" id="createInputFirstname" class="form-control" placeholder="First Name" ng-model="createInputFirstname">
+                    <label for="createInputLastname" >Last Name</label>
+                    <input type="text" id="createInputLastname" class="form-control" placeholder="Last Name" ng-model="createInputLastname">
+                    <label for="createInputEmail" >Email</label>
+                    <input type="text" id="createInputEmail" class="form-control" placeholder="Email" ng-model="createInputEmail">
+
+                    <button class="btn btn-success" style="width: 100%" ng-click="createUser(createInputUsername, createInputPassword, createInputFirstname, createInputLastname,createInputEmail)">Create User and Login</button>
+                </form>
+            </div>
+        </div>
+    </body>
+    <script src="jquery/jquery.min.js"></script>
+    <script src="bootstrap/js/bootstrap.min.js"></script>
+    <script src="angular/angular.min.js"></script>
+    <script src="angular-cookies/angular-cookies.min.js"></script>
+    <script src="javascripts/app.js"></script>
+    <script src="javascripts/service/UserTokenFactory.js"></script>
+    <script src="javascripts/service/UserService.js"></script>
+    <script src="javascripts/controller/LoginController.js"></script>
+    <script src="javascripts/controller/NavbarController.js"></script>
+</html>

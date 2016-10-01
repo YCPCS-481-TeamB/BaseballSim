@@ -165,6 +165,21 @@ exports.getPlayersById = function(id){
 }
 
 /**
+ * Returns a Promise of an array of players with the requested team id
+ * @param team_id
+ * @returns {Promise}
+ */
+exports.getPlayersByTeamId = function(team_id) {
+    return new Promise(function(resolve, reject){
+        DatabaseController.query("SELECT * from players WHERE team_id = $1", [team_id]).then(function(data){
+            if(data.rows){
+                resolve(data.rows);
+            }
+        });
+    });
+}
+
+/**
  * Returns a promise that contains an array of player's stats with the requested id
  * @param id - the players id
  * @returns {Promise}
@@ -192,9 +207,9 @@ exports.getStatsByPlayerId = function(id){
 createPlayerStats = function(id) {
     return new Promise(function(resolve, reject) {
         var statsMap = {hits: 0, doubles:0, games_played: 0, at_bats: 0, runs: 0, triples: 0,
-            homeruns: 0, runs_batted_in: 0, stolen_bases: 0, on_base_percentage: 0, batting_average: 0,
-            strikeouts: 0, walks: 0, wins: 0, losses: 0, hits_allowed: 0, innings_pitched: 0,
-            runs_allowed: 0, walks_allowed : 0, earned_runs: 0, earned_run_average: 0, strikeouts_thrown: 0,
+            homeruns: 0, runs_batted_in: 0, stolen_bases: 0, on_base_percentage: .000, batting_average: .000,
+            strikeouts: 0, walks: 0, wins: 0, losses: 0, hits_allowed: 0, innings_pitched: 0.0,
+            runs_allowed: 0, walks_allowed : 0, earned_runs: 0, earned_run_average: 0.00, strikeouts_thrown: 0,
             saves: 0};
 
         DatabaseController.query("INSERT INTO stats (player_id, hits, doubles, games_played, at_bats, runs, triples, homeruns, runs_batted_in, stolen_bases, on_base_percentage, batting_average, strikeouts, walks, wins, losses, hits_allowed, innings_pitched, runs_allowed, walks_allowed, earned_runs, earned_run_average, strikeouts_thrown, saves)" +

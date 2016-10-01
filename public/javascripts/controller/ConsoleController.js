@@ -1,4 +1,4 @@
-var ConsoleController = App.controller('ConsoleController', function($scope,$document,PlayerService, UserService, TeamService, GameService){
+var ConsoleController = App.controller('ConsoleController', function($scope,$document,PlayerService, UserService, TeamService, GameService, UserTokenFactory){
     console.log('Console Controller');
 
     $scope.shiftKeyDown = false;
@@ -17,8 +17,15 @@ var ConsoleController = App.controller('ConsoleController', function($scope,$doc
     $scope.showGameList = false;
     $scope.games = [];
 
+    UserTokenFactory.checkTokenValidity().then(function(data){
+        if(data === false){
+            window.location.assign("/login");
+        }
+    });
+
     $scope.loadPlayers = function(){
         var players = PlayerService.getAll().then(function(response){
+            console.log(response);
             $scope.players = response.data.players;
         });
     }
@@ -29,6 +36,16 @@ var ConsoleController = App.controller('ConsoleController', function($scope,$doc
             var attrs = PlayerService.getAttrByPlayerId(player.id).then(function (response) {
                 console.log(response.data.attributes);
                 player.attrs = response.data.attributes;
+            });
+        }
+    }
+
+    $scope.loadPlayerStats = function(player) {
+        console.log("loading player stats");
+        if (player && player.id) {
+            var stats = PlayerService.getStatsByPlayerId(player.id).then(function(response) {
+                console.log(response);
+                player.stats = response.data.stats;
             });
         }
     }
@@ -91,7 +108,7 @@ var ConsoleController = App.controller('ConsoleController', function($scope,$doc
             if(response.data.id){
                 $scope.teams.push(response.data);
             }else{
-                alert(response.data);
+                alert(response.data.error);
                 console.log(response.data);
             }
         });
@@ -115,8 +132,8 @@ var ConsoleController = App.controller('ConsoleController', function($scope,$doc
     $scope.createGame = function(team1_id, team2_id){
         GameService.create(team1_id, team2_id, 0, 0).then(function(response){
             console.log(response);
-            if(response.data.id){
-                $scope.games.push(response.data);
+            if(response.data.game.id){
+                $scope.games.push(response.data.game);
             }else{
                 alert(response.data);
                 console.log(response.data);
@@ -129,6 +146,58 @@ var ConsoleController = App.controller('ConsoleController', function($scope,$doc
             GameService.deleteById(game.id).then(function(response){
                 var index = $scope.games.indexOf(game);
                 $scope.games.splice(index, 1);
+            });
+        }
+    }
+
+    $scope.loadGameEvents = function(game){
+        if(game && game.id){
+            GameService.loadEventsByGameId(game.id).then(function(response){
+                console.log(response);
+                if(response.data[0].id) {
+                    console.log(response);
+                    game.events = response.data;
+                }else{
+                    console.log(response.data);
+                    alert(response.data);
+                }
+            });
+        }
+    }
+
+    $scope.nextGameEvent = function(game,team1_player_id, team2_player_id){
+        if(game && game.id){
+            GameService.nextGameEvent(game.id, team1_player_id, team2_player_id).then(function(response){
+                if(response.data[0].id){
+                    console.log(response);
+                    game.events.push(response.data[0]);
+                }else{
+                    console.log(response.data);
+                    alert(response.data);
+                }
+            });
+        }
+    }
+
+    $scope.loadPositions = function(event){
+        if(event && event.id){
+            GameService.getPositionsByEventId(event.id).then(function(response){
+                console.log(response);
+                //if(!event.positions){
+                  //  event.positions = [];
+                //}
+                event.positions = [response.data];
+
+                console.log(event.positions);
+            });
+        }
+    }
+
+    $scope.startGame = function(game){
+        if(game && game.id){
+            GameService.startGameEvent(game.id).then(function(response){
+                console.log(response);
+                game.events.push(response.data);
             });
         }
     }

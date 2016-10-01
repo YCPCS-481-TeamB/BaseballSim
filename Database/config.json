@@ -1,5 +1,5 @@
 {
-    "database": "testdb2",
+    "database" : "testdb2",
     "user" : "postgres",
     "password" : "postgres",
     "port": 5432,
