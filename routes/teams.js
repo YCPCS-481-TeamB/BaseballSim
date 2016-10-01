@@ -28,6 +28,17 @@ router.post('/', function(req, res, next){
 	});
 });
 
+router.put('/:id', function(req, res, next){
+	var id = req.params.id;
+	var teamname = req.body.teamname;
+	console.log(teamname);
+	TeamsController.updateTeam(id, teamname).then(function(response){
+		res.status(200).json({success: true, team: response});
+	}).catch(function(err){
+		res.status(200).json({success: false, error: err});
+	});
+});
+
 /*
  * Retrieves the team from the database with the given id value
  * @params id = The id of the team

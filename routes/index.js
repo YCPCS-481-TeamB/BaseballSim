@@ -30,4 +30,9 @@ router.get('/teams',  function(req, res, next) {
   res.render('teams', {title: 'BaseballSim Teams'});
 });
 
+/* GET teams page. */
+router.get('/games',  function(req, res, next) {
+  res.render('games', {title: 'BaseballSim Games'});
+});
+
 module.exports = router;

@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 
 var GameController = require("./../Controller/GameController");
+var PermissionController = require("./../Controller/PermissionController");
 
 /**
  * GET for getting all games from database
@@ -33,7 +34,11 @@ router.post('/', function(req, res, next){
     var league_id = req.body.league_id;
 
     GameController.createGame(team1_id, team2_id, field_id, league_id).then(function(data){
-        res.status(200).json(data);
+        PermissionController.addPermission('games', data.id,req.userdata.id).then(function(response){
+            res.status(200).json({success: true, game: data});
+        }).catch(function(err){
+            res.status(200).json({success: false, error: err});
+        })
     }).catch(function(err){
         res.status(200).json("" + err);
     });

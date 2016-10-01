@@ -12,6 +12,14 @@ var TeamsController = App.controller('TeamsController', function($scope, UserTok
         });
     }
 
+    $scope.updateTeam = function(team){
+        TeamService.updateTeam(team.id, team.name).then(function(response){
+            console.log(response);
+        }).catch(function(err){
+            console.log(err);
+        })
+    }
+
     $scope.deleteTeam = function(team){
         if(team && team.id){
             TeamService.deleteById(team.id).then(function(response){
@@ -24,7 +32,7 @@ var TeamsController = App.controller('TeamsController', function($scope, UserTok
     $scope.createNewTeam = function(team_name, league_id){
         TeamService.create(team_name, league_id).then(function(response){
             console.log(response);
-            $scope.teams.push(response.data);
+            $scope.teams.push(response.data.teams);
         }).catch(function(err){
             console.log(err);
         });

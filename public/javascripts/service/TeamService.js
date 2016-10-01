@@ -8,6 +8,10 @@ var TeamService = App.service('TeamService', function($http, UserTokenFactory){
         return $http.get('/api/users/'+ user_id +'/teams', {headers: {"x-access-token" : UserTokenFactory.getToken()}});
     }
 
+    this.updateTeam = function(team_id, teamname){
+        return $http.put('/api/teams/'+team_id, {teamname: teamname},{headers: {"x-access-token" : UserTokenFactory.getToken()}});
+    }
+
     this.create = function(teamname, league_id){
         return $http.post('/api/teams', {teamname: teamname, league_id: league_id}, {headers: {"x-access-token" : UserTokenFactory.getToken()}});
     }
