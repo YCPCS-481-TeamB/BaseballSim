@@ -59,5 +59,6 @@ CREATE TABLE game_player_positions (id SERIAL, game_action_id INTEGER, onfirst_i
 --CREATES PERMISSIONS TABLE FOR OWNERSHIP AND VIEW RIGHTS FOR FIELDS (ALLOWS CO-OWNERSHIP OF ITEMS)
 CREATE TABLE permissions (id SERIAL, user_id INTEGER, item_type VARCHAR(255) NOT NULL, item_id INTEGER NOT NULL, type permission_type NOT NULL DEFAULT 'view', date_created TIMESTAMP DEFAULT NOW());
 
+
 INSERT INTO player_names (name, isLast) VALUES ('Brandon', 'n');
 INSERT INTO player_names (name, isLast) VALUES ('Walton', 'y');
