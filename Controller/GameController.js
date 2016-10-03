@@ -5,7 +5,7 @@ var PlayerController = require('./PlayersController');
 exports.getGames = function(limit, offset){
     return new Promise(function(resolve, reject){
         DatabaseController.query("SELECT * from games LIMIT $1 OFFSET $2", [limit | 1000, offset | 0]).then(function(data){
-            resolve({games: data.rows});
+            resolve(data.rows);
         }).catch(function(err){
             reject(err);
         });
@@ -16,7 +16,7 @@ exports.getGames = function(limit, offset){
 exports.getGameByUserId = function(user_id){
     return new Promise(function(resolve, reject){
         DatabaseController.query("SELECT * from games WHERE id in (SELECT item_id FROM permissions WHERE item_type='games' AND user_id=$1)", [user_id]).then(function(data){
-            resolve({games: data.rows});
+            resolve(data.rows);
         }).catch(function(err){
             reject(err);
         });

@@ -13,7 +13,7 @@ router.get('/', function(req, res, next) {
     var limit = req.query.limit;
     var offset = req.query.offset;
     GameController.getGames(limit, offset).then(function(data){
-        res.status(200).json(data);
+        res.status(200).json({success: true, games: data});
     }).catch(function(err){
         res.status(200).json({success: false, message:""+ err});
     });
@@ -66,7 +66,7 @@ router.get('/events/:event_id/positions', function(req, res, next){
     var event_id = req.params.event_id;
 
     GameController.getPlayerPositionByGameEventId(event_id).then(function(data){
-        res.status(200).json(data);
+        res.status(200).json({positions: data});
     }).catch(function(err){
         res.status(200).json(err);
     });
