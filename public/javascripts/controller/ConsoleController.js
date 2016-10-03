@@ -52,6 +52,7 @@ var ConsoleController = App.controller('ConsoleController', function($scope,$doc
 
     $scope.createPlayer = function(){
         PlayerService.create().then(function(response){
+            console.log("Response", response);
             $scope.players.push(response.data);
         });
     }
@@ -105,8 +106,8 @@ var ConsoleController = App.controller('ConsoleController', function($scope,$doc
 
     $scope.createTeam = function(teamname, league_id){
         TeamService.create(teamname, league_id).then(function(response){
-            if(response.data.id){
-                $scope.teams.push(response.data);
+            if(response.data.teams.id){
+                $scope.teams.push(response.data.teams);
             }else{
                 alert(response.data.error);
                 console.log(response.data);

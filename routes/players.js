@@ -27,8 +27,6 @@ router.get('/', function(req, res, next) {
 router.post('/', function(req, res, next){
     var team_id = req.body.team_id;
     PlayersController.createRandomPlayer(team_id).then(function(data){
-        //Returns the first and last name for the created player
-        console.log(data);
         res.status(200).json(data);
     }).catch(function(err){
        res.status(200).json("" + err);
