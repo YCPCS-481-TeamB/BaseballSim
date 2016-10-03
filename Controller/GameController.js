@@ -1,3 +1,5 @@
+var bluebird = require('bluebird');
+var Promise = bluebird.Promise;
 var DatabaseController = require('./DatabaseController');
 
 var PlayerController = require('./PlayersController');
@@ -174,12 +176,104 @@ function basicPlayerEvent(player1_id, player2_id){
     return new Promise(function(resolve, reject){
         PlayerController.getPlayersById(player1_id).then(function(player1){
             PlayerController.getPlayersById(player2_id).then(function(player2){
-                var max = 7;
+                console.log("TEST");
+                var totalattrs;
+                var max = 100 + totalattrs;
                 var min = 0;
-                var num = Math.random() * (max - min) + min;
-                var options = ['home_run', 'walk', 'triple', 'double', 'single', 'ball', 'strike', 'foul'];
-                console.log("RAND: " + num);
-                resolve(options[Math.floor(num)]);
+
+                // Base chance for each outcome
+
+                var ball = 30;
+                var single = 10;
+                var double = 5;
+                var triple = 3;
+                var home_run = 2;
+
+                var strike = 30;
+                var out = 10;
+                var foul = 10;
+
+                // Get the Attributes for Players 1 & 2
+                /*
+                var player1attrs, player2attrs;
+                PlayerController.getPlayerAttributesById(player1_id).then(function(data){
+                    player1attrs = data;
+                }).catch(function(err){
+                    reject(err);
+                });
+
+                PlayerController.getPlayerAttributesById(player2_id).then(function(data){
+                    player2attrs = data;
+                }).catch(function(err){
+                    reject(err);
+                });
+                */
+                Promise.all([PlayerController.getPlayerAttributesById(player1_id),PlayerController.getPlayerAttributesById(player2_id)]).spread(function(player1, player2){
+                    console.log("TEST2");
+                    console.log(player1);
+                    var technique = player2.technique;
+                    var pitch_speed = player2.pitch_speed;
+                    var endurance = player2.endurance;
+
+                    var contact = player1.contact;
+                    var swing_speed = player1.swing_speed;
+                    var bat_power = player1.bat_power;
+
+
+                    totalattrs = contact + swing_speed + bat_power + technique + pitch_speed
+                        + endurance;
+
+                    ball += ((.7 * swing_speed));
+                    single += ((.15 * swing_speed) + (.6 * contact));
+                    double += ((.3 * bat_power) + (.15 * swing_speed) + (.4 * contact));
+                    home_run += (.4 * bat_power);
+
+                    strike += ((.4 * endurance) + (technique));
+                    out += ((.3 * endurance) + (.5 * pitch_speed));
+                    foul += ((.5 * pitch_speed) + (.3 * endurance));
+
+                    // Selection of RNG
+                    var rng = 0;
+                    var num = Math.floor(Math.random() * 100+totalattrs);
+                    if (num >= 0  && num < ball){
+                        // Returns Ball
+                        rng = 0;
+                    }
+                    else if (num >= ball && num < ball+single){
+                        // Returns Single
+                        rng = 1;
+                    }
+                    else if (num >= ball+single && num < (ball+single+double)) {
+                        // Returns Double
+                        rng = 2;
+                    }
+                    else if (num >= (ball+single+double) && num < (ball+single+double+triple)) {
+                        // Returns Triple
+                        rng = 3;
+                    }
+                    else if (num >= (ball+single+double+triple) && num < (ball+single+double+triple+home_run)) {
+                        // Returns Home Run
+                        rng = 4;
+                    }
+                    else if (num >= (ball+single+double+triple+home_run) && num < (ball+single+double+triple+home_run+strike)) {
+                        // Returns Strike
+                        rng = 5;
+                    }
+                    else if (num >= (ball+single+double+triple+home_run+strike) && num < (ball+single+double+triple+home_run+strike+out)) {
+                        // Returns Out
+                        rng = 6;
+                    }
+                    else if (num >= (ball+single+double+triple+home_run+strike+out) && num < totalattrs){
+                        // Returns Foul
+                        rng = 7;
+                    }
+
+                    var options = ['ball', 'single', 'double', 'triple', 'home_run', 'strike', 'out', 'foul'];
+                    console.log("RAND: " + rng);
+                    resolve(options[rng]);
+                });
+            }).catch(function(err){
+                reject(err);
             });
         }).catch(function(err){
             reject(err);

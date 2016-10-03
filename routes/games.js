@@ -101,7 +101,7 @@ router.post('/:id/events/next', function(req, res, next){
         GameController.doGameEvent(id, player1_id, player2_id).then(function(data){
             res.status(200).json(data);
         }).catch(function(err){
-            res.status(200).json(err);
+            res.status(200).json("" + err);
         });
     }else{
         res.status(200).json("Need 2 Players Selected");

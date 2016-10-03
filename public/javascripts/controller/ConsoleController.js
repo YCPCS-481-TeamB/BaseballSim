@@ -168,6 +168,7 @@ var ConsoleController = App.controller('ConsoleController', function($scope,$doc
     $scope.nextGameEvent = function(game,team1_player_id, team2_player_id){
         if(game && game.id){
             GameService.nextGameEvent(game.id, team1_player_id, team2_player_id).then(function(response){
+                console.log(response);
                 if(response.data[0].id){
                     console.log(response);
                     game.events.push(response.data[0]);
