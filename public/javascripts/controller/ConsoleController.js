@@ -125,6 +125,7 @@ var ConsoleController = App.controller('ConsoleController', function($scope,$doc
 
     $scope.loadGames = function(){
         var games = GameService.getAll().then(function(response){
+            console.log(response.data);
             $scope.games = response.data.games;
         });
     }

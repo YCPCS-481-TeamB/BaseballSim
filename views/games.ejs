@@ -15,13 +15,51 @@
 
     <div class="container" ng-controller="GameController">
 
+        <div ng-bind="selectedGame" class="">
+            {{selectedGame.id}}
+        </div>
+
         <button class="btn btn-success form-control" ng-click="showCreateGame = true">Create Game</button>
 
         <div class="overlay" ng-show="showCreateGame">
             <button class="btn btn-danger pull-right" ng-click="showCreateGame = false">X</button>
+            <h2 class="form-signin-heading">Create Games</h2>
+            <form class="form-group">
+                <label for="myTeamSelect">My Team</label>
+                <select id="myTeamSelect" class="form-control" ng-model="myTeamSelect">
+                    <option ng-repeat="team in myTeams track by team.id" value="{{team.id}}">{{team.name}}</option>
+                </select>
+
+                <label for="theirTeamSelect">My Team</label>
+                <select id="theirTeamSelect" class="form-control" ng-model="theirTeamSelect">
+                    <option ng-repeat="team in theirTeams track by team.id" value="{{team.id}}">{{team.name}}</option>
+                </select>
+                <button class="btn btn-success" ng-click="createNewGame(myTeamSelect, theirTeamSelect); showCreateGame = false">Create Game</button>
+            </form>
         </div>
 
-        {{games}}
+        <table class="table table-responsive table-hover">
+            <thead>
+            <tr>
+                <th>ID</th><th>Team 1</th><th>Team 2</th><th></th>
+            </tr>
+            </thead>
+            <tbody ng-repeat="game in games">
+            <tr  ng-if="!game.edit || game.edit == false">
+                <td>{{game.id}}</td><td>{{game.team1_id}}</td><td>{{game.team2_id}}</td>
+                <td><button class="btn  btn-primary glyphicon glyphicon-pencil" ng-click="game.edit=!game.edit"></button></td>
+            </tr>
+            <tr ng-if="game.edit == true">
+                <td><input type="text" ng-model="game.id" ng-bind="game.id"></td>
+                <td><input type="text" ng-model="game.team1_id" ng-bind="game.team1_id"></td>
+                <td><input type="text" ng-model="game.team2_id" ng-bind="game.team2_id"></td>
+                <td>
+                    <button class="btn  btn-primary glyphicon glyphicon-floppy-disk" ng-click="selectedGame = game;"></button>
+                    <button class="btn  btn-danger glyphicon glyphicon-trash" ng-click="game.edit=!game.edit; deleteGame(game)"></button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
     </div>
 </body>
 

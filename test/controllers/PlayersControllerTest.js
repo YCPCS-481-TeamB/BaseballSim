@@ -189,7 +189,6 @@ exports['test_delete_players_by_id'] = function(test)
                                 })
                             .catch(
                                 function(reason) {
-                                    //console.log('('+reason+') in test_delete_players_by_id: [getPlayer]');
                                     test.equal('Player ' + playerId + ' not found', reason);
                                     test.done();
                             });

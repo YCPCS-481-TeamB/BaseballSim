@@ -26,7 +26,7 @@ router.get('/:id/teams', function(req, res, next){
   var limit = req.query.limit;
   var offset = req.query.offset;
   TeamsController.getTeamByUserId(id).then(function(data){
-    res.status(200).json(data);
+    res.status(200).json({success: false, teams:data});
   }).catch(function(err){
     res.status(200).json({success: false, message:""+ err});
   });
@@ -37,7 +37,7 @@ router.get('/:id/games', function(req, res, next){
   var limit = req.query.limit;
   var offset = req.query.offset;
   GameController.getGameByUserId(id).then(function(data){
-    res.status(200).json(data);
+    res.status(200).json({success: true, games: data});
   }).catch(function(err){
     res.status(200).json({success: false, message:""+ err});
   });
