@@ -6,7 +6,7 @@ CREATE TYPE dominant_arm AS ENUM ('left', 'right');
 
 CREATE TYPE permission_type AS ENUM ('owner', 'edit', 'view', 'delete');
 
-CREATE TYPE game_action_type AS ENUM ('start', 'end', 'home_run', 'walk', 'triple', 'double', 'single', 'ball', 'strike', 'foul', 'strike_out');
+CREATE TYPE game_action_type AS ENUM ('start', 'end', 'home_run', 'triple', 'double', 'single', 'ball', 'strike', 'foul', 'strike_out', 'out', 'walk');
 
 --PLAYERS STUFF
 CREATE TABLE players (
