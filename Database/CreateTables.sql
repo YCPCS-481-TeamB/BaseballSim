@@ -57,7 +57,7 @@ CREATE TABLE game_action (id SERIAL, game_id INTEGER, team1_score INTEGER DEFAUL
 CREATE TABLE game_player_positions (id SERIAL, game_action_id INTEGER, onfirst_id INTEGER DEFAULT 0, onsecond_id INTEGER DEFAULT 0, onthird_id INTEGER DEFAULT 0, date_created TIMESTAMP DEFAULT NOW());
 
 --CREATES PERMISSIONS TABLE FOR OWNERSHIP AND VIEW RIGHTS FOR FIELDS (ALLOWS CO-OWNERSHIP OF ITEMS)
-CREATE TABLE permissions (id SERIAL, user_id INTEGER, item_type VARCHAR(255) NOT NULL, item_id INTEGER NOT NULL, type permission_type NOTE NULL, date_created TIMESTAMP DEFAULT NOW());
+CREATE TABLE permissions (id SERIAL, user_id INTEGER, item_type VARCHAR(255) NOT NULL, item_id INTEGER NOT NULL DEFAULT 'view', type permission_type NOTE NULL, date_created TIMESTAMP DEFAULT NOW());
 
 INSERT INTO player_names (name, isLast) VALUES ('Brandon', 'n');
 INSERT INTO player_names (name, isLast) VALUES ('Walton', 'y');
