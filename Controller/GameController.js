@@ -178,7 +178,7 @@ function basicPlayerEvent(player1_id, player2_id){
             PlayerController.getPlayersById(player2_id).then(function(player2){
                 console.log("TEST");
                 var totalattrs;
-                var max = 100 + totalattrs;
+                var max = 105 + totalattrs;
                 var min = 0;
 
                 // Base chance for each outcome
@@ -190,7 +190,7 @@ function basicPlayerEvent(player1_id, player2_id){
                 var home_run = 2;
 
                 var strike = 25;
-                var out = 20;
+                var out = 15;
                 var foul = 20;
 
                 // Get the Attributes for Players 1 & 2
