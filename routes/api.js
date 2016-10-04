@@ -8,6 +8,10 @@ var fields = require('./fields');
 var users = require('./users');
 var games = require('./games');
 
+router.get('/test', function(req, res, next){
+    res.status(200).json({success: true, message: 'Yay!'});
+});
+
 router.use('/users', users);
 router.use(AuthenticationMiddleware.validateTokenMiddleware);
 router.use('/players', players);

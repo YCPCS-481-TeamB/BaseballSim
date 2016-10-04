@@ -7,9 +7,9 @@ exports.validateTokenMiddleware = function(req, res, next){
             req.userdata = data;
             next();
         }).catch(function(err){
-            res.status(200).json({success: false, message: "Could Not Authenticate"});
+            res.status(401).json({success: false, message: "Could Not Authenticate"});
         });
     }else{
-        res.status(200).json("Authentication Required!");
+        res.status(401).json("Authentication Required!");
     }
 }
