@@ -47,7 +47,7 @@ exports.createRandomPlayer = function(team_id){
  */
 
 function assignPlayerPosition() {
-    var num = Math.floor(Math.random() * 7);
+    var num = Math.floor(Math.random() * 9);
     var positionStringArray = ['pitcher', 'catcher', 'first_baseman', 'second_baseman', 'third_baseman','shortstop', 'left_fielder', 'center_fielder', 'right_fielder'];
     return positionStringArray[num];
 }
