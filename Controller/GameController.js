@@ -3,6 +3,9 @@ var Promise = bluebird.Promise;
 var DatabaseController = require('./DatabaseController');
 
 var PlayerController = require('./PlayersController');
+var ApprovalsController = require('./ApprovalsController');
+var PermissionController = require('./PermissionController');
+var TeamsController = require('./TeamsController');
 
 exports.getGames = function(limit, offset){
     return new Promise(function(resolve, reject){
@@ -30,7 +33,17 @@ exports.createGame = function(team1_id, team2_id, field_id, league_id){
     return new Promise(function(resolve, reject){
         if(team1_id && team2_id){
             DatabaseController.query("INSERT INTO games (team1_id, team2_id, field_id, league_id) VALUES ($1, $2, $3, $4) RETURNING *", [team1_id, team2_id, field_id | 0, league_id | 0]).then(function(data){
-                resolve(data.rows[0]);
+                PermissionController.getOwnerForItem('teams', team2_id).then(function(response){
+                    var user2_id = response.rows[0].user_id;
+                    ApprovalsController.createApproval('games', data.rows[0].id, user2_id).then(function(approval){
+                        console.log(data.rows[0]);
+                        resolve(data.rows[0]);
+                    }).catch(function(err){
+                        reject(err);
+                    });
+                }).catch(function(err){
+                    reject(err);
+                });
             }).catch(function(err){
                 reject(err);
             });
@@ -82,24 +95,32 @@ function addPlayerPosition(game_action_id, firstbase_player_id, secondbase_playe
 exports.startGame = function(game_id){
     return new Promise(function(resolve, reject){
         if(game_id){
-            exports.isGameStarted(game_id).then(function(data){
-                if(data.started == false){
-                    DatabaseController.query("INSERT INTO game_action (game_id, team1_score, team2_score, type, message) VALUES ($1, 0, 0, 'start', 'Game Started!') RETURNING *", [game_id]).then(function(data){
-                        var game_event = data.rows[0];
-                        addPlayerPosition(game_event.id, 0, 0, 0).then(function(data){
-                            resolve(game_event);
-                        }).catch(function(err){
-                           reject(err);
-                        });
+            ApprovalsController.getApprovalByItemTypeAndId('games', game_id).then(function(data){
+                if(checkAllForApprovalStatus(data) === true){
+                    exports.isGameStarted(game_id).then(function(data){
+                        if(data.started == false){
+                            DatabaseController.query("INSERT INTO game_action (game_id, team1_score, team2_score, type, message) VALUES ($1, 0, 0, 'start', 'Game Started!') RETURNING *", [game_id]).then(function(data){
+                                var game_event = data.rows[0];
+                                addPlayerPosition(game_event.id, 0, 0, 0).then(function(data){
+                                    resolve(game_event);
+                                }).catch(function(err){
+                                    reject(err);
+                                });
+                            }).catch(function(err){
+                                reject(err);
+                            });
+                        }else{
+                            reject("Game \'" + game_id + "\' is already started");
+                        }
                     }).catch(function(err){
                         reject(err);
                     });
                 }else{
-                    reject("Game \'" + game_id + "\' is already started");
+                    reject("All Players Must Accept Before Play Can Start");
                 }
             }).catch(function(err){
                 reject(err);
-            })
+            });
         }else{
             reject("Game ID is Required");
         }
@@ -280,6 +301,14 @@ function basicPlayerEvent(player1_id, player2_id){
             reject(err);
         });
     });
+}
+
+function checkAllForApprovalStatus(approvals){
+    var approvals = approvals.filter(function(item){
+        return item.approved != 'approved';
+    });
+
+    return approvals.length > 0;
 }
 
 /**

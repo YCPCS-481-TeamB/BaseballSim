@@ -2,12 +2,14 @@ var TeamsController = App.controller('TeamsController', function($scope, UserTok
 
     UserTokenFactory.getUserData().then(function(user){
         TeamService.getTeamByUserId(user.id).then(function(response){
+            console.log("User Teams", response);
             $scope.teams = response.data.teams;
         });
     });
 
     $scope.loadTeams = function(user_id){
         TeamService.getTeamByUserId(user_id).then(function(response){
+            console.log(response);
             $scope.teams = response.data.teams;
         });
     }
