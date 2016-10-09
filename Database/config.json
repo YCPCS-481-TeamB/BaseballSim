@@ -1,7 +1,7 @@
 {
     "database" : "testdb2",
     "user" : "postgres",
-    "password" : "Gordon",
+    "password" : "postgres",
     "port": 5432,
     "max": 10,
     "idleTimeoutMillis": 30000

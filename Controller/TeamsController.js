@@ -47,7 +47,7 @@ exports.getPlayersByTeamId = function(team_id){
 exports.getTeamById = function(id){
 	return new Promise(function(resolve, reject){
 		DatabaseController.query("SELECT * from teams WHERE id = $1", [id]).then(function(data){
-			resolve(data.rows);
+			resolve(data.rows[0]);
 		});
 	});
 }
@@ -55,7 +55,7 @@ exports.getTeamById = function(id){
 exports.updateTeam = function(id, teamname){
 	return new Promise(function(resolve, reject){
 		DatabaseController.query("UPDATE teams SET name=$2 WHERE id=$1 RETURNING *", [id, teamname]).then(function(data){
-			resolve(data.rows);
+			resolve(data.rows[0]);
 		}).catch(function(err){
 			reject(err);
 		})

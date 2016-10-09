@@ -199,8 +199,13 @@ var ConsoleController = App.controller('ConsoleController', function($scope,$doc
     $scope.startGame = function(game){
         if(game && game.id){
             GameService.startGameEvent(game.id).then(function(response){
-                console.log(response);
-                game.events.push(response.data);
+                if(typeof response.data === "object"){
+                    game.events.push(response.data);
+                }else{
+                    console.log(response.data);
+                    alert(response.data);
+                }
+
             });
         }
     }

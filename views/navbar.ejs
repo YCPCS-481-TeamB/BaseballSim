@@ -1,4 +1,5 @@
-<nav class="navbar navbar-inverse navbar-fixed-top" ng-controller="NavbarController">
+<div ng-controller="NavbarController">
+<nav class="navbar navbar-inverse navbar-fixed-top">
     <div class="container">
         <div class="navbar-header">
             <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
@@ -20,10 +21,39 @@
             <% if(loggedIn == true){ %>
                 <ul class="nav navbar-nav pull-right">
                     <li><a>Welcome {{userdata.username}}!</a></li>
+                    <li ng-if="approvals.length > 0" data-toggle="modal" data-target="#approvalModal"><a class="glyphicon glyphicon-inbox">{{approvals.length}}</a></li>
                     <li><a ng-click="logout()">Logout</a></li>
                 </ul>
             <%}
             %>
+
         </div><!--/.nav-collapse -->
     </div>
 </nav>
+
+<div class="modal" id="approvalModal">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Approvals</h4>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-success" ng-repeat="approval in approvals">
+                    Type: {{approval.item_type}}
+                    ID: {{approval.item_id}}
+
+                    <div class="btn-group pull-right" style="margin-top: -1.5%;">
+                        <button class="btn btn-success" data-dismiss="alert" ng-click="approve(approval)">Approve</button>
+                        <button class="btn btn-danger" data-dismiss="alert" ng-click="decline(approval)">Reject</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+</div>
