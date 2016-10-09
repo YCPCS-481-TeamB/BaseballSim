@@ -158,6 +158,7 @@ exports.getGameById = function(id){
 exports.doGameEvent = function(game_id, player1_id, player2_id){
     return new Promise(function(resolve, reject){
         basicPlayerEvent(player1_id, player2_id).then(function(result){
+        //gameAlgorithmController(game_id, player1_id, player2_id).then(function(result) {
             var game_message = generateMessage(player1_id, player2_id, game_id, result);
             DatabaseController.query("INSERT INTO game_action (game_id, team1_score, team2_score, type, message) VALUES ($1, 0, 0, $2, $3) RETURNING *", [game_id, result, game_message]).then(function(data){
                 resolve(data.rows);
@@ -187,6 +188,20 @@ function calculateNewPlayerPositions(obj_prev_pos, event){
 
 //function getNumStrikes(game_id)
 
+function gameAlgorithmController(game_id, player1_id, player2_id) {
+    return new Promise(function(resolve, reject) {
+        var team2 = game_id.team1_id;
+        var team1 = game_id.team2_id;
+
+        var player1 = player1_id;
+        var player2 = player2_id;
+
+        basicPlayerEvent(player1, player2);
+    }).catch(function(err){
+        reject(err);
+    });
+}
+
 /**
  * Should Return any of 'home_run', 'walk', 'triple', 'double', 'single', 'ball', 'strike', 'foul'
  * @param player1_id
@@ -197,7 +212,7 @@ function basicPlayerEvent(player1_id, player2_id){
     return new Promise(function(resolve, reject){
         PlayerController.getPlayersById(player1_id).then(function(player1){
             PlayerController.getPlayersById(player2_id).then(function(player2){
-                console.log("TEST");
+                //console.log("TEST");
                 var totalattrs;
                 var max = 100 + totalattrs;
                 var min = 0;
@@ -229,8 +244,10 @@ function basicPlayerEvent(player1_id, player2_id){
                  });
                  */
                 Promise.all([PlayerController.getPlayerAttributesById(player1_id),PlayerController.getPlayerAttributesById(player2_id)]).spread(function(player1, player2){
-                    console.log("TEST2");
-                    console.log(player1);
+                    //console.log("TEST2");
+                    //console.log(player1);
+
+                    // Attributes
                     var technique = player2.technique;
                     var pitch_speed = player2.pitch_speed;
                     var endurance = player2.endurance;
@@ -239,6 +256,14 @@ function basicPlayerEvent(player1_id, player2_id){
                     var swing_speed = player1.swing_speed;
                     var bat_power = player1.bat_power;
 
+                    // Stats
+                    var hits = 0;
+                    var hits_allowed = 0;
+                    var at_bats = 0;
+                    var innings_pitched = 0;
+                    var doubles = 0;
+                    var triples = 0;
+                    var homeruns = 0;
 
                     totalattrs = contact + swing_speed + bat_power + technique + pitch_speed
                         + endurance;
@@ -259,22 +284,38 @@ function basicPlayerEvent(player1_id, player2_id){
                     if (num >= 0  && num < ball){
                         // Returns Ball
                         rng = 0;
+
                     }
                     else if (num >= ball && num < ball+single){
                         // Returns Single
                         rng = 1;
+                        hits += 1;
+                        at_bats += 1;
+                        hits_allowed += 1;
                     }
                     else if (num >= ball+single && num < (ball+single+double)) {
                         // Returns Double
                         rng = 2;
+                        doubles += 1;
+                        hits += 1;
+                        at_bats += 1;
+                        hits_allowed += 1;
                     }
                     else if (num >= (ball+single+double) && num < (ball+single+double+triple)) {
                         // Returns Triple
                         rng = 3;
+                        triples += 1;
+                        hits += 1;
+                        at_bats += 1;
+                        hits_allowed += 1;
                     }
                     else if (num >= (ball+single+double+triple) && num < (ball+single+double+triple+home_run)) {
                         // Returns Home Run
                         rng = 4;
+                        homeruns += 1;
+                        hits += 1;
+                        at_bats += 1;
+                        hits_allowed += 1;
                     }
                     else if (num >= (ball+single+double+triple+home_run) && num < (ball+single+double+triple+home_run+strike)) {
                         // Returns Strike
@@ -283,6 +324,8 @@ function basicPlayerEvent(player1_id, player2_id){
                     else if (num >= (ball+single+double+triple+home_run+strike) && num < (ball+single+double+triple+home_run+strike+out)) {
                         // Returns Out
                         rng = 6;
+                        at_bats += 1;
+                        innings_pitched += 0.1;
                     }
                     else if (num >= (ball+single+double+triple+home_run+strike+out) && num < totalattrs){
                         // Returns Foul
@@ -291,6 +334,20 @@ function basicPlayerEvent(player1_id, player2_id){
 
                     var options = ['ball', 'single', 'double', 'triple', 'home_run', 'strike', 'out', 'foul'];
                     console.log("RAND: " + rng);
+                    Promise.all([PlayerController.getStatsByPlayerId(player1_id),PlayerController.getStatsByPlayerId(player2_id)]).spread(function(player1, player2) {
+                        console.log(player1);
+                        player1.homeruns += homeruns;
+                        player1.hits += hits;
+                        player1.at_bats += at_bats;
+                        player1.doubles += doubles;
+                        player1.triples += triples;
+                        player2.hits_allowed += hits_allowed;
+                        player2.innings_pitched += innings_pitched;
+                        console.log(player1);
+
+                    }).catch(function(err) {
+                        reject(err);
+                    });
                     resolve(options[rng]);
                 });
             }).catch(function(err){
