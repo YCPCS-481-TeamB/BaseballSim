@@ -47,7 +47,27 @@ exports.getPlayersByTeamId = function(team_id){
 exports.getTeamById = function(id){
 	return new Promise(function(resolve, reject){
 		DatabaseController.query("SELECT * from teams WHERE id = $1", [id]).then(function(data){
+			resolve(data.rows[0]);
+		});
+	});
+}
+
+exports.updateTeam = function(id, teamname){
+	return new Promise(function(resolve, reject){
+		DatabaseController.query("UPDATE teams SET name=$2 WHERE id=$1 RETURNING *", [id, teamname]).then(function(data){
+			resolve(data.rows[0]);
+		}).catch(function(err){
+			reject(err);
+		})
+	});
+}
+
+exports.getTeamByUserId = function(user_id){
+	return new Promise(function(resolve, reject){
+		DatabaseController.query("SELECT * from teams WHERE id in (SELECT item_id FROM permissions WHERE item_type='teams' AND user_id=$1)", [user_id]).then(function(data){
 			resolve(data.rows);
+		}).catch(function(err){
+			reject(err);
 		});
 	});
 }

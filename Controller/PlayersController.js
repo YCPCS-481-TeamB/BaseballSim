@@ -24,10 +24,14 @@ exports.createRandomPlayer = function(team_id){
             var firstname = firstname_data.rows[0].name;
             DatabaseController.query("SELECT name FROM player_names WHERE isLast = 'y' OFFSET floor(random()*(SELECT COUNT(name) FROM player_names WHERE isLast = 'y')) LIMIT 1").then(function(lastname_data){
                 var lastname = lastname_data.rows[0].name;
-                DatabaseController.query("INSERT INTO players (firstname,lastname,position,team_id) VALUES($1, $2, $3, $4) RETURNING *", [firstname, lastname, 'pitcher', team_id]).then(function(player){
+                DatabaseController.query("INSERT INTO players (firstname,lastname,position,team_id) VALUES($1, $2, $3, $4) RETURNING *", [firstname, lastname, assignPlayerPosition(), team_id]).then(function(player){
                     var player = player.rows[0];
                     createRandomAttr(player.id, player.position).then(function(attr){
-                        resolve(player);
+                        createPlayerStats(player.id).then(function(stats) {
+                            resolve(player);
+                        }).catch(function(err){
+                            reject(err);
+                        });
                     })
                 });
             });
@@ -35,6 +39,17 @@ exports.createRandomPlayer = function(team_id){
             reject("" + err);
         });
     });
+}
+
+/**
+ * @params void
+ * @returns string of player position
+ */
+
+function assignPlayerPosition() {
+    var num = Math.floor(Math.random() * 9);
+    var positionStringArray = ['pitcher', 'catcher', 'first_baseman', 'second_baseman', 'third_baseman','shortstop', 'left_fielder', 'center_fielder', 'right_fielder'];
+    return positionStringArray[num];
 }
 
 /**
@@ -156,6 +171,66 @@ exports.getPlayersById = function(id){
                 reject("Player " + id + " not found");
             }
 
+        });
+    });
+}
+
+/**
+ * Returns a Promise of an array of players with the requested team id
+ * @param team_id
+ * @returns {Promise}
+ */
+exports.getPlayersByTeamId = function(team_id) {
+    return new Promise(function(resolve, reject){
+        DatabaseController.query("SELECT * from players WHERE team_id = $1", [team_id]).then(function(data){
+            if(data.rows){
+                resolve(data.rows);
+            }
+        });
+    });
+}
+
+/**
+ * Returns a promise that contains an array of player's stats with the requested id
+ * @param id - the players id
+ * @returns {Promise}
+ */
+exports.getStatsByPlayerId = function(id){
+    return new Promise(function(resolve, reject) {
+            DatabaseController.query("SELECT * from stats WHERE player_id = $1", [id]).then(function(data) {
+                if (data.rows[0]) {
+                    resolve(data.rows[0]);
+                }
+                else {
+                    reject("Player " + id + " not found");
+                }
+            }).catch(function(err){
+                reject(err);
+            });
+    });
+}
+
+/**
+ * Returns a promise that returns the stats for the new player
+ * @param id
+ * @returns {Promise}
+ */
+createPlayerStats = function(id) {
+    return new Promise(function(resolve, reject) {
+        var statsMap = {hits: 0, doubles:0, games_played: 0, at_bats: 0, runs: 0, triples: 0,
+            homeruns: 0, runs_batted_in: 0, stolen_bases: 0, on_base_percentage: .000, batting_average: .000,
+            strikeouts: 0, walks: 0, wins: 0, losses: 0, hits_allowed: 0, innings_pitched: 0.0,
+            runs_allowed: 0, walks_allowed : 0, earned_runs: 0, earned_run_average: 0.00, strikeouts_thrown: 0,
+            saves: 0};
+
+        DatabaseController.query("INSERT INTO stats (player_id, hits, doubles, games_played, at_bats, runs, triples, homeruns, runs_batted_in, stolen_bases, on_base_percentage, batting_average, strikeouts, walks, wins, losses, hits_allowed, innings_pitched, runs_allowed, walks_allowed, earned_runs, earned_run_average, strikeouts_thrown, saves)" +
+            "VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24) RETURNING *", [id, statsMap.hits, statsMap.doubles,
+            statsMap.games_played, statsMap.at_bats, statsMap.runs, statsMap.triples, statsMap.homeruns, statsMap.runs_batted_in, statsMap.stolen_bases, statsMap.on_base_percentage,
+            statsMap.batting_average, statsMap.strikeouts, statsMap.walks, statsMap.wins, statsMap.losses, statsMap.hits_allowed, statsMap.innings_pitched, statsMap.runs_allowed,
+            statsMap.walks_allowed, statsMap.earned_runs, statsMap.earned_run_average, statsMap.strikeouts_thrown, statsMap.saves]).then(function(stats){
+            resolve(stats);
+        }).catch(function(err){
+            reject("" + err);
         });
     });
 }

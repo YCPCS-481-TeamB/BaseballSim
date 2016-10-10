@@ -10,28 +10,10 @@
         <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
         <link rel="stylesheet" href="stylesheets/webconsole.css">
     </head>
-    <body>
-        <nav class="navbar navbar-inverse navbar-fixed-top">
-            <div class="container">
-                <div class="navbar-header">
-                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-                        <span class="sr-only">Toggle navigation</span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </button>
-                    <a class="navbar-brand" href="#">BaseballSim</a>
-                </div>
-                <div id="navbar" class="collapse navbar-collapse">
-                    <ul class="nav navbar-nav">
-                        <li class="active"><a href="#">Home</a></li>
-                        <li><a href="#about">About</a></li>
-                    </ul>
-                </div><!--/.nav-collapse -->
-            </div>
-        </nav>
+    <body ng-app="app" >
+        <% include navbar %>
 
-        <div class="container" ng-app="app" ng-controller="ConsoleController">
+        <div class="container" ng-controller="ConsoleController">
             <div class="inner-container">
                 <div ng-class="{selected: showPlayerList}" class="display-box" ng-click="showPlayerList = !showPlayerList; loadPlayers()">Players</div>
                 <div ng-class="{selected: showUserList}" class="display-box" ng-click="showUserList = !showUserList; loadUsers()">Users</div>
@@ -52,13 +34,26 @@
                                 <td><button class="btn btn-danger" ng-click="deletePlayer(player); $event.stopPropagation()">X</button></td>
                             </tr>
                             <tr ng-if="player.showAttrs">
-                                <td colspan="6">
+                                <td colspan="6" ng-click="player.showStats = !player.showStats; loadPlayerStats(player);">
                                     <table class="table-striped table-condensed" style="width: 100%">
                                         <tr>
                                             <th>ID</th><th>Technique</th><th>Pitch Speed</th><th>Endurance</th><th>Contact</th><th>Swing Speed</th><th>Batting Power</th><th>Catching</th><th>Throwing</th><th>Awareness</th><th>Speed</th><th>Clutch</th><th>arm</th>                                        </tr>
                                         </tr>
                                         <tr>
                                             <td>{{player.attrs.player_id}}</td><td>{{player.attrs.technique}}</td><td>{{player.attrs.pitch_speed}}</td><td>{{player.attrs.endurance}}</td><td>{{player.attrs.contact}}</td><td>{{player.attrs.swing_speed}}</td><td>{{player.attrs.bat_power}}</td><td>{{player.attrs.catching}}</td><td>{{player.attrs.throwing}}</td><td>{{player.attrs.awareness}}</td><td>{{player.attrs.speed}}</td><td>{{player.attrs.clutch}}</td><td>{{player.attrs.arm}}</td>                                        </tr>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="12">
+                                                <table class="table-striped table-condensed" style="width: 100%">
+                                                    <tr>
+                                                        <th>ID</th><th>H</th><th>2B</th><th>GP</th><th>AB</th><th>R</th><th>3B</th><th>HR</th><th>RBI</th><th>SB</th><th>OBP</th><th>BA</th><th>SO</th><th>BB</th><th>W</th><th>L</th><th>HA</th><th>IP</th><th>RA</th><th>BBA</th><th>ER</th><th>ERA</th><th>Ks</th><th>SV</th>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>{{player.attrs.player_id}}</td><td>{{player.stats.hits}}</td><td>{{player.stats.doubles}}</td><td>{{player.stats.games_played}}</td><td>{{player.stats.at_bats}}</td><td>{{player.stats.runs}}</td><td>{{player.stats.triples}}</td><td>{{player.stats.homeruns}}</td><td>{{player.stats.runs_batted_in}}</td><td>{{player.stats.stolen_bases}}</td><td>{{player.stats.on_base_percentage}}</td><td>{{player.stats.batting_average}}</td><td>{{player.stats.strikeouts}}</td><td>{{player.stats.walks}}</td><td>{{player.stats.wins}}</td><td>{{player.stats.losses}}</td><td>{{player.stats.hits_allowed}}</td><td>{{player.stats.innings_pitched}}</td><td>{{player.stats.runs_allowed}}</td><td>{{player.stats.walks_allowed}}</td><td>{{player.stats.earned_runs}}</td><td>{{player.stats.earned_run_average}}</td><td>{{player.stats.strikeouts_thrown}}</td><td>{{player.stats.saves}}</td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+
                                         </tr>
                                     </table>
                                 </td>
@@ -150,8 +145,37 @@
                         </tr>
                         </thead>
                         <tbody ng-repeat="game in games">
-                            <td>{{game.id}}</td><td>{{game.team1_id}}</td><td>{{game.team2_id}}</td><td>{{game.field_id}}</td><td>{{game.league_id}}</td><td>{{game.date_created}}</td>
-                            <td><button class="btn btn-danger" ng-click="deleteGame(game)">X</button></td>
+                            <tr ng-click="loadGameEvents(game); game.showEvents = !game.showEvents">
+                                <td>{{game.id}}</td><td>{{game.team1_id}}</td><td>{{game.team2_id}}</td><td>{{game.field_id}}</td><td>{{game.league_id}}</td><td>{{game.date_created | date : "medium" }}</td>
+                                <td><button class="btn btn-danger" ng-click="deleteGame(game)">X</button></td>
+                            </tr>
+                            <tr  ng-if="game.showEvents">
+                                <td colspan="7">
+                                    <table class="table table-condensed">
+                                        <tr>
+                                            <th>Team 1 Score</th><th>Team 2 Score</th><th>Balls</th><th>Strikes</th><th>Outs</th><th>Type</th><th>Message</th><th>date_created</th>
+                                        </tr>
+                                        <tbody ng-repeat="event in game.events">
+                                        <tr ng-click="event.showGamePos = !event.showGamePos; loadPositions(event)">
+                                            <td>{{event.team1_score}}</td><td>{{event.team2_score}}</td><td>{{event.balls}}</td><td>{{event.strikes}}</td><td>{{event.outs}}</td><td>{{event.type}}</td><td>{{event.message}}</td><td>{{event.date_created | date : "medium" }}</td>
+                                        </tr>
+                                        <tr ng-if="event.showGamePos" ng-repeat="position in event.positions">
+                                            <td colspan="8">
+                                                {{position}}
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                        <tr>
+                                            <td colspan="8">
+                                                <button class="btn btn-success" ng-click="game.events = []; startGame(game)">Start Game</button>
+                                                <input type="number" ng-model="team1_player_id" placeholder="Team 1 Player id">
+                                                <input type="number" ng-model="team2_player_id" placeholder="Team 2 Player id">
+                                                <button class="btn btn-success" ng-click="nextGameEvent(game, team1_player_id, team2_player_id)">Next Event</button>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -162,10 +186,14 @@
     <script src="jquery/jquery.min.js"></script>
     <script src="bootstrap/js/bootstrap.min.js"></script>
     <script src="angular/angular.min.js"></script>
+    <script src="angular-cookies/angular-cookies.min.js"></script>
     <script src="javascripts/app.js"></script>
+    <script src="javascripts/service/UserTokenFactory.js"></script>
     <script src="javascripts/service/UserService.js"></script>
     <script src="javascripts/service/GameService.js"></script>
     <script src="javascripts/service/TeamService.js"></script>
     <script src="javascripts/service/PlayerService.js"></script>
     <script src="javascripts/controller/ConsoleController.js"></script>
+    <script src="javascripts/service/ApprovalService.js"></script>
+    <script src="javascripts/controller/NavbarController.js"></script>
 </html>

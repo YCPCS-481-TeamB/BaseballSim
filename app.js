@@ -30,6 +30,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/bootstrap', express.static('node_modules/bootstrap/dist'));
 app.use('/jquery', express.static('node_modules/jquery/dist'));
 app.use('/angular', express.static('node_modules/angular'));
+app.use('/angular-cookies', express.static('node_modules/angular-cookies'));
 
 app.use('/', routes);
 app.use('/api', api);
