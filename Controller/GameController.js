@@ -304,11 +304,11 @@ function basicPlayerEvent(player1_id, player2_id){
 }
 
 function checkAllForApprovalStatus(approvals){
+    console.log("Approvals", approvals);
     var approvals = approvals.filter(function(item){
         return item.approved != 'approved';
     });
-
-    return approvals.length > 0;
+    return approvals.length == 0;
 }
 
 /**

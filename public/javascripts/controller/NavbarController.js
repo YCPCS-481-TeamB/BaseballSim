@@ -4,9 +4,15 @@ var NavbarController = App.controller('NavbarController', function($scope, $inte
     $scope.approvals = [];
 
     function updateApprovals(){
-        ApprovalService.getAll().then(function(response){
-            console.log(response);
-            $scope.approvals = response.data.approvals;
+        UserTokenFactory.checkTokenValidity().then(function(valid){
+            if(valid == true){
+                ApprovalService.getAll().then(function(response){
+                    console.log(response);
+                    $scope.approvals = response.data.approvals;
+                }).catch(function(err){
+                    console.log(err);
+                });
+            }
         }).catch(function(err){
             console.log(err);
         });

@@ -1,6 +1,6 @@
 var GameController = App.controller('GameController', function($scope, UserTokenFactory, GameService, TeamService){
 
-    $scope.selectedGame = {};
+    $scope.selectedGame;
 
     UserTokenFactory.getUserData().then(function(user){
         GameService.loadGamesByUserId(user.id).then(function(response){

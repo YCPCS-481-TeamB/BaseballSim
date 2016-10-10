@@ -40,6 +40,11 @@
             </form>
         </div>
 
+        <div class="overlay" ng-show="showSelectedGame">
+            <button class="btn btn-danger pull-right" ng-click="showSelectedGame = false">X</button>
+
+        </div>
+
         <table class="table table-responsive table-hover">
             <thead>
             <tr>
@@ -47,19 +52,9 @@
             </tr>
             </thead>
             <tbody ng-repeat="game in games">
-            <tr  ng-if="!game.edit || game.edit == false">
-                <td>{{game.id}}</td><td>{{game.team1_id}}</td><td>{{game.team2_id}}</td>
-                <td><button class="btn  btn-primary glyphicon glyphicon-pencil" ng-click="game.edit=!game.edit"></button></td>
-            </tr>
-            <tr ng-if="game.edit == true">
-                <td><input type="text" ng-model="game.id" ng-bind="game.id"></td>
-                <td><input type="text" ng-model="game.team1_id" ng-bind="game.team1_id"></td>
-                <td><input type="text" ng-model="game.team2_id" ng-bind="game.team2_id"></td>
-                <td>
-                    <button class="btn  btn-primary glyphicon glyphicon-floppy-disk" ng-click="selectedGame = game;"></button>
-                    <button class="btn  btn-danger glyphicon glyphicon-trash" ng-click="game.edit=!game.edit; deleteGame(game)"></button>
-                </td>
-            </tr>
+                <tr ng-click="showSelectedGame=true">
+                    <td>{{game.id}}</td><td>{{game.team1_id}}</td><td>{{game.team2_id}}</td>
+                </tr>
             </tbody>
         </table>
     </div>

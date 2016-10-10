@@ -202,7 +202,6 @@ var ConsoleController = App.controller('ConsoleController', function($scope,$doc
                 if(typeof response.data === "object"){
                     game.events.push(response.data);
                 }else{
-                    console.log(response.data);
                     alert(response.data);
                 }
 
