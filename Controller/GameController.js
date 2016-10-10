@@ -14,7 +14,6 @@ exports.getGames = function(limit, offset){
         }).catch(function(err){
             reject(err);
         });
-
     });
 }
 
@@ -29,18 +28,32 @@ exports.getGameByUserId = function(user_id){
     });
 }
 
+
+
 exports.createGame = function(team1_id, team2_id, field_id, league_id){
     return new Promise(function(resolve, reject){
         if(team1_id && team2_id){
             DatabaseController.query("INSERT INTO games (team1_id, team2_id, field_id, league_id) VALUES ($1, $2, $3, $4) RETURNING *", [team1_id, team2_id, field_id | 0, league_id | 0]).then(function(data){
-                PermissionController.getOwnerForItem('teams', team2_id).then(function(response){
-                    var user2_id = response.rows[0].user_id;
-                    ApprovalsController.createApproval('games', data.rows[0].id, user2_id).then(function(approval){
-                        console.log(data.rows[0]);
-                        resolve(data.rows[0]);
+                PermissionController.getOwnerForItem('teams', team1_id).then(function(response){
+                    var user1_id = response.rows[0].user_id;
+
+                    PermissionController.getOwnerForItem('teams', team2_id).then(function(response2){
+                        var user2_id = response2.rows[0].user_id;
+                        ApprovalsController.createApproval('games', data.rows[0].id, user2_id).then(function(approval){
+                            PermissionController.addPermission('games', data.rows[0].id, user1_id).then(function(user1_perm){
+                                PermissionController.addPermission('games', data.rows[0].id, user2_id).then(function(user1_perm){
+                                    resolve(data.rows[0]);
+                                });
+                            });
+
+                        }).catch(function(err){
+                            reject(err);
+                        });
+
                     }).catch(function(err){
                         reject(err);
                     });
+
                 }).catch(function(err){
                     reject(err);
                 });
@@ -67,7 +80,7 @@ exports.isGameStarted = function(game_id){
     return new Promise(function(resolve, reject){
         DatabaseController.query("SELECT * FROM game_action WHERE game_id = $1 AND type = 'start'", [game_id]).then(function(data){
             if(data.rows.length > 0){
-                resolve({started: true, game_action: data.rows})
+                resolve({started: true, game_action: data.rows});
             }else{
                 resolve({started: false});
             }
@@ -92,6 +105,55 @@ function addPlayerPosition(game_action_id, firstbase_player_id, secondbase_playe
     return DatabaseController.query("INSERT INTO game_player_positions (game_action_id, onfirst_id, onsecond_id, onthird_id) VALUES ($1, $2, $3, $4)", [game_action_id, firstbase_player_id, secondbase_player_id, thirdbase_player_id]);
 }
 
+function createApprovalsForEvent(game_id, event_id){
+    var promises = [];
+    PermissionController.getOwnerForItem('games', game_id).then(function(data){
+        var users = data.rows;
+        for(var i = 0;i<data.rows.length;i++){
+            promises.push(ApprovalsController.createApproval('events', event_id, users[i].user_id));
+        }
+        return Promise.all(promises);
+    }).catch(function(err){
+        console.log(err);
+    });
+}
+
+exports.checkNextTurnReadyState = function(game_id){
+    return new Promise(function(resolve,reject){
+        exports.getEventsByGameId(game_id).then(function(data){
+
+        }).catch(function(err){
+
+        });
+    });
+}
+
+exports.getLatestEventForGame = function(game_id){
+    return new Promise(function(resolve, reject){
+        DatabaseController.query("SELECT * FROM game_action WHERE game_id=$1 ORDER BY date_created DESC LIMIT 1;", [game_id]).then(function(data){
+            resolve(data.rows[0]);
+        }).catch(function(err){
+            reject(err);
+        });
+    });
+}
+
+exports.getLatestEventApprovalsForGame = function(game_id){
+    return new Promise(function(resolve, reject){
+        exports.getLatestEventForGame(game_id).then(function(data){
+            console.log("DATA", data);
+            ApprovalsController.getApprovalByItemTypeAndId('events', data.id).then(function(approvals){
+                console.log(approvals);
+                resolve(approvals);
+            }).catch(function(err){
+              reject(err);
+            })
+        }).catch(function(err){
+            reject(err);
+        });
+    });
+}
+
 exports.startGame = function(game_id){
     return new Promise(function(resolve, reject){
         if(game_id){
@@ -100,9 +162,13 @@ exports.startGame = function(game_id){
                     exports.isGameStarted(game_id).then(function(data){
                         if(data.started == false){
                             DatabaseController.query("INSERT INTO game_action (game_id, team1_score, team2_score, type, message) VALUES ($1, 0, 0, 'start', 'Game Started!') RETURNING *", [game_id]).then(function(data){
-                                var game_event = data.rows[0];
-                                addPlayerPosition(game_event.id, 0, 0, 0).then(function(data){
-                                    resolve(game_event);
+                                    var game_event = data.rows[0];
+                                    addPlayerPosition(game_event.id, 0, 0, 0).then(function(data){
+                                        createApprovalsForEvent(game_id, game_event.id).then(function(approvals){
+                                            resolve(game_event);
+                                        }).catch(function(err){
+                                            console.log(err);
+                                        });
                                 }).catch(function(err){
                                     reject(err);
                                 });
