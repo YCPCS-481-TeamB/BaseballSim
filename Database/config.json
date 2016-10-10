@@ -1,7 +1,8 @@
 {
-    "database" : "testdb2",
-    "user" : "postgres",
-    "password" : "Gordon",
+    "database" : "ddinad4qa47rub",
+    "user" : "rfzgrezthdpzxa",
+    "host" : "ec2-54-163-249-150.compute-1.amazonaws.com",
+    "password" : "fK5rZUC8P0GyGQ3ZOxt0zkvHn0",
     "port": 5432,
     "max": 10,
     "idleTimeoutMillis": 30000
