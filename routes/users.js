@@ -2,6 +2,8 @@ var express = require('express');
 var router = express.Router();
 
 var UserController = require('./../Controller/UserController');
+var TeamsController = require('./../Controller/TeamsController');
+var GameController = require('./../Controller/GameController');
 var SecurityController = require('./../Controller/SecurityController');
 
 /**
@@ -14,6 +16,29 @@ router.get('/', function(req, res, next) {
   var offset = req.query.offset;
   UserController.getUsers(limit, offset).then(function(data){
     res.status(200).json(data);
+  }).catch(function(err){
+    res.status(200).json({success: false, message:""+ err});
+  });
+});
+
+router.get('/:id/teams', function(req, res, next){
+  var id = req.params.id;
+  var limit = req.query.limit;
+  var offset = req.query.offset;
+  TeamsController.getTeamByUserId(id).then(function(data){
+    res.status(200).json({success: true, teams:data});
+  }).catch(function(err){
+    res.status(200).json({success: false, message:""+ err});
+  });
+});
+
+router.get('/:id/games', function(req, res, next){
+  var id = req.params.id;
+  var limit = req.query.limit;
+  var offset = req.query.offset;
+  GameController.getGameByUserId(id).then(function(data){
+    console.log(data);
+    res.status(200).json({success: true, games: data});
   }).catch(function(err){
     res.status(200).json({success: false, message:""+ err});
   });
@@ -33,12 +58,12 @@ router.post('/', function(req, res, next){
 
   if(username && password){
     UserController.createUser(username, password, firstname, lastname, email).then(function(data){
-      res.status(200).json(data.rows[0]);
+      res.status(200).json({success: true, user: data.rows[0]});
     }).catch(function(err){
-      res.status(200).json(err);
+      res.status(200).json({success: false, error: err});
     });
   }else{
-    res.status(200).json("Must Enter Username and Password");
+    res.status(200).json({success: false, error: "Must Enter Username and Password"});
   }
 });
 

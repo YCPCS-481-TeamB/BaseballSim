@@ -13,7 +13,7 @@ var PlayerService = App.service('PlayerService', function($http, UserTokenFactor
     }
 
     this.create= function(){
-        return $http.post('/api/players', {headers: {"x-access-token" : UserTokenFactory.getToken()}});
+        return $http.post('/api/players', {},{headers: {"x-access-token" : UserTokenFactory.getToken()}});
     }
 
     this.deleteById = function(id){

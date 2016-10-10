@@ -156,7 +156,7 @@
                                             <th>Team 1 Score</th><th>Team 2 Score</th><th>Balls</th><th>Strikes</th><th>Outs</th><th>Type</th><th>Message</th><th>date_created</th>
                                         </tr>
                                         <tbody ng-repeat="event in game.events">
-                                        <tr ng-click="event.showGamePos = !event.showGamePos; console.log(event.showGamePos); loadPositions(event)">
+                                        <tr ng-click="event.showGamePos = !event.showGamePos; loadPositions(event)">
                                             <td>{{event.team1_score}}</td><td>{{event.team2_score}}</td><td>{{event.balls}}</td><td>{{event.strikes}}</td><td>{{event.outs}}</td><td>{{event.type}}</td><td>{{event.message}}</td><td>{{event.date_created | date : "medium" }}</td>
                                         </tr>
                                         <tr ng-if="event.showGamePos" ng-repeat="position in event.positions">
@@ -167,7 +167,7 @@
                                         </tbody>
                                         <tr>
                                             <td colspan="8">
-                                                <button class="btn btn-success" ng-click="startGame(game)">Start Game</button>
+                                                <button class="btn btn-success" ng-click="game.events = []; startGame(game)">Start Game</button>
                                                 <input type="number" ng-model="team1_player_id" placeholder="Team 1 Player id">
                                                 <input type="number" ng-model="team2_player_id" placeholder="Team 2 Player id">
                                                 <button class="btn btn-success" ng-click="nextGameEvent(game, team1_player_id, team2_player_id)">Next Event</button>
@@ -194,5 +194,6 @@
     <script src="javascripts/service/TeamService.js"></script>
     <script src="javascripts/service/PlayerService.js"></script>
     <script src="javascripts/controller/ConsoleController.js"></script>
-    <script src="javascripts/controller/LogoutController.js"></script>
+    <script src="javascripts/service/ApprovalService.js"></script>
+    <script src="javascripts/controller/NavbarController.js"></script>
 </html>

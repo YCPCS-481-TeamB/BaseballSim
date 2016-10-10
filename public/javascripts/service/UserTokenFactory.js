@@ -1,8 +1,21 @@
 var UserTokenFactory = App.service('UserTokenFactory', function($http, $cookies){
     var token;
 
+    this.getUserData = function(){
+        return new Promise(function(resolve, reject){
+            $http.post('/api/users/validate', {token: token}).then(function(data){
+                resolve(data.data.user);
+            }).catch(function(err){
+                console.log(err);
+            });
+        });
+    }
+
     if($cookies.get('userToken')){
         token = $cookies.get('userToken');
+        this.getUserData().then(function(user){
+            console.log("UserData: ", user);
+        });
     }
 
     this.getToken = function(){
@@ -41,4 +54,5 @@ var UserTokenFactory = App.service('UserTokenFactory', function($http, $cookies)
             });
         });
     }
+
 });

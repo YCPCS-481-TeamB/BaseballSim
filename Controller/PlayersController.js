@@ -24,7 +24,7 @@ exports.createRandomPlayer = function(team_id){
             var firstname = firstname_data.rows[0].name;
             DatabaseController.query("SELECT name FROM player_names WHERE isLast = 'y' OFFSET floor(random()*(SELECT COUNT(name) FROM player_names WHERE isLast = 'y')) LIMIT 1").then(function(lastname_data){
                 var lastname = lastname_data.rows[0].name;
-                DatabaseController.query("INSERT INTO players (firstname,lastname,position,team_id) VALUES($1, $2, $3, $4) RETURNING *", [firstname, lastname, 'pitcher', team_id]).then(function(player){
+                DatabaseController.query("INSERT INTO players (firstname,lastname,position,team_id) VALUES($1, $2, $3, $4) RETURNING *", [firstname, lastname, assignPlayerPosition(), team_id]).then(function(player){
                     var player = player.rows[0];
                     createRandomAttr(player.id, player.position).then(function(attr){
                         createPlayerStats(player.id).then(function(stats) {
@@ -39,6 +39,17 @@ exports.createRandomPlayer = function(team_id){
             reject("" + err);
         });
     });
+}
+
+/**
+ * @params void
+ * @returns string of player position
+ */
+
+function assignPlayerPosition() {
+    var num = Math.floor(Math.random() * 9);
+    var positionStringArray = ['pitcher', 'catcher', 'first_baseman', 'second_baseman', 'third_baseman','shortstop', 'left_fielder', 'center_fielder', 'right_fielder'];
+    return positionStringArray[num];
 }
 
 /**

@@ -27,7 +27,6 @@ exports.updateUser = function(id, firstname, lastname, email){
 
 exports.createUser = function(username, password, firstname, lastname, email){
     return new Promise(function(resolve, reject){
-        console.log(username, password, firstname, lastname, email);
         if(username && password){
             SecurityController.createSecureUser(username, password).then(function(data){
                 exports.updateUser(data.rows[0].id, firstname, lastname, email).then(function(data2){

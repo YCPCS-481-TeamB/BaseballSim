@@ -52,6 +52,7 @@ var ConsoleController = App.controller('ConsoleController', function($scope,$doc
 
     $scope.createPlayer = function(){
         PlayerService.create().then(function(response){
+            console.log("Response", response);
             $scope.players.push(response.data);
         });
     }
@@ -105,10 +106,10 @@ var ConsoleController = App.controller('ConsoleController', function($scope,$doc
 
     $scope.createTeam = function(teamname, league_id){
         TeamService.create(teamname, league_id).then(function(response){
-            if(response.data.id){
-                $scope.teams.push(response.data);
+            if(response.data.teams.id){
+                $scope.teams.push(response.data.teams);
             }else{
-                alert(response.data);
+                alert(response.data.error);
                 console.log(response.data);
             }
         });
@@ -125,6 +126,7 @@ var ConsoleController = App.controller('ConsoleController', function($scope,$doc
 
     $scope.loadGames = function(){
         var games = GameService.getAll().then(function(response){
+            console.log(response.data);
             $scope.games = response.data.games;
         });
     }
@@ -132,8 +134,8 @@ var ConsoleController = App.controller('ConsoleController', function($scope,$doc
     $scope.createGame = function(team1_id, team2_id){
         GameService.create(team1_id, team2_id, 0, 0).then(function(response){
             console.log(response);
-            if(response.data.id){
-                $scope.games.push(response.data);
+            if(response.data.game.id){
+                $scope.games.push(response.data.game);
             }else{
                 alert(response.data);
                 console.log(response.data);
@@ -153,6 +155,7 @@ var ConsoleController = App.controller('ConsoleController', function($scope,$doc
     $scope.loadGameEvents = function(game){
         if(game && game.id){
             GameService.loadEventsByGameId(game.id).then(function(response){
+                console.log(response);
                 if(response.data[0].id) {
                     console.log(response);
                     game.events = response.data;
@@ -167,6 +170,7 @@ var ConsoleController = App.controller('ConsoleController', function($scope,$doc
     $scope.nextGameEvent = function(game,team1_player_id, team2_player_id){
         if(game && game.id){
             GameService.nextGameEvent(game.id, team1_player_id, team2_player_id).then(function(response){
+                console.log(response);
                 if(response.data[0].id){
                     console.log(response);
                     game.events.push(response.data[0]);
@@ -195,8 +199,12 @@ var ConsoleController = App.controller('ConsoleController', function($scope,$doc
     $scope.startGame = function(game){
         if(game && game.id){
             GameService.startGameEvent(game.id).then(function(response){
-                console.log(response);
-                game.events.push(response.data);
+                if(typeof response.data === "object"){
+                    game.events.push(response.data);
+                }else{
+                    alert(response.data);
+                }
+
             });
         }
     }

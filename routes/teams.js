@@ -3,6 +3,7 @@ var router = express.Router();
 
 var TeamsController = require('./../Controller/TeamsController');
 var PlayersController = require('./../Controller/PlayersController');
+var PermissionController = require('./../Controller/PermissionController');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -14,12 +15,27 @@ router.get('/', function(req, res, next) {
 });
 
 router.post('/', function(req, res, next){
-	var teamname = req.body.teamname | "Untitled";
-	var league_id = req.body.league_id | 0;
+	var teamname = req.body.teamname || "Untitled";
+	var league_id = req.body.league_id || 0;
 	TeamsController.buildRandomTeam(teamname, league_id).then(function(response){
-		res.status(200).json(response);
+		PermissionController.addPermission('teams', response.id, req.userdata.id).then(function(data){
+			res.status(200).json({success: true, teams: response});
+		}).catch(function(err){
+			res.status(200).json({success: false, error:""+ err});
+		})
 	}).catch(function(err){
-		res.status(200).json({success: false, message:""+ err});
+		res.status(200).json({success: false, error:""+ err});
+	});
+});
+
+router.put('/:id', function(req, res, next){
+	var id = req.params.id;
+	var teamname = req.body.teamname;
+	console.log(teamname);
+	TeamsController.updateTeam(id, teamname).then(function(response){
+		res.status(200).json({success: true, team: response});
+	}).catch(function(err){
+		res.status(200).json({success: false, error: err});
 	});
 });
 

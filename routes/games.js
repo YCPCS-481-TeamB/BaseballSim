@@ -2,6 +2,8 @@ var express = require('express');
 var router = express.Router();
 
 var GameController = require("./../Controller/GameController");
+var PermissionController = require("./../Controller/PermissionController");
+var TeamsController = require("./../Controller/TeamsController");
 
 /**
  * GET for getting all games from database
@@ -12,7 +14,7 @@ router.get('/', function(req, res, next) {
     var limit = req.query.limit;
     var offset = req.query.offset;
     GameController.getGames(limit, offset).then(function(data){
-        res.status(200).json(data);
+        res.status(200).json({success: true, games: data});
     }).catch(function(err){
         res.status(200).json({success: false, message:""+ err});
     });
@@ -31,9 +33,20 @@ router.post('/', function(req, res, next){
     var team2_id = req.body.team2_id;
     var field_id = req.body.field_id;
     var league_id = req.body.league_id;
-
     GameController.createGame(team1_id, team2_id, field_id, league_id).then(function(data){
-        res.status(200).json(data);
+        PermissionController.addPermission('games', data.id,req.userdata.id).then(function(response){
+            PermissionController.getOwnerForItem('teams', team2_id).then(function(team){
+                PermissionController.addPermission('games', data.id, team.rows[0].user_id).then(function(response){
+                    res.status(200).json({success: true, game: data});
+                }).catch(function(err){
+                    res.status(200).json({success: false, error: err});
+                });
+            }).catch(function(err){
+                res.status(200).json({success: false, error: err});
+            });
+        }).catch(function(err){
+            res.status(200).json({success: false, error: err});
+        })
     }).catch(function(err){
         res.status(200).json("" + err);
     });
@@ -61,7 +74,7 @@ router.get('/events/:event_id/positions', function(req, res, next){
     var event_id = req.params.event_id;
 
     GameController.getPlayerPositionByGameEventId(event_id).then(function(data){
-        res.status(200).json(data);
+        res.status(200).json({positions: data});
     }).catch(function(err){
         res.status(200).json(err);
     });
@@ -96,7 +109,7 @@ router.post('/:id/events/next', function(req, res, next){
         GameController.doGameEvent(id, player1_id, player2_id).then(function(data){
             res.status(200).json(data);
         }).catch(function(err){
-            res.status(200).json(err);
+            res.status(200).json("" + err);
         });
     }else{
         res.status(200).json("Need 2 Players Selected");
