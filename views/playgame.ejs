@@ -1,0 +1,96 @@
+<html>
+<head>
+    <title><%=title%></title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/stylesheets/style.css">
+</head>
+<body ng-app="app">
+<% include navbar%>
+
+<div class="container" ng-controller="PlayGameController">
+
+    <div class="row">
+        <div class="col-sm-4">
+            <canvas id="FieldCanvas" width="200" height="200">
+                Canvas Element Is Not Supported On Your Browser
+            </canvas>
+        </div>
+        <div class="col-sm-8">
+            <div class="scroll-view">
+                <button class="btn btn-success form-control" ng-show="gameEvents.length == 0" ng-click="startGame()">Start Game</button>
+                <div class="alert alert-success" ng-repeat="event in gameEvents">
+                    {{event.type}} {{event.message}}
+                    Team 1 Score: {{event.team1_score}} Team 2 Score: {{event.team2_score}}
+                    Balls: {{event.balls}}
+                    Strikes: {{event.strikes}}
+                    Outs: {{event.outs}}
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+</body>
+
+<script>
+    var canvas = document.getElementById("FieldCanvas");
+    var ctx = canvas.getContext("2d");
+
+    var width = 200;
+    var height = 200;
+
+    var base1_filled = false;
+    var base2_filled = false;
+    var base3_filled = false;
+    var base4_filled = false;
+
+    //Draw Grass
+    ctx.fillStyle = "green";
+    ctx.fillRect(0,0,width,height);
+
+    //Draw Field
+    ctx.translate(width/2, height/2);
+    ctx.rotate(45*Math.PI/180);
+    ctx.translate(-width/2, -height/2);
+    ctx.fillStyle = "brown";
+    ctx.rect(width/5, height/5, width/2, height/2);
+    //Draw Bases
+    if(base1_filled){
+        ctx.fillStyle = "grey";
+    }else{
+        ctx.fillStyle = "brown";
+    }
+    ctx.fillRect(width/5, height/5, width*(25/500), height*(25/500));
+
+    if(base2_filled){
+        ctx.fillStyle = "grey";
+    }else{
+        ctx.fillStyle = "brown";
+    }
+    ctx.fillRect(width*(325/500), height*(325/500), width*(25/500), height*(25/500));
+
+    if(base3_filled){
+        ctx.fillStyle = "grey";
+    }else{
+        ctx.fillStyle = "brown";
+    }
+    ctx.fillRect(width*(325/500), height/5, width*(25/500), height*(25/500));
+
+    if(base4_filled){
+        ctx.fillStyle = "grey";
+    }else{
+        ctx.fillStyle = "brown";
+    }
+    ctx.fillRect(width/5, height*(325/500), width*(25/500), height*(25/500));
+    ctx.stroke();
+</script>
+
+<% include footer%>
+</html>

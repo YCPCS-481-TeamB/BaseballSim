@@ -34,21 +34,9 @@ router.post('/', function(req, res, next){
     var field_id = req.body.field_id;
     var league_id = req.body.league_id;
     GameController.createGame(team1_id, team2_id, field_id, league_id).then(function(data){
-        PermissionController.addPermission('games', data.id,req.userdata.id).then(function(response){
-            PermissionController.getOwnerForItem('teams', team2_id).then(function(team){
-                PermissionController.addPermission('games', data.id, team.rows[0].user_id).then(function(response){
-                    res.status(200).json({success: true, game: data});
-                }).catch(function(err){
-                    res.status(200).json({success: false, error: err});
-                });
-            }).catch(function(err){
-                res.status(200).json({success: false, error: err});
-            });
-        }).catch(function(err){
-            res.status(200).json({success: false, error: err});
-        })
+        res.status(200).json({success: true, game: data});
     }).catch(function(err){
-        res.status(200).json("" + err);
+        res.status(200).json({success: false, error: err});
     });
 });
 
@@ -88,6 +76,34 @@ router.get('/:id/events', function(req, res, next){
     var id = req.params.id;
 
     GameController.getEventsByGameId(id).then(function(data){
+        res.status(200).json(data);
+    }).catch(function(err){
+        res.status(200).json(err);
+    });
+});
+
+/**
+ * Gets all game events for a game
+ * @params id - the game's id
+ */
+router.get('/:id/events/latest', function(req, res, next){
+    var id = req.params.id;
+
+    GameController.getLatestEventForGame(id).then(function(data){
+        res.status(200).json(data);
+    }).catch(function(err){
+        res.status(200).json(err);
+    });
+});
+
+/**
+ * Gets all game events for a game
+ * @params id - the game's id
+ */
+router.get('/:id/approvals/state', function(req, res, next){
+    var id = req.params.id;
+
+    GameController.getLatestEventApprovalsForGame(id).then(function(data){
         res.status(200).json(data);
     }).catch(function(err){
         res.status(200).json(err);

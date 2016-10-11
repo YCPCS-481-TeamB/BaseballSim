@@ -16,4 +16,11 @@ a {
   z-index: 1000000;
   border-radius: 10px 10px 10px 10px; }
 
+.scroll-view {
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: 100%;
+  max-width: 100%;
+  background-color: grey; }
+
 /*# sourceMappingURL=style.css.map */
