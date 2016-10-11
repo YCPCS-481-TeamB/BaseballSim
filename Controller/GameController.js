@@ -295,20 +295,6 @@ function basicPlayerEvent(player1_id, player2_id){
                 var out = 20;
                 var foul = 20;
 
-                // Get the Attributes for Players 1 & 2
-                /*
-                 var player1attrs, player2attrs;
-                 PlayerController.getPlayerAttributesById(player1_id).then(function(data){
-                 player1attrs = data;
-                 }).catch(function(err){
-                 reject(err);
-                 });
-                 PlayerController.getPlayerAttributesById(player2_id).then(function(data){
-                 player2attrs = data;
-                 }).catch(function(err){
-                 reject(err);
-                 });
-                 */
                 Promise.all([PlayerController.getPlayerAttributesById(player1_id),PlayerController.getPlayerAttributesById(player2_id)]).spread(function(player1, player2){
                     //console.log("TEST2");
                     //console.log(player1);

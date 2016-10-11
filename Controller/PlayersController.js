@@ -240,23 +240,27 @@ createPlayerStats = function(id) {
 exports.statTracker = function(player1, player2, outcome) {
     console.log('Entered Stat Tracker');
     console.log(outcome);
+    var pitch_count = 0;
     Promise.all([exports.getStatsByPlayerId(player1.id),exports.getStatsByPlayerId(player2.id)]).spread(function(player1, player2) {
         if (outcome == 'single') {
             player1.at_bats += 1;
             player1.hits += 1;
             player2.hits_allowed += 1;
+            pitch_count += 1;
         }
         else if (outcome == 'double') {
             player1.at_bats += 1;
             player1.hits += 1;
             player1.doubles += 1;
             player2.hits_allowed += 1;
+            pitch_count += 1;
         }
         else if (outcome == 'triple') {
             player1.at_bats += 1;
             player1.hits += 1;
             player1.triples += 1;
             player2.hits_allowed += 1;
+            pitch_count += 1;
         }
         else if (outcome == 'home_run') {
             player1.at_bats += 1;
@@ -264,12 +268,20 @@ exports.statTracker = function(player1, player2, outcome) {
             player1.homeruns += 1;
             player2.hits_allowed += 1;
             player2.earned_runs += 1;
+            pitch_count += 1;
         }
         else if (outcome == 'out') {
             player1.at_bats += 1;
             player2.innings_pitched += 0.1;
+            pitch_count += 1;
+        }
+        else {
+            pitch_count += 1;
         }
         console.log('Num At_Bats: ' + player1.at_bats);
+        DatabaseController.query('UPDATE stats SET hits = $2, doubles = $3, triples = $4, homeruns = $5, at_bats = $6, batting_average = $7 WHERE id = $1', [player1.id, player1.hits, player1.doubles,
+            player1.triples, player1.homeruns, player1.at_bats, (player1.hits / player1.at_bats)]);
+        console.log(player1);
     }).catch(function(err) {
         reject(err);
     });
