@@ -16,7 +16,7 @@ CREATE TABLE players (
 );
 
 CREATE TABLE attributes (
-	player_id INTEGER,
+	id SERIAL, player_id INTEGER,
 		--Pitching attributes
 	technique INTEGER, pitch_speed INTEGER, endurance INTEGER,
 		--Batting attributes
@@ -28,6 +28,7 @@ CREATE TABLE attributes (
 );
 
 CREATE TABLE stats (
+    id SERIAL,
 	player_id INTEGER,
 		--Fieldplayer Stats
 	hits INTEGER, doubles INTEGER, games_played INTEGER, at_bats INTEGER,

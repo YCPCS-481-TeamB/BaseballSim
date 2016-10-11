@@ -1,4 +1,6 @@
 var DatabaseController = require('./DatabaseController');
+var bluebird = require('bluebird');
+var Promise = bluebird.Promise;
 
 /**
  * Creates the player with the given parameters
@@ -234,3 +236,42 @@ createPlayerStats = function(id) {
         });
     });
 }
+
+exports.statTracker = function(player1, player2, outcome) {
+    console.log('Entered Stat Tracker');
+    console.log(outcome);
+    Promise.all([exports.getStatsByPlayerId(player1.id),exports.getStatsByPlayerId(player2.id)]).spread(function(player1, player2) {
+        if (outcome == 'single') {
+            player1.at_bats += 1;
+            player1.hits += 1;
+            player2.hits_allowed += 1;
+        }
+        else if (outcome == 'double') {
+            player1.at_bats += 1;
+            player1.hits += 1;
+            player1.doubles += 1;
+            player2.hits_allowed += 1;
+        }
+        else if (outcome == 'triple') {
+            player1.at_bats += 1;
+            player1.hits += 1;
+            player1.triples += 1;
+            player2.hits_allowed += 1;
+        }
+        else if (outcome == 'home_run') {
+            player1.at_bats += 1;
+            player1.hits += 1;
+            player1.homeruns += 1;
+            player2.hits_allowed += 1;
+            player2.earned_runs += 1;
+        }
+        else if (outcome == 'out') {
+            player1.at_bats += 1;
+            player2.innings_pitched += 0.1;
+        }
+        console.log('Num At_Bats: ' + player1.at_bats);
+    }).catch(function(err) {
+        reject(err);
+    });
+}
+

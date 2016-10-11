@@ -289,33 +289,21 @@ function basicPlayerEvent(player1_id, player2_id){
                     else if (num >= ball && num < ball+single){
                         // Returns Single
                         rng = 1;
-                        hits += 1;
-                        at_bats += 1;
-                        hits_allowed += 1;
+
                     }
                     else if (num >= ball+single && num < (ball+single+double)) {
                         // Returns Double
                         rng = 2;
-                        doubles += 1;
-                        hits += 1;
-                        at_bats += 1;
-                        hits_allowed += 1;
+
                     }
                     else if (num >= (ball+single+double) && num < (ball+single+double+triple)) {
                         // Returns Triple
                         rng = 3;
-                        triples += 1;
-                        hits += 1;
-                        at_bats += 1;
-                        hits_allowed += 1;
+
                     }
                     else if (num >= (ball+single+double+triple) && num < (ball+single+double+triple+home_run)) {
                         // Returns Home Run
                         rng = 4;
-                        homeruns += 1;
-                        hits += 1;
-                        at_bats += 1;
-                        hits_allowed += 1;
                     }
                     else if (num >= (ball+single+double+triple+home_run) && num < (ball+single+double+triple+home_run+strike)) {
                         // Returns Strike
@@ -324,8 +312,6 @@ function basicPlayerEvent(player1_id, player2_id){
                     else if (num >= (ball+single+double+triple+home_run+strike) && num < (ball+single+double+triple+home_run+strike+out)) {
                         // Returns Out
                         rng = 6;
-                        at_bats += 1;
-                        innings_pitched += 0.1;
                     }
                     else if (num >= (ball+single+double+triple+home_run+strike+out) && num < totalattrs){
                         // Returns Foul
@@ -334,20 +320,9 @@ function basicPlayerEvent(player1_id, player2_id){
 
                     var options = ['ball', 'single', 'double', 'triple', 'home_run', 'strike', 'out', 'foul'];
                     console.log("RAND: " + rng);
-                    Promise.all([PlayerController.getStatsByPlayerId(player1_id),PlayerController.getStatsByPlayerId(player2_id)]).spread(function(player1, player2) {
-                        console.log(player1);
-                        player1.homeruns += homeruns;
-                        player1.hits += hits;
-                        player1.at_bats += at_bats;
-                        player1.doubles += doubles;
-                        player1.triples += triples;
-                        player2.hits_allowed += hits_allowed;
-                        player2.innings_pitched += innings_pitched;
-                        console.log(player1);
+                    PlayerController.statTracker(player1, player2, options[rng]);
 
-                    }).catch(function(err) {
-                        reject(err);
-                    });
+
                     resolve(options[rng]);
                 });
             }).catch(function(err){
