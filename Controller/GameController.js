@@ -7,6 +7,9 @@ var ApprovalsController = require('./ApprovalsController');
 var PermissionController = require('./PermissionController');
 var TeamsController = require('./TeamsController');
 
+// Don't yell at me Brandon I wanted some global variables
+var numBalls = 0;
+var numStrikes = 0;
 exports.getGames = function(limit, offset){
     return new Promise(function(resolve, reject){
         DatabaseController.query("SELECT * from games LIMIT $1 OFFSET $2", [limit | 1000, offset | 0]).then(function(data){
@@ -299,6 +302,9 @@ function basicPlayerEvent(player1_id, player2_id){
                     //console.log("TEST2");
                     //console.log(player1);
 
+                    var outcome = ' ';
+                    var options = ['ball', 'single', 'double', 'triple', 'home_run', 'strike', 'out', 'foul', 'strike_out', 'walk'];
+
                     // Attributes
                     var technique = player2.technique;
                     var pitch_speed = player2.pitch_speed;
@@ -332,50 +338,58 @@ function basicPlayerEvent(player1_id, player2_id){
                     // Selection of RNG
                     var rng = 0;
                     var num = Math.floor(Math.random() * 100+totalattrs);
-                    console.log(num);
+                    console.log('Choosing Outcome: ' + num);
                     if (num >= 0  && num < ball){
                         // Returns Ball
                         rng = 0;
-
+                        console.log('Passing in "ball"');
+                        outcome = exports.ballsAndStrikesCounter(options[rng]);
                     }
                     else if (num >= ball && num < ball+single){
                         // Returns Single
                         rng = 1;
-
+                        outcome = exports.ballsAndStrikesCounter(options[rng]);
                     }
                     else if (num >= ball+single && num < (ball+single+double)) {
                         // Returns Double
                         rng = 2;
-
+                        outcome = exports.ballsAndStrikesCounter(options[rng]);
                     }
                     else if (num >= (ball+single+double) && num < (ball+single+double+triple)) {
                         // Returns Triple
                         rng = 3;
-
+                        outcome = exports.ballsAndStrikesCounter(options[rng]);
                     }
                     else if (num >= (ball+single+double+triple) && num < (ball+single+double+triple+home_run)) {
                         // Returns Home Run
                         rng = 4;
+                        outcome = exports.ballsAndStrikesCounter(options[rng]);
                     }
                     else if (num >= (ball+single+double+triple+home_run) && num < (ball+single+double+triple+home_run+strike)) {
                         // Returns Strike
                         rng = 5;
+                        console.log('Strike');
+                        outcome = exports.ballsAndStrikesCounter(options[rng]);
                     }
                     else if (num >= (ball+single+double+triple+home_run+strike) && num < (ball+single+double+triple+home_run+strike+out)) {
                         // Returns Out
                         rng = 6;
+                        outcome = exports.ballsAndStrikesCounter(options[rng]);
                     }
-                    else if (num >= (ball+single+double+triple+home_run+strike+out) && num < totalattrs){
+                    else if (num >= (ball+single+double+triple+home_run+strike+out) && num < (totalattrs+100)){
                         // Returns Foul
                         rng = 7;
+                        console.log('Foul');
+                        outcome = exports.ballsAndStrikesCounter(options[rng]);
                     }
+                    console.log(totalattrs);
 
-                    var options = ['ball', 'single', 'double', 'triple', 'home_run', 'strike', 'out', 'foul'];
-                    console.log("RAND: " + rng);
+
+                    //console.log("RAND: " + outcome);
                     PlayerController.statTracker(player1, player2, options[rng]);
 
 
-                    resolve(options[rng]);
+                    resolve(outcome);
                 });
             }).catch(function(err){
                 reject(err);
@@ -392,6 +406,47 @@ function checkAllForApprovalStatus(approvals){
         return item.approved != 'approved';
     });
     return approvals.length == 0;
+}
+
+exports.ballsAndStrikesCounter = function(outcome) {
+    console.log('Outcome: ' + outcome);
+    if (outcome == 'ball' && numBalls != 3) {
+        numBalls += 1;
+
+    }
+    else if (outcome == 'strike' && numStrikes != 2) {
+        numStrikes += 1;
+    }
+    else if (outcome == 'out') {
+        numStrikes = 0;
+        numBalls = 0;
+    }
+    else if (outcome == 'foul') {
+        if (numStrikes == 2) {
+            numStrikes = 2;
+        }
+        else {
+            numStrikes += 1;
+        }
+    }
+    else if (outcome == 'ball' && numBalls == 3) {
+        outcome = 'walk';
+        numBalls = 0;
+        numStrikes = 0;
+    }
+    else if (outcome == 'strike' && numStrikes == 2) {
+        outcome = 'strike_out';
+        numBalls = 0;
+        numStrikes = 0;
+    }
+    else {
+        numBalls = 0;
+        numStrikes = 0;
+        return outcome;
+    }
+    console.log('Count: ' + numBalls + ' balls, ' + numStrikes + ' strikes.');
+    console.log('Outcome Final: ' + outcome);
+    return outcome;
 }
 
 /**
