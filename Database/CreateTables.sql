@@ -49,7 +49,7 @@ CREATE TABLE fields (id SERIAL, name VARCHAR(255), team_id INTEGER, date_created
 CREATE TABLE leagues (id SERIAL, name VARCHAR(255), date_created TIMESTAMP DEFAULT NOW());
 
 CREATE TABLE lineups (id SERIAL, team_id INTEGER, game_action_id INTEGER, date_created TIMESTAMP DEFAULT NOW());
-CREATE TABLE lineup_items (id SERIAL, lineup_id INTEGER, player_id INTEGER, date_created TIMESTAMP DEFAULT NOW());
+CREATE TABLE lineup_items (id SERIAL, lineup_id INTEGER, player_id INTEGER, lineup_index INTEGER, date_created TIMESTAMP DEFAULT NOW());
 
 --FOR SCHEDULE OF GAMES
 CREATE TABLE schedule (id SERIAL, league_id INTEGER, date_created TIMESTAMP DEFAULT NOW());

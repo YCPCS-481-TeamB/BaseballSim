@@ -106,16 +106,23 @@ function addPlayerPosition(game_action_id, firstbase_player_id, secondbase_playe
 }
 
 function createApprovalsForEvent(game_id, event_id){
-    var promises = [];
-    PermissionController.getOwnerForItem('games', game_id).then(function(data){
-        var users = data.rows;
-        for(var i = 0;i<data.rows.length;i++){
-            promises.push(ApprovalsController.createApproval('events', event_id, users[i].user_id));
-        }
-        return Promise.all(promises);
-    }).catch(function(err){
-        console.log(err);
-    });
+   return new Promise(function(resolve, reject){
+       var promises = [];
+       PermissionController.getOwnerForItem('games', game_id).then(function(data){
+           var users = data.rows;
+           for(var i = 0;i<data.rows.length;i++){
+               promises.push(ApprovalsController.createApproval('events', event_id, users[i].user_id));
+           }
+           Promise.all(promises).then(function(data){
+                console.log(data);
+                resolve(data);
+           }).catch(function(err){
+                console.log(err);
+           });
+       }).catch(function(err){
+           console.log(err);
+       });
+   });
 }
 
 exports.checkNextTurnReadyState = function(game_id){
