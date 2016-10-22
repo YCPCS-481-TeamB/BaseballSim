@@ -262,8 +262,11 @@ function calculateNewPlayerPositions(obj_prev_pos, event){
     }
 }
 
-//function getNumStrikes(game_id)
 
+/*
+ * Different method of doing the basicPlayerEvent, uses game_id instead of only players
+ * Not working
+ */
 function gameAlgorithmController(game_id, player1_id, player2_id) {
     return new Promise(function(resolve, reject) {
         var team2 = game_id.team1_id;
@@ -279,10 +282,11 @@ function gameAlgorithmController(game_id, player1_id, player2_id) {
 }
 
 /**
- * Should Return any of 'home_run', 'walk', 'triple', 'double', 'single', 'ball', 'strike', 'foul'
- * @param player1_id
- * @param player2_id
+ * Should Return any of 'home_run', 'walk', 'triple', 'double', 'single', 'ball', 'strike', 'foul' (Not 'strike_out' or 'walk')
+ * @param player1_id (Batter)
+ * @param player2_id (Pitcher)
  * @returns {Promise}
+ * Calculates outcome based on player attributes
  */
 function basicPlayerEvent(player1_id, player2_id){
     return new Promise(function(resolve, reject){
@@ -393,6 +397,8 @@ function basicPlayerEvent(player1_id, player2_id){
 
 
                     //console.log("RAND: " + outcome);
+
+                    // Tracks stats based on outcome
                     PlayerController.statTracker(player1, player2, options[rng]);
 
 
@@ -415,6 +421,11 @@ function checkAllForApprovalStatus(approvals){
     return approvals.length == 0;
 }
 
+/*
+ * params - outcome of basicPlayerEvent
+ * returns - specific outcome after totaling balls & strikes
+ * adds strike_out and walk outcome possibilities
+ */
 exports.ballsAndStrikesCounter = function(outcome) {
     console.log('Outcome: ' + outcome);
     if (outcome == 'ball' && numBalls != 3) {
@@ -452,9 +463,15 @@ exports.ballsAndStrikesCounter = function(outcome) {
         return outcome;
     }
     console.log('Count: ' + numBalls + ' balls, ' + numStrikes + ' strikes.');
+    //DatabaseController.query("INSERT INTO game_action
     console.log('Outcome Final: ' + outcome);
     return outcome;
 }
+/*
+exports.getStrikesAndBalls = function(outcome) {
+    DatabaseController.query()
+}
+*/
 
 /**
  * Things to keep track of during the game:
