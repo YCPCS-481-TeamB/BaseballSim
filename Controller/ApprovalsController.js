@@ -62,7 +62,6 @@ exports.getApprovalById = function(id){
 
 exports.setApprovalStatus = function(id, status){
     return new Promise(function(resolve, reject){
-        console.log("UPDATE approvals SET approved="+status+" WHERE id = "+ id +" RETURNING *");
         DatabaseController.query("UPDATE approvals SET approved=$2 WHERE id = $1 RETURNING *", [id, status]).then(function(data){
             resolve(data.rows);
         }).catch(function(err){

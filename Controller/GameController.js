@@ -7,6 +7,8 @@ var ApprovalsController = require('./ApprovalsController');
 var PermissionController = require('./PermissionController');
 var TeamsController = require('./TeamsController');
 
+var LineupController = require('./LineupController');
+
 // Don't yell at me Brandon I wanted some global variables
 var numBalls = 0;
 var numStrikes = 0;
@@ -128,15 +130,16 @@ function createApprovalsForEvent(game_id, event_id){
    });
 }
 
-exports.checkNextTurnReadyState = function(game_id){
-    return new Promise(function(resolve,reject){
-        exports.getEventsByGameId(game_id).then(function(data){
-
-        }).catch(function(err){
-
-        });
-    });
-}
+//Unused?
+//exports.checkNextTurnReadyState = function(game_id){
+//    return new Promise(function(resolve,reject){
+//        exports.getEventsByGameId(game_id).then(function(data){
+//
+//        }).catch(function(err){
+//
+//        });
+//    });
+//}
 
 exports.getLatestEventForGame = function(game_id){
     return new Promise(function(resolve, reject){
@@ -151,9 +154,7 @@ exports.getLatestEventForGame = function(game_id){
 exports.getLatestEventApprovalsForGame = function(game_id){
     return new Promise(function(resolve, reject){
         exports.getLatestEventForGame(game_id).then(function(data){
-            console.log("DATA", data);
             ApprovalsController.getApprovalByItemTypeAndId('events', data.id).then(function(approvals){
-                console.log(approvals);
                 resolve(approvals);
             }).catch(function(err){
               reject(err);
@@ -164,6 +165,18 @@ exports.getLatestEventApprovalsForGame = function(game_id){
     });
 }
 
+exports.getLatestGameActionByGameId = function(game_id){
+    return new Promise(function(resolve, reject){
+        DatabaseController.query("SELECT * FROM game_action WHERE game_id = $1 ORDER BY date_created DESC LIMIT 1", [game_id]).then(function(result){
+            resolve(result.rows[0]);
+        }).catch(function(err){
+            reject(err);
+        });
+    });
+}
+
+
+//TODO: Break The Start Game Method Down to Reduce complexity
 exports.startGame = function(game_id){
     return new Promise(function(resolve, reject){
         if(game_id){
@@ -172,15 +185,23 @@ exports.startGame = function(game_id){
                     exports.isGameStarted(game_id).then(function(data){
                         if(data.started == false){
                             DatabaseController.query("INSERT INTO game_action (game_id, team1_score, team2_score, type, message) VALUES ($1, 0, 0, 'start', 'Game Started!') RETURNING *", [game_id]).then(function(data){
-                                    var game_event = data.rows[0];
-                                    addPlayerPosition(game_event.id, 0, 0, 0).then(function(data){
-                                        createApprovalsForEvent(game_id, game_event.id).then(function(approvals){
-                                            resolve(game_event);
+                                exports.getGameById(game_id).then(function(game){
+                                    Promise.all(LineupController.setDefaultLineup(game[0].team1_id, data.rows[0].id), LineupController.setDefaultLineup(game[0].team2_id, data.rows[0].id)).then(function(result){
+                                        var game_event = data.rows[0];
+                                        addPlayerPosition(game_event.id, 0, 0, 0).then(function(data){
+                                            createApprovalsForEvent(game_id, game_event.id).then(function(approvals){
+                                                resolve(game_event);
+                                            }).catch(function(err){
+                                                reject(err);
+                                            });
                                         }).catch(function(err){
-                                            console.log(err);
+                                            reject(err);
                                         });
+                                    }).catch(function(err){
+                                        reject(err);
+                                    });
                                 }).catch(function(err){
-                                    reject(err);
+                                   reject(err);
                                 });
                             }).catch(function(err){
                                 reject(err);
@@ -237,7 +258,11 @@ exports.doGameEvent = function(game_id, player1_id, player2_id){
         //gameAlgorithmController(game_id, player1_id, player2_id).then(function(result) {
             var game_message = generateMessage(player1_id, player2_id, game_id, result);
             DatabaseController.query("INSERT INTO game_action (game_id, team1_score, team2_score, type, message) VALUES ($1, 0, 0, $2, $3) RETURNING *", [game_id, result, game_message]).then(function(data){
-                resolve(data.rows);
+                Promise.all([LineupController.sendPlayerToBackofLineup(player1_id), LineupController.sendPlayerToBackofLineup(player2_id)]).then(function(result){
+                    resolve(data.rows);
+                }).catch(function(err){
+                    reject(err);
+                });
             }).catch(function(err){
                 reject(err);
             });

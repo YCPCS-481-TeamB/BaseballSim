@@ -53,7 +53,7 @@
             </thead>
             <tbody ng-repeat="game in games">
                 <tr ng-click="showSelectedGame=true">
-                    <td>{{game.id}}</td><td>{{game.team1_id}}</td><td>{{game.team2_id}}</td>
+                    <td><a href="/games/{{game.id}}">{{game.id}}</a></td><td>{{game.team1_id}}</td><td>{{game.team2_id}}</td>
                 </tr>
             </tbody>
         </table>

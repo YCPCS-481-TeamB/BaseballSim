@@ -4,6 +4,7 @@ var router = express.Router();
 var GameController = require("./../Controller/GameController");
 var PermissionController = require("./../Controller/PermissionController");
 var TeamsController = require("./../Controller/TeamsController");
+var LineupController = require("./../Controller/LineupController");
 
 /**
  * GET for getting all games from database
@@ -127,10 +128,41 @@ router.post('/:id/events/next', function(req, res, next){
             res.status(200).json("" + err);
         });
     }else{
-        res.status(200).json("Need 2 Players Selected");
+        GameController.getGameById(id).then(function(game){
+            GameController.getLatestEventForGame(id).then(function(game_action){
+                LineupController.getNextLineupPlayerByGameActionAndTeamId(game_action.id, game[0].team1_id).then(function(lineup_player1){
+                    console.log("Lineup Team 1: ", lineup_player1);
+                    LineupController.getNextLineupPlayerByGameActionAndTeamId(game_action.id, game[0].team2_id).then(function(lineup_player2){
+                        console.log("Lineup Team 2: ", lineup_player2);
+                        GameController.doGameEvent(id, lineup_player1.id, lineup_player2.id).then(function(data){
+                            res.status(200).json(data);
+                        }).catch(function(err){
+                            res.status(200).json("Game Event Cannot Happen: " + err);
+                        });
+                    }).catch(function(err){
+                        res.status(500).json("Lineup 2 cannot be determined: " + err);
+                    });
+                }).catch(function(err){
+                    res.status(500).json("Lineup 1 Cannot be determined: " + err);
+                });
+            }).catch(function(err){
+                res.status(500).json("Error Finding Last Game Event");
+                //res.status(200).json("Need 2 Players Selected");
+            });
+        }).catch(function(err){
+            res.status(200).json("Game Not Found: " + err);
+        });
     }
+});
 
+router.get('/:id/events/latest', function(req, res, next){
+    var id = req.params.id;
 
+    GameController.getLatestGameActionByGameId(id).then(function(data){
+        res.status(200).json(data);
+    }).catch(function(err){
+        res.status(200).json("" + err);
+    });
 });
 
 

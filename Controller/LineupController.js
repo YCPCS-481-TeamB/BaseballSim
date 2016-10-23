@@ -24,6 +24,20 @@ exports.setDefaultLineup = function(team_id, game_action_id){
     });
 }
 
+exports.getNextLineupPlayerByGameActionAndTeamId = function(game_action_id, team_id){
+    return new Promise(function(resolve, reject){
+        DatabaseController.query("SELECT * FROM players WHERE id IN (SELECT player_id FROM lineup_items WHERE lineup_id IN (SELECT id FROM lineups WHERE game_action_id = $1 AND team_id = $2) ORDER BY lineup_index ASC LIMIT 1)",[game_action_id, team_id]).then(function(result){
+            resolve(result.rows[0]);
+        }).catch(function(err){
+           reject(err);
+        });
+    });
+}
+
+exports.sendPlayerToBackofLineup = function(player_id){
+
+}
+
 exports.createLineup = function(team_id, game_action_id){
     return new Promise(function(resolve, reject){
         DatabaseController.query("INSERT INTO lineups (team_id, game_action_id) VALUES ($1, $2) RETURNING *", [team_id, game_action_id]).then(function(result){
