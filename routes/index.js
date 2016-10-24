@@ -41,4 +41,9 @@ router.get('/games',  function(req, res, next) {
   res.render('games', {title: 'BaseballSim Games'});
 });
 
+/* GET teams page. */
+router.get('/games/:id',  function(req, res, next) {
+  res.render('playgame', {title: 'BaseballSim Game'});
+});
+
 module.exports = router;

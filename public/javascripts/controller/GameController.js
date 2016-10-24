@@ -1,5 +1,4 @@
 var GameController = App.controller('GameController', function($scope, UserTokenFactory, GameService, TeamService){
-
     $scope.selectedGame;
 
     UserTokenFactory.getUserData().then(function(user){

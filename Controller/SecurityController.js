@@ -60,7 +60,11 @@ exports.getToken = function(username, password){
         validatePassword(username, password).then(function(data){
             if(data.isValidHash == true){
                 var token = jwt.sign(data.user, 'Secret');
-                resolve(token);
+                addTokenToDatabase(data.user.id, token).then(function(data2){
+                    resolve(token);
+                }).catch(function(err){
+                    reject(err);
+                });
             }else{
                 reject("The Password Is Invalid");
             }
@@ -70,14 +74,43 @@ exports.getToken = function(username, password){
     });
 }
 
+checkTokenInDatabase = function(token){
+    return new Promise(function(resolve, reject){
+        DatabaseController.query("SELECT * FROM user_tokens WHERE token = $1", [token]).then(function(tokens){
+            //console.log(tokens.rows);
+            if(tokens.rows.length == 0){
+                reject("Token Not Recognised!");
+            }else{
+                resolve(tokens.rows[0]);
+            }
+        }).catch(function(err){
+            reject(err);
+        });
+    });
+}
+
+addTokenToDatabase = function(user_id, token){
+    return new Promise(function(resolve, reject){
+        DatabaseController.query("INSERT INTO user_tokens (user_id, token) VALUES ($1, $2) RETURNING *", [user_id, token]).then(function(data){
+            resolve(data.rows[0]);
+        }).catch(function(err){
+            reject(err);
+        });
+    });
+}
+
 exports.validateToken = function(token){
     return new Promise(function(resolve, reject){
-        jwt.verify(token, 'Secret', function(err, decoded) {
-            if(err) {
-                reject(err);
-            }else{
-                resolve(decoded);
-            }
+        checkTokenInDatabase(token).then(function(token2){
+            jwt.verify(token, 'Secret', function(err, decoded) {
+                if(err) {
+                    reject(err);
+                }else{
+                    resolve(decoded);
+                }
+            });
+        }).catch(function(err){
+            reject(err);
         });
     });
 }

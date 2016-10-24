@@ -8,6 +8,7 @@
   "dependencies": {
     "angular": "^1.5.8",
     "angular-cookies": "^1.5.8",
+    "angular-route": "^1.5.8",
     "bcrypt": "^0.8.7",
     "bluebird": "^3.4.6",
     "body-parser": "~1.15.1",
