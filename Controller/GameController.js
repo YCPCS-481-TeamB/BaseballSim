@@ -33,8 +33,6 @@ exports.getGameByUserId = function(user_id){
     });
 }
 
-
-
 exports.createGame = function(team1_id, team2_id, field_id, league_id){
     return new Promise(function(resolve, reject){
         if(team1_id && team2_id){
@@ -106,8 +104,86 @@ exports.getPlayerPositionByGameEventId = function(game_event_id){
 }
 
 
-function addPlayerPosition(game_action_id, firstbase_player_id, secondbase_player_id, thirdbase_player_id){
+function updatePlayerPosition(game_action_id, firstbase_player_id, secondbase_player_id, thirdbase_player_id){
     return DatabaseController.query("INSERT INTO game_player_positions (game_action_id, onfirst_id, onsecond_id, onthird_id) VALUES ($1, $2, $3, $4)", [game_action_id, firstbase_player_id, secondbase_player_id, thirdbase_player_id]);
+}
+
+function createInitialGamePlayerPositions(game_action_id){
+    return new Promise(function(resolve, reject){
+        DatabaseController.query("INSERT INTO game_player_positions (game_action_id) VALUES ($1) RETURNING *", [game_action_id]).then(function(result){
+            resolve(result.rows[0]);
+        }).catch(function(err){
+            reject(err);
+        });
+    });
+}
+
+function copyPlayerPositions(lastActionId, currentActionId){
+    return new Promise(function(resolve, reject){
+        DatabaseController.query("INSERT INTO game_player_positions (game_action_id, onfirst_id, onsecond_id, onthird_id) SELECT $1, onfirst_id, onsecond_id, onthird_id FROM game_player_positions WHERE game_action_id = $2 RETURNING *", [currentActionId, lastActionId]).then(function(result){
+            resolve(result.rows[0]);
+        }).catch(function(err){
+            reject(err);
+        });
+    });
+}
+
+function updateGameScore(game_action_id, score){
+    return DatabaseController.query("UPDATE game_action SET score = $1 WHERE id=$1", game_action_id);
+}
+
+function updatePlayerPositionByEventResult(game_action_id, player_id, result){
+    //'home_run', 'walk', 'triple', 'double', 'single'
+    return new Promise(function(resolve, reject){
+        DatabaseController.query("SELECT * FROM game_action WHERE id = $1", [game_action_id]).then(function(game_action_data){
+            var game_action = game_action_data.rows[0];
+            DatabaseController.query("SELECT * FROM game_player_positions WHERE game_action_id = $1", [game_action_id]).then(function(result){
+                console.log("RESULT PLAYER POSITIONS", result.rows[0]);
+                var player_positons = result.rows[0];
+                var movements = 0;
+                if(result == 'single' || result == 'walk'){
+                    movements = 1;
+                }else if(result == 'double'){
+                    movements = 2;
+                }else if(result == 'triple'){
+                    movements = 3;
+                }else if(result == 'home_run'){
+                    movements = 4;
+                }
+                var score = game_action.score;
+
+                var player_pos_arr = [player_positons.onfirst_id, player_positons.onsecond_id, player_positons.onthird_id];
+
+                for(var i = player_pos_arr.length;i>0;i--){
+                    if(player_pos_arr[i] != 0){
+                        if(i + movements > 3){
+                            score++;
+                        }else{
+                            if(i+movements < 4){
+                                player_pos_arr[i + movements] = player_pos_arr[i];
+                            }else{
+                                score++;
+                            }
+                        }
+                    }
+                }
+
+                player_pos_arr[movements] = player_id;
+
+                console.log("PLAYERS ARR", [game_action_id].concat(player_pos_arr));
+
+                DatabaseController.query("UPDATE game_player_positions SET onfirst_id = $2, onsecond_id = $3, onthird_id=$4 WHERE game_action_id = $1 RETURNING *", [game_action_id, player_pos_arr[0],player_pos_arr[1],player_pos_arr[2]]).then(function(result_data){
+                    resolve(result.rows[0]);
+                }).catch(function(err){
+                    reject(err);
+                });
+            }).catch(function(err){
+                reject(err);
+            });
+        }).catch(function(err){
+            reject(err);
+        });
+    });
 }
 
 function createApprovalsForEvent(game_id, event_id){
@@ -164,7 +240,6 @@ exports.getLatestGameActionByGameId = function(game_id){
     });
 }
 
-
 //TODO: Break The Start Game Method Down to Reduce complexity
 exports.startGame = function(game_id){
     return new Promise(function(resolve, reject){
@@ -177,12 +252,12 @@ exports.startGame = function(game_id){
                                 exports.getGameById(game_id).then(function(game){
                                     Promise.all(LineupController.setDefaultLineup(game[0].team1_id, game_id), LineupController.setDefaultLineup(game[0].team2_id, game_id)).then(function(result){
                                         var game_event = data.rows[0];
-                                        addPlayerPosition(game_event.id, 0, 0, 0).then(function(data){
-                                            createApprovalsForEvent(game_id, game_event.id).then(function(approvals){
+                                        createInitialGamePlayerPositions(game_event.id).then(function(data){
+                                            //createApprovalsForEvent(game_id, game_event.id).then(function(approvals){
                                                 resolve(game_event);
-                                            }).catch(function(err){
-                                                reject(err);
-                                            });
+                                            //}).catch(function(err){
+                                                //reject(err);
+                                            //});
                                         }).catch(function(err){
                                             reject(err);
                                         });
@@ -244,17 +319,32 @@ exports.getGameById = function(id){
 exports.doGameEvent = function(game_id, player1_id, player2_id){
     return new Promise(function(resolve, reject){
         basicPlayerEvent(player1_id, player2_id).then(function(result){
+            console.log(result);
         //gameAlgorithmController(game_id, player1_id, player2_id).then(function(result) {
             var game_message = generateMessage(player1_id, player2_id, game_id, result);
-            DatabaseController.query("INSERT INTO game_action (game_id, team1_score, team2_score, type, message) VALUES ($1, 0, 0, $2, $3) RETURNING *", [game_id, result, game_message]).then(function(data){
-                Promise.all([LineupController.sendPlayerToBackofLineup(player1_id), LineupController.sendPlayerToBackofLineup(player2_id)]).then(function(result){
-                    resolve(data.rows);
+            exports.getLatestEventForGame(game_id).then(function(lastGameEvent){
+                DatabaseController.query("INSERT INTO game_action (game_id, team1_score, team2_score, type, message) VALUES ($1, 0, 0, $2, $3) RETURNING *", [game_id, result, game_message]).then(function(data){
+                    var game_action = data.rows[0];
+                    console.log("COPY PLAYER POSITION");
+                    copyPlayerPositions(lastGameEvent.id, game_action.id).then(function(result){
+                        console.log("UPDATE PLAYER POSITION");
+                        updatePlayerPositionByEventResult(game_action.id, player1_id, result).then(function(position_data){
+                            console.log("POSITION DATA: ", position_data);
+                            resolve(data.rows);
+                        }).catch(function(err){
+                            console.log("ERR", err);
+                            reject(err);
+                        });
+
+                    }).catch(function(err){
+                        reject(err);
+                    });
                 }).catch(function(err){
                     reject(err);
                 });
             }).catch(function(err){
                 reject(err);
-            });
+            })
         }).catch(function(err){
             reject(err);
         });

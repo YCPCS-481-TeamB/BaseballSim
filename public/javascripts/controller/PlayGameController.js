@@ -19,8 +19,8 @@ var PlayGameController = App.controller('PlayGameController', function($scope,$i
     $scope.nextGameEvent = function(){
         UserTokenFactory.getUserData().then(function(user) {
             GameService.nextGameEvent(id).then(function (data) {
-                console.log(data);
-                $scope.gameEvents.push(data.data);
+                //console.log(data);
+                //$scope.gameEvents.push(data.data);
             }).catch(function (err) {
                 console.log(err);
                 alert(err);
