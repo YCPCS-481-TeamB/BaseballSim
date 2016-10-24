@@ -129,10 +129,9 @@ router.post('/:id/events/next', function(req, res, next){
         });
     }else{
         GameController.getGameById(id).then(function(game){
-            GameController.getLatestEventForGame(id).then(function(game_action){
-                LineupController.getNextLineupPlayerByGameActionAndTeamId(game_action.id, game[0].team1_id).then(function(lineup_player1){
+                LineupController.getNextLineupPlayerByGameAndTeamId(game[0].id, game[0].team1_id).then(function(lineup_player1){
                     console.log("Lineup Team 1: ", lineup_player1);
-                    LineupController.getNextLineupPlayerByGameActionAndTeamId(game_action.id, game[0].team2_id).then(function(lineup_player2){
+                    LineupController.getNextLineupPlayerByGameAndTeamId(game[0].id, game[0].team2_id).then(function(lineup_player2){
                         console.log("Lineup Team 2: ", lineup_player2);
                         GameController.doGameEvent(id, lineup_player1.id, lineup_player2.id).then(function(data){
                             res.status(200).json(data);
@@ -145,10 +144,6 @@ router.post('/:id/events/next', function(req, res, next){
                 }).catch(function(err){
                     res.status(500).json("Lineup 1 Cannot be determined: " + err);
                 });
-            }).catch(function(err){
-                res.status(500).json("Error Finding Last Game Event");
-                //res.status(200).json("Need 2 Players Selected");
-            });
         }).catch(function(err){
             res.status(200).json("Game Not Found: " + err);
         });
@@ -162,6 +157,17 @@ router.get('/:id/events/latest', function(req, res, next){
         res.status(200).json(data);
     }).catch(function(err){
         res.status(200).json("" + err);
+    });
+});
+
+router.get("/:id/teams/:team_id/lineup", function(req, res, next){
+    var id = req.params.id;
+    var team_id = req.params.team_id;
+
+    LineupController.getLineupByGameAndTeamId(id, team_id).then(function(data){
+        res.status(200).json(data);
+    }).catch(function(err){
+        res.status(500).json("" + err);
     });
 });
 

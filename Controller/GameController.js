@@ -130,17 +130,6 @@ function createApprovalsForEvent(game_id, event_id){
    });
 }
 
-//Unused?
-//exports.checkNextTurnReadyState = function(game_id){
-//    return new Promise(function(resolve,reject){
-//        exports.getEventsByGameId(game_id).then(function(data){
-//
-//        }).catch(function(err){
-//
-//        });
-//    });
-//}
-
 exports.getLatestEventForGame = function(game_id){
     return new Promise(function(resolve, reject){
         DatabaseController.query("SELECT * FROM game_action WHERE game_id=$1 ORDER BY date_created DESC LIMIT 1;", [game_id]).then(function(data){
