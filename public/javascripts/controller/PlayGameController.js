@@ -2,11 +2,6 @@ var PlayGameController = App.controller('PlayGameController', function($scope,$i
     var url = $location.absUrl();
     var id = url.substring(url.lastIndexOf('/')+1);
 
-    GameService.loadEventsByGameId(id).then(function (response) {
-        $scope.gameEvents = response.data;
-        console.log(response.data);
-    });
-
     $scope.startGame = function(){
         UserTokenFactory.getUserData().then(function(user) {
             GameService.startGameEvent(id).then(function (response) {
@@ -60,9 +55,28 @@ var PlayGameController = App.controller('PlayGameController', function($scope,$i
         });
     }
 
+    var updateScoreBoard = function(){
+        $scope.team1_score = $scope.gameEvents[$scope.gameEvents.length-1].team1_score;
+        $scope.team2_score = $scope.gameEvents[$scope.gameEvents.length-1].team2_score;
+        $scope.balls = $scope.gameEvents[$scope.gameEvents.length-1].balls;
+        $scope.strikes = $scope.gameEvents[$scope.gameEvents.length-1].strikes;
+        $scope.outs = $scope.gameEvents[$scope.gameEvents.length-1].outs;
+    }
+
+    var updateGameEvents = function(){
+        GameService.loadEventsByGameId(id).then(function (response) {
+            $scope.gameEvents = response.data;
+            $scope.gameEvents.reverse();
+        });
+    }
+
     checkNextActionPlayable();
     checkPlayerLineup();
+    updateGameEvents();
 
-    $interval(checkNextActionPlayable, 10000);
+    $interval(updateGameEvents, 1000);
+    $interval(checkNextActionPlayable, 1000);
+    $interval(checkPlayerLineup, 1000);
+    $interval(updateScoreBoard, 2000);
 
 });

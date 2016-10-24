@@ -175,7 +175,7 @@ exports.startGame = function(game_id){
                         if(data.started == false){
                             DatabaseController.query("INSERT INTO game_action (game_id, team1_score, team2_score, type, message) VALUES ($1, 0, 0, 'start', 'Game Started!') RETURNING *", [game_id]).then(function(data){
                                 exports.getGameById(game_id).then(function(game){
-                                    Promise.all(LineupController.setDefaultLineup(game[0].team1_id, data.rows[0].id), LineupController.setDefaultLineup(game[0].team2_id, data.rows[0].id)).then(function(result){
+                                    Promise.all(LineupController.setDefaultLineup(game[0].team1_id, game_id), LineupController.setDefaultLineup(game[0].team2_id, game_id)).then(function(result){
                                         var game_event = data.rows[0];
                                         addPlayerPosition(game_event.id, 0, 0, 0).then(function(data){
                                             createApprovalsForEvent(game_id, game_event.id).then(function(approvals){
