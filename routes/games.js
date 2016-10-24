@@ -171,6 +171,17 @@ router.get("/:id/teams/:team_id/lineup", function(req, res, next){
     });
 });
 
+router.get("/:id/users/:user_id/lineup", function(req, res, next){
+    var id = req.params.id;
+    var user_id = req.params.user_id;
+
+    LineupController.getLineupByGameAndTeamId(id, user_id).then(function(data){
+        res.status(200).json(data);
+    }).catch(function(err){
+        res.status(500).json("" + err);
+    });
+});
+
 
 /**
  * Returns he game from the database with the given id value

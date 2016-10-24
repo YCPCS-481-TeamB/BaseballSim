@@ -8,39 +8,60 @@ var PlayGameController = App.controller('PlayGameController', function($scope,$i
     });
 
     $scope.startGame = function(){
-        GameService.startGameEvent(id).then(function(response){
-            if(typeof response.data == 'object'){
-                $scope.gameEvents.push(response.data);
-            }else{
-                alert(response.data);
-            }
-        }).catch(function(err){
-            console.log(err);
+        UserTokenFactory.getUserData().then(function(user) {
+            GameService.startGameEvent(id).then(function (response) {
+                if (typeof response.data == 'object') {
+                    $scope.gameEvents.push(response.data);
+                } else {
+                    alert(response.data);
+                }
+            }).catch(function (err) {
+                console.log(err);
+            });
         });
     }
 
     $scope.nextGameEvent = function(){
-        GameService.nextGameEvent(id).then(function(data){
-
-        }).catch(function(err){
-            console.log(err);
-            alert(err);
+        UserTokenFactory.getUserData().then(function(user) {
+            GameService.nextGameEvent(id).then(function (data) {
+                console.log(data);
+                $scope.gameEvents.push(data.data);
+            }).catch(function (err) {
+                console.log(err);
+                alert(err);
+            });
         });
     }
 
     var checkNextActionPlayable = function(){
-        GameService.getPlayableState(id).then(function(response){
-            if(response.data.filter(function(item){return !item.approved == "approved";}).length == 0){
-                $scope.showNextButton = true;
-            }else{
-                $scope.showNextButton = false;
-            }
-        }).catch(function(err){
-           console.log(err);
+        UserTokenFactory.getUserData().then(function(user) {
+            GameService.getPlayableState(id).then(function (response) {
+                if (response.data.filter(function (item) {
+                        return !item.approved == "approved";
+                    }).length == 0) {
+                    $scope.showNextButton = true;
+                } else {
+                    $scope.showNextButton = false;
+                }
+            }).catch(function (err) {
+                console.log(err);
+            });
+        });
+    }
+
+    var checkPlayerLineup = function(){
+        UserTokenFactory.getUserData().then(function(user){
+            GameService.getLineup(id, user.id).then(function(data){
+                console.log(data);
+                $scope.lineup = data.data;
+            }).catch(function(err){
+                console.log(err);
+            });
         });
     }
 
     checkNextActionPlayable();
+    checkPlayerLineup();
 
     $interval(checkNextActionPlayable, 10000);
 

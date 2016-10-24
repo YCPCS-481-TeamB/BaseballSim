@@ -21,6 +21,12 @@
                 Canvas Element Is Not Supported On Your Browser
             </canvas>
             <button class="btn btn-success" ng-show="showNextButton" ng-click="nextGameEvent()">Next Game Action</button>
+
+            <table class="table table-condensed">
+                <tr><th>Player Name</th></tr>
+                <tr ng-repeat="player in lineup" ng-class="{active : player.already_played == false}"><td>{{player.player_id}}</td></tr>
+            </table>
+
         </div>
         <div class="col-sm-8">
             <div class="scroll-view">

@@ -45,7 +45,17 @@ exports.getNextLineupPlayerByGameAndTeamId = function(game_id, team_id){
 
 exports.getLineupByGameAndTeamId = function(game_id, team_id){
     return new Promise(function(resolve, reject){
-        DatabaseController.query("SELECT * FROM lineup_items WHERE lineup_id in (SELECT id FROM lineups WHERE game_id=$1 AND team_id=$2)",[game_id, team_id]).then(function(result){
+        DatabaseController.query("SELECT * FROM lineup_items WHERE lineup_id in (SELECT id FROM lineups WHERE game_id=$1 AND team_id=$2) ORDER BY lineup_index ASC",[game_id, team_id]).then(function(result){
+            resolve(result.rows);
+        }).catch(function(err){
+            reject(err);
+        });
+    });
+}
+
+exports.getLineupByGameAndUserId = function(game_id, team_id){
+    return new Promise(function(resolve, reject){
+        DatabaseController.query("SELECT * FROM lineup_items WHERE lineup_id in (SELECT id FROM lineups WHERE game_id=$1 AND team_id IN (SELECT id FROM teams WHERE id in (SELECT item_id FROM permissions WHERE item_type='teams' AND user_id=$2))) ORDER BY lineup_index ASC",[game_id, user_id]).then(function(result){
             resolve(result.rows);
         }).catch(function(err){
             reject(err);

@@ -4,6 +4,14 @@ var GameService = App.service('GameService', function($http, UserTokenFactory){
         return $http.get('/api/games',{headers: {"x-access-token" : UserTokenFactory.getToken()}});
     }
 
+    this.getById = function(id){
+        return $http.get('/api/games/' + id,{headers: {"x-access-token" : UserTokenFactory.getToken()}});
+    }
+
+    this.getLineup = function(id, user_id){
+        return $http.get('/api/games/' + id + '/users/' + user_id + '/lineup',{headers: {"x-access-token" : UserTokenFactory.getToken()}});
+    }
+
     this.loadEventsByGameId = function(game_id){
         return $http.get('/api/games/' + game_id + '/events', {headers: {"x-access-token" : UserTokenFactory.getToken()}});
     }
