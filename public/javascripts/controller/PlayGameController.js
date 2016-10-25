@@ -19,8 +19,6 @@ var PlayGameController = App.controller('PlayGameController', function($scope,$i
     $scope.nextGameEvent = function(){
         UserTokenFactory.getUserData().then(function(user) {
             GameService.nextGameEvent(id).then(function (data) {
-                //console.log(data);
-                //$scope.gameEvents.push(data.data);
             }).catch(function (err) {
                 console.log(err);
                 alert(err);
@@ -47,7 +45,6 @@ var PlayGameController = App.controller('PlayGameController', function($scope,$i
     var checkPlayerLineup = function(){
         UserTokenFactory.getUserData().then(function(user){
             GameService.getLineup(id, user.id).then(function(data){
-                console.log(data);
                 $scope.lineup = data.data;
             }).catch(function(err){
                 console.log(err);
@@ -56,11 +53,11 @@ var PlayGameController = App.controller('PlayGameController', function($scope,$i
     }
 
     var updateScoreBoard = function(){
-        $scope.team1_score = $scope.gameEvents[$scope.gameEvents.length-1].team1_score;
-        $scope.team2_score = $scope.gameEvents[$scope.gameEvents.length-1].team2_score;
-        $scope.balls = $scope.gameEvents[$scope.gameEvents.length-1].balls;
-        $scope.strikes = $scope.gameEvents[$scope.gameEvents.length-1].strikes;
-        $scope.outs = $scope.gameEvents[$scope.gameEvents.length-1].outs;
+        $scope.team1_score = $scope.gameEvents[0].team1_score;
+        $scope.team2_score = $scope.gameEvents[0].team2_score;
+        $scope.balls = $scope.gameEvents[0].balls;
+        $scope.strikes = $scope.gameEvents[0].strikes;
+        $scope.outs = $scope.gameEvents[0].outs;
     }
 
     var updateGameEvents = function(){
@@ -70,13 +67,24 @@ var PlayGameController = App.controller('PlayGameController', function($scope,$i
         });
     }
 
+    var updatePlayerPositions = function(){
+        if($scope.gameEvents && $scope.gameEvents[0]){
+            var game_action_id = $scope.gameEvents[0].id;
+            GameService.getGamePositionByGameEvent(game_action_id).then(function(response){
+                $scope.player_positions = response.data.positions;
+            });
+        }
+    }
+
     checkNextActionPlayable();
     checkPlayerLineup();
     updateGameEvents();
+    updatePlayerPositions();
 
     $interval(updateGameEvents, 1000);
     $interval(checkNextActionPlayable, 1000);
     $interval(checkPlayerLineup, 1000);
     $interval(updateScoreBoard, 2000);
+    $interval(updatePlayerPositions, 1000);
 
 });

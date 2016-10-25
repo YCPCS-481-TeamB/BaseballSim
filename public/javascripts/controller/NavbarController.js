@@ -7,7 +7,7 @@ var NavbarController = App.controller('NavbarController', function($scope, $inte
         UserTokenFactory.checkTokenValidity().then(function(valid){
             if(valid == true){
                 ApprovalService.getAll().then(function(response){
-                    console.log(response);
+                    //console.log(response);
                     $scope.approvals = response.data.approvals;
                 }).catch(function(err){
                     console.log(err);
@@ -40,9 +40,6 @@ var NavbarController = App.controller('NavbarController', function($scope, $inte
 
     UserTokenFactory.getUserData().then(function(user){
         $scope.userdata = user;
-
-
-
         $scope.$apply();
     });
 

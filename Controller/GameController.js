@@ -103,7 +103,6 @@ exports.getPlayerPositionByGameEventId = function(game_event_id){
     });
 }
 
-
 function updatePlayerPosition(game_action_id, firstbase_player_id, secondbase_player_id, thirdbase_player_id){
     return DatabaseController.query("INSERT INTO game_player_positions (game_action_id, onfirst_id, onsecond_id, onthird_id) VALUES ($1, $2, $3, $4)", [game_action_id, firstbase_player_id, secondbase_player_id, thirdbase_player_id]);
 }
@@ -128,52 +127,64 @@ function copyPlayerPositions(lastActionId, currentActionId){
     });
 }
 
-function updateGameScore(game_action_id, score){
-    return DatabaseController.query("UPDATE game_action SET score = $1 WHERE id=$1", game_action_id);
+function updateGameScore(game_action_id, isTeam1, score){
+    if(isTeam1){
+        return DatabaseController.query("UPDATE game_action SET team1_score = $1 WHERE id=$2", [score, game_action_id]);
+    }else{
+        return DatabaseController.query("UPDATE game_action SET team2_score = $1 WHERE id=$2", [score, game_action_id]);
+
+    }
 }
 
-function updatePlayerPositionByEventResult(game_action_id, player_id, result){
+function updatePlayerPositionByEventResult(game_action_id, player_id, game_result){
     //'home_run', 'walk', 'triple', 'double', 'single'
     return new Promise(function(resolve, reject){
         DatabaseController.query("SELECT * FROM game_action WHERE id = $1", [game_action_id]).then(function(game_action_data){
             var game_action = game_action_data.rows[0];
             DatabaseController.query("SELECT * FROM game_player_positions WHERE game_action_id = $1", [game_action_id]).then(function(result){
-                console.log("RESULT PLAYER POSITIONS", result.rows[0]);
                 var player_positons = result.rows[0];
+                var player_pos_arr = [player_positons.onfirst_id, player_positons.onsecond_id, player_positons.onthird_id];
                 var movements = 0;
-                if(result == 'single' || result == 'walk'){
+
+                var score = game_action.team1_score;
+
+                if(game_result == 'walk' || game_result == 'single'){
                     movements = 1;
-                }else if(result == 'double'){
+                }else if(game_result == 'double'){
                     movements = 2;
-                }else if(result == 'triple'){
+                }else if(game_result == 'triple'){
                     movements = 3;
-                }else if(result == 'home_run'){
+                }else if(game_result == 'home_run'){
                     movements = 4;
                 }
-                var score = game_action.score;
 
-                var player_pos_arr = [player_positons.onfirst_id, player_positons.onsecond_id, player_positons.onthird_id];
-
-                for(var i = player_pos_arr.length;i>0;i--){
-                    if(player_pos_arr[i] != 0){
-                        if(i + movements > 3){
-                            score++;
-                        }else{
-                            if(i+movements < 4){
-                                player_pos_arr[i + movements] = player_pos_arr[i];
-                            }else{
+                //Update Player Positions
+                if(movements > 0){
+                    for(var i = player_pos_arr.length;i>0;i--){
+                        var index = i-1;
+                        if(player_pos_arr[index] != 0){
+                            if((i + movements) > 3){
                                 score++;
+                                player_pos_arr[index] = 0;
+                            }else{
+                                player_pos_arr[index + movements] = player_pos_arr[index];
+                                player_pos_arr[index] = 0;
                             }
                         }
                     }
+                    if(movements > 3){
+                        score++;
+                    }else{
+                        player_pos_arr[movements-1] = player_id;
+                    }
                 }
 
-                player_pos_arr[movements] = player_id;
-
-                console.log("PLAYERS ARR", [game_action_id].concat(player_pos_arr));
-
                 DatabaseController.query("UPDATE game_player_positions SET onfirst_id = $2, onsecond_id = $3, onthird_id=$4 WHERE game_action_id = $1 RETURNING *", [game_action_id, player_pos_arr[0],player_pos_arr[1],player_pos_arr[2]]).then(function(result_data){
-                    resolve(result.rows[0]);
+                    updateGameScore(game_action_id,true, score).then(function(data){
+                        resolve(result.rows[0]);
+                    }).catch(function(err){
+                        reject(err);
+                    });
                 }).catch(function(err){
                     reject(err);
                 });
@@ -240,6 +251,23 @@ exports.getLatestGameActionByGameId = function(game_id){
     });
 }
 
+
+//TODO: FINISH
+function createGameActionFromPrevious(game_id, result, game_message){
+    return new Promise(function(resolve, reject){
+        exports.getLatestEventForGame(game_id).then(function(event){
+            DatabaseController.query("INSERT INTO game_action (game_id, team_at_bat,team1_score,team2_score, balls, strikes, outs, type, message)" +
+                "VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *", [game_id, event.team_at_bat, event.team1_score, event.team2_score, event.balls, event.strikes, event.outs, result, game_message]).then(function(result){
+                resolve(result.rows);
+            }).catch(function(err){
+                reject(err);
+            });
+        }).catch(function(err){
+            reject(err);
+        });
+    });
+}
+
 //TODO: Break The Start Game Method Down to Reduce complexity
 exports.startGame = function(game_id){
     return new Promise(function(resolve, reject){
@@ -253,11 +281,7 @@ exports.startGame = function(game_id){
                                     Promise.all(LineupController.setDefaultLineup(game[0].team1_id, game_id), LineupController.setDefaultLineup(game[0].team2_id, game_id)).then(function(result){
                                         var game_event = data.rows[0];
                                         createInitialGamePlayerPositions(game_event.id).then(function(data){
-                                            //createApprovalsForEvent(game_id, game_event.id).then(function(approvals){
                                                 resolve(game_event);
-                                            //}).catch(function(err){
-                                                //reject(err);
-                                            //});
                                         }).catch(function(err){
                                             reject(err);
                                         });
@@ -323,16 +347,12 @@ exports.doGameEvent = function(game_id, player1_id, player2_id){
         //gameAlgorithmController(game_id, player1_id, player2_id).then(function(result) {
             var game_message = generateMessage(player1_id, player2_id, game_id, result);
             exports.getLatestEventForGame(game_id).then(function(lastGameEvent){
-                DatabaseController.query("INSERT INTO game_action (game_id, team1_score, team2_score, type, message) VALUES ($1, 0, 0, $2, $3) RETURNING *", [game_id, result, game_message]).then(function(data){
-                    var game_action = data.rows[0];
-                    console.log("COPY PLAYER POSITION");
-                    copyPlayerPositions(lastGameEvent.id, game_action.id).then(function(result){
-                        console.log("UPDATE PLAYER POSITION");
+                createGameActionFromPrevious(game_id, result, game_message).then(function(data){
+                var game_action = data[0];
+                    copyPlayerPositions(lastGameEvent.id, game_action.id).then(function(player_pos_result){
                         updatePlayerPositionByEventResult(game_action.id, player1_id, result).then(function(position_data){
-                            console.log("POSITION DATA: ", position_data);
-                            resolve(data.rows);
+                            resolve(data);
                         }).catch(function(err){
-                            console.log("ERR", err);
                             reject(err);
                         });
 
