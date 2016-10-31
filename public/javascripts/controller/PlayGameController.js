@@ -68,12 +68,23 @@ var PlayGameController = App.controller('PlayGameController', function($scope,$i
         });
     }
 
+    var updatePlayerPositions = function(){
+        if($scope.gameEvents && $scope.gameEvents[0]){
+            var game_action_id = $scope.gameEvents[0].id;
+            GameService.getGamePositionByGameEvent(game_action_id).then(function(response){
+                $scope.player_positions = response.data.positions;
+            });
+        }
+    }
+
+    updatePlayerPositions();
     checkNextActionPlayable();
     checkPlayerLineup();
     updateGameEvents();
 
 
     $interval(updateGameEvents, 1000);
+    $interval(updatePlayerPositions, 1000);
     $interval(checkNextActionPlayable, 1000);
     $interval(checkPlayerLineup, 1000);
     $interval(updateScoreBoard, 2000);

@@ -11,17 +11,17 @@ App.directive('gameViewDirective', function(GameService, $interval){
             var width = 200;
             var height = 200;
 
-            var updatePlayerPositions = function(){
-                if($scope.gameEvents && $scope.gameEvents[0]){
-                    var game_action_id = $scope.gameEvents[0].id;
-                    GameService.getGamePositionByGameEvent(game_action_id).then(function(response){
-                        $scope.player_positions = response.data.positions;
-                    });
-                }
-            }
-
-            updatePlayerPositions();
-            $interval(updatePlayerPositions, 1000);
+            //var updatePlayerPositions = function(){
+            //    if($scope.gameEvents && $scope.gameEvents[0]){
+            //        var game_action_id = $scope.gameEvents[0].id;
+            //        GameService.getGamePositionByGameEvent(game_action_id).then(function(response){
+            //            $scope.player_positions = response.data.positions;
+            //        });
+            //    }
+            //}
+            //
+            //updatePlayerPositions();
+            //$interval(updatePlayerPositions, 1000);
 
             //Second Base
             var base1_filled = false;//($scope.player_positions && $scope.player_positions.onfirst_id != 0);
@@ -40,7 +40,7 @@ App.directive('gameViewDirective', function(GameService, $interval){
             //console.log("BASE 3: " , base3_filled);
             //console.log("BASE 4: " , base4_filled);
 
-            console.log($scope.player_positions);
+            //console.log($scope.player_positions);
 
             //Draw Grass
             ctx.fillStyle = "green";
