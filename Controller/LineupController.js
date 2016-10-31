@@ -40,7 +40,15 @@ exports.getNextLineupPlayerByGameAndTeamId = function(game_id, team_id){
             if(result.rows.length > 0){
                 resolve(result.rows[0]);
             }else{
-                reject("No Players Left To Play");
+                DatabaseController.query("UPDATE lineup_items SET already_played = false WHERE already_played = true AND lineup_id IN (SELECT id FROM lineups WHERE game_id = $1 AND team_id = $2)",[game_id, team_id]).then(function(result){
+                    DatabaseController.query("SELECT * FROM players WHERE id IN (SELECT player_id FROM lineup_items WHERE already_played = false AND lineup_id IN (SELECT id FROM lineups WHERE game_id = $1 AND team_id = $2) ORDER BY lineup_index ASC LIMIT 1)",[game_id, team_id]).then(function(result){
+                        resolve(result.rows[result.rows.length-1]);
+                    }).catch(function(err){
+                        reject(err);
+                    });
+                }).catch(function(err){
+                    reject("No Players Left To Play: " + err);
+                });
             }
         }).catch(function(err){
            reject(err);
