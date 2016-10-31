@@ -331,8 +331,6 @@ exports.getLatestGameActionByGameId = function(game_id){
     });
 }
 
-
-//TODO: FINISH
 function createGameActionFromPrevious(game_id, result, game_message){
     return new Promise(function(resolve, reject){
         exports.getLatestEventForGame(game_id).then(function(event){
