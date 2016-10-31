@@ -218,23 +218,68 @@ function updateCountsByEventResult(game_action_id, player_id, game_result){
             var balls = game_action.balls;
             var strikes = game_action.strikes;
             var outs = game_action.outs;
+            var inning = game_action.inning;
 
             var changeoutplayer = false;
 
-            if(game_result == 'strike' || game_action == 'foul'){
+            if(game_result == 'strike' || (game_result == 'foul' && strikes != 2)){
                 strikes++;
+                if (strikes >= 3){
+                    // Strikeout
+                    console.log("AND HE STRIKES OUT!")
+                    strikes = 0;
+                    balls = 0;
+                    changeoutplayer = true;
+                    outs++;
+                    if (outs >= 3 && outs != 0) {
+                        // Swap Teams here maybe?
+                        inning += 1;
+                        outs = 0;
+                        balls = 0;
+                        console.log("Current Inning: " + inning);
+                        if (inning == 18){
+                            // Game Over
+                            console.log("GAME OVER");
+                        }
+                    }
+                }
             }else if(game_result == 'ball'){
                 balls++;
+                if (balls >= 4) {
+                    // Walk
+                    console.log("AND HE WALKS!");
+                    balls = 0;
+                    strikes = 0;
+                }
             }
-
-            if(strikes != 0 && strikes % 3 == 0 || game_result == 'out'){
+            else if (game_result == 'foul' && strikes == 2) {
+                strikes = 2;
+            }
+            else if(game_result == 'out'){
                 strikes = 0;
+                balls = 0;
                 changeoutplayer = true;
                 outs++;
+                if (outs >= 3 && outs != 0) {
+                    // Swap Teams here maybe?
+                    inning += 1;
+                    outs = 0;
+                    balls = 0;
+                    console.log("Current Inning: " + inning);
+                    if (inning == 18){
+                        // Game Over
+                        console.log("GAME OVER");
+                    }
+                }
+            }
+            // Result is a hit of some sort
+            else {
+                balls = 0;
+                strikes = 0;
             }
 
-            DatabaseController.query("UPDATE game_action SET balls = $1, strikes = $2, outs = $3 WHERE id = $4 RETURNING *",
-                [balls, strikes, outs, game_action_id]).then(function(result){
+            DatabaseController.query("UPDATE game_action SET balls = $1, strikes = $2, outs = $3, inning = $4 WHERE id = $5 RETURNING *",
+                [balls, strikes, outs, inning, game_action_id]).then(function(result){
                 if(changeoutplayer === true){
                     updateGameLineupByResult(game_action.game_id).then(function(data){
                         resolve(result.rows[0]);
