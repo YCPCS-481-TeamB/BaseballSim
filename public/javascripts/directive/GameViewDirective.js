@@ -1,12 +1,27 @@
-App.directive('gameViewDirective', function(){
+App.directive('gameViewDirective', function(GameService, $interval){
     return {
         template: "<canvas id='FieldCanvas' width='200' height='200'></canvas>",
+        scope : {
+          gameid: '@'
+        },
         link : function($scope, element, attribute){
             var canvas = document.getElementById("FieldCanvas");
             var ctx = canvas.getContext("2d");
 
             var width = 200;
             var height = 200;
+
+            var updatePlayerPositions = function(){
+                if($scope.gameEvents && $scope.gameEvents[0]){
+                    var game_action_id = $scope.gameEvents[0].id;
+                    GameService.getGamePositionByGameEvent(game_action_id).then(function(response){
+                        $scope.player_positions = response.data.positions;
+                    });
+                }
+            }
+
+            updatePlayerPositions();
+            $interval(updatePlayerPositions, 1000);
 
             //Second Base
             var base1_filled = false;//($scope.player_positions && $scope.player_positions.onfirst_id != 0);

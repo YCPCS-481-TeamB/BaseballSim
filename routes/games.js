@@ -70,6 +70,25 @@ router.get('/events/:event_id/positions', function(req, res, next){
 });
 
 /**
+ * Gets the game event positions from the given game id and game event id
+ * @params id - the game's id
+ */
+router.get('/:id/positions/latest', function(req, res, next){
+    var id = req.params.id;
+
+    GameController.getLatestEventForGame(id).then(function(result){
+        GameController.getPlayerPositionByGameEventId(result.id).then(function(data){
+            res.status(200).json({positions: data});
+        }).catch(function(err){
+            res.status(200).json(err);
+        });
+    }).catch(function(err){
+        res.status(500).json(err);
+    });
+});
+
+
+/**
  * Gets all game events for a game
  * @params id - the game's id
  */

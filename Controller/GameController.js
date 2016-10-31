@@ -10,8 +10,8 @@ var TeamsController = require('./TeamsController');
 var LineupController = require('./LineupController');
 
 // Don't yell at me Brandon I wanted some global variables
-var numBalls = 0;
-var numStrikes = 0;
+//var numBalls = 0;
+//var numStrikes = 0;
 exports.getGames = function(limit, offset){
     return new Promise(function(resolve, reject){
         DatabaseController.query("SELECT * from games LIMIT $1 OFFSET $2", [limit | 1000, offset | 0]).then(function(data){
@@ -197,6 +197,39 @@ function updatePlayerPositionByEventResult(game_action_id, player_id, game_resul
     });
 }
 
+function updateCountsByEventResult(game_action_id, player_id, game_result){
+    //'ball', 'strike', 'foul'
+    return new Promise(function(resolve, reject){
+        DatabaseController.query("SELECT * FROM game_action WHERE id = $1", [game_action_id]).then(function(data){
+            var game_action = data.rows[0];
+            var balls = game_action.balls;
+            var strikes = game_action.strikes;
+            var outs = game_action.outs;
+
+            if(game_result == 'strike' || game_action == 'foul'){
+                strikes++;
+            }else if(game_result == 'ball'){
+                balls++;
+            }
+
+            if(strikes != 0 && strikes % 3 == 0 || game_result == 'out'){
+                strikes = 0;
+                outs++;
+            }
+
+            DatabaseController.query("UPDATE game_action SET balls = $1, strikes = $2, outs = $3 WHERE id = $4 RETURNING *",
+                [balls, strikes, outs, game_action_id]).then(function(result){
+                resolve(result.rows[0]);
+            }).catch(function(err){
+                reject(err);
+            });
+
+        }).catch(function(err){
+            reject(err);
+        });
+    });
+}
+
 function createApprovalsForEvent(game_id, event_id){
    return new Promise(function(resolve, reject){
        var promises = [];
@@ -347,11 +380,16 @@ exports.doGameEvent = function(game_id, player1_id, player2_id){
         //gameAlgorithmController(game_id, player1_id, player2_id).then(function(result) {
             var game_message = generateMessage(player1_id, player2_id, game_id, result);
             exports.getLatestEventForGame(game_id).then(function(lastGameEvent){
+                console.log("EVENT: ", game_id, result, game_message);
                 createGameActionFromPrevious(game_id, result, game_message).then(function(data){
                 var game_action = data[0];
                     copyPlayerPositions(lastGameEvent.id, game_action.id).then(function(player_pos_result){
                         updatePlayerPositionByEventResult(game_action.id, player1_id, result).then(function(position_data){
-                            resolve(data);
+                            updateCountsByEventResult(game_action.id, player1_id, result).then(function(update_game_action_data){
+                                resolve(data);
+                            }).catch(function(err){
+                                reject(err);
+                            });
                         }).catch(function(err){
                             reject(err);
                         });
@@ -478,53 +516,51 @@ function basicPlayerEvent(player1_id, player2_id){
                         // Returns Ball
                         rng = 0;
                         console.log('Passing in "ball"');
-                        outcome = exports.ballsAndStrikesCounter(options[rng]);
+                        //outcome = exports.ballsAndStrikesCounter(options[rng]);
                     }
                     else if (num >= ball && num < ball+single){
                         // Returns Single
                         rng = 1;
-                        outcome = exports.ballsAndStrikesCounter(options[rng]);
+                        //outcome = exports.ballsAndStrikesCounter(options[rng]);
                     }
                     else if (num >= ball+single && num < (ball+single+double)) {
                         // Returns Double
                         rng = 2;
-                        outcome = exports.ballsAndStrikesCounter(options[rng]);
+                        //outcome = exports.ballsAndStrikesCounter(options[rng]);
                     }
                     else if (num >= (ball+single+double) && num < (ball+single+double+triple)) {
                         // Returns Triple
                         rng = 3;
-                        outcome = exports.ballsAndStrikesCounter(options[rng]);
+                        //outcome = exports.ballsAndStrikesCounter(options[rng]);
                     }
                     else if (num >= (ball+single+double+triple) && num < (ball+single+double+triple+home_run)) {
                         // Returns Home Run
                         rng = 4;
-                        outcome = exports.ballsAndStrikesCounter(options[rng]);
+                        //outcome = exports.ballsAndStrikesCounter(options[rng]);
                     }
                     else if (num >= (ball+single+double+triple+home_run) && num < (ball+single+double+triple+home_run+strike)) {
                         // Returns Strike
                         rng = 5;
                         console.log('Strike');
-                        outcome = exports.ballsAndStrikesCounter(options[rng]);
+                       // outcome = exports.ballsAndStrikesCounter(options[rng]);
                     }
                     else if (num >= (ball+single+double+triple+home_run+strike) && num < (ball+single+double+triple+home_run+strike+out)) {
                         // Returns Out
                         rng = 6;
-                        outcome = exports.ballsAndStrikesCounter(options[rng]);
+                       // outcome = exports.ballsAndStrikesCounter(options[rng]);
                     }
                     else if (num >= (ball+single+double+triple+home_run+strike+out) && num < (totalattrs+100)){
                         // Returns Foul
                         rng = 7;
                         console.log('Foul');
-                        outcome = exports.ballsAndStrikesCounter(options[rng]);
+                       // outcome = exports.ballsAndStrikesCounter(options[rng]);
                     }
                     console.log(totalattrs);
-
-
-                    //console.log("RAND: " + outcome);
+                    outcome = options[rng];
+                    console.log("RAND: " + outcome);
 
                     // Tracks stats based on outcome
                     PlayerController.statTracker(player1, player2, options[rng]);
-
 
                     resolve(outcome);
                 });
@@ -550,47 +586,47 @@ function checkAllForApprovalStatus(approvals){
  * returns - specific outcome after totaling balls & strikes
  * adds strike_out and walk outcome possibilities
  */
-exports.ballsAndStrikesCounter = function(outcome) {
-    console.log('Outcome: ' + outcome);
-    if (outcome == 'ball' && numBalls != 3) {
-        numBalls += 1;
-
-    }
-    else if (outcome == 'strike' && numStrikes != 2) {
-        numStrikes += 1;
-    }
-    else if (outcome == 'out') {
-        numStrikes = 0;
-        numBalls = 0;
-    }
-    else if (outcome == 'foul') {
-        if (numStrikes == 2) {
-            numStrikes = 2;
-        }
-        else {
-            numStrikes += 1;
-        }
-    }
-    else if (outcome == 'ball' && numBalls == 3) {
-        outcome = 'walk';
-        numBalls = 0;
-        numStrikes = 0;
-    }
-    else if (outcome == 'strike' && numStrikes == 2) {
-        outcome = 'strike_out';
-        numBalls = 0;
-        numStrikes = 0;
-    }
-    else {
-        numBalls = 0;
-        numStrikes = 0;
-        return outcome;
-    }
-    console.log('Count: ' + numBalls + ' balls, ' + numStrikes + ' strikes.');
-    //DatabaseController.query("INSERT INTO game_action
-    console.log('Outcome Final: ' + outcome);
-    return outcome;
-}
+//exports.ballsAndStrikesCounter = function(outcome) {
+//    console.log('Outcome: ' + outcome);
+//    if (outcome == 'ball' && numBalls != 3) {
+//        numBalls += 1;
+//
+//    }
+//    else if (outcome == 'strike' && numStrikes != 2) {
+//        numStrikes += 1;
+//    }
+//    else if (outcome == 'out') {
+//        numStrikes = 0;
+//        numBalls = 0;
+//    }
+//    else if (outcome == 'foul') {
+//        if (numStrikes == 2) {
+//            numStrikes = 2;
+//        }
+//        else {
+//            numStrikes += 1;
+//        }
+//    }
+//    else if (outcome == 'ball' && numBalls == 3) {
+//        outcome = 'walk';
+//        numBalls = 0;
+//        numStrikes = 0;
+//    }
+//    else if (outcome == 'strike' && numStrikes == 2) {
+//        outcome = 'strike_out';
+//        numBalls = 0;
+//        numStrikes = 0;
+//    }
+//    else {
+//        numBalls = 0;
+//        numStrikes = 0;
+//        return outcome;
+//    }
+//    console.log('Count: ' + numBalls + ' balls, ' + numStrikes + ' strikes.');
+//    //DatabaseController.query("INSERT INTO game_action
+//    console.log('Outcome Final: ' + outcome);
+//    return outcome;
+//}
 /*
 exports.getStrikesAndBalls = function(outcome) {
     DatabaseController.query()

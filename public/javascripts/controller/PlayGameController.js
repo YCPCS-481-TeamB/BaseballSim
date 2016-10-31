@@ -1,7 +1,7 @@
 var PlayGameController = App.controller('PlayGameController', function($scope,$interval, $location, UserTokenFactory, GameService, TeamService) {
     var url = $location.absUrl();
     var id = url.substring(url.lastIndexOf('/')+1);
-
+    $scope.game_id = id;
     $scope.startGame = function(){
         UserTokenFactory.getUserData().then(function(user) {
             GameService.startGameEvent(id).then(function (response) {
@@ -29,7 +29,7 @@ var PlayGameController = App.controller('PlayGameController', function($scope,$i
     var checkNextActionPlayable = function(){
         UserTokenFactory.getUserData().then(function(user) {
             GameService.getPlayableState(id).then(function (response) {
-                if (response.data.filter(function (item) {
+                if (response.data && response.data.filter(function (item) {
                         return !item.approved == "approved";
                     }).length == 0) {
                     $scope.showNextButton = true;
@@ -46,6 +46,7 @@ var PlayGameController = App.controller('PlayGameController', function($scope,$i
         UserTokenFactory.getUserData().then(function(user){
             GameService.getLineup(id, user.id).then(function(data){
                 $scope.lineup = data.data;
+                console.log("LINEUP", $scope.lineup);
             }).catch(function(err){
                 console.log(err);
             });
@@ -67,24 +68,14 @@ var PlayGameController = App.controller('PlayGameController', function($scope,$i
         });
     }
 
-    var updatePlayerPositions = function(){
-        if($scope.gameEvents && $scope.gameEvents[0]){
-            var game_action_id = $scope.gameEvents[0].id;
-            GameService.getGamePositionByGameEvent(game_action_id).then(function(response){
-                $scope.player_positions = response.data.positions;
-            });
-        }
-    }
-
     checkNextActionPlayable();
     checkPlayerLineup();
     updateGameEvents();
-    updatePlayerPositions();
+
 
     $interval(updateGameEvents, 1000);
     $interval(checkNextActionPlayable, 1000);
     $interval(checkPlayerLineup, 1000);
     $interval(updateScoreBoard, 2000);
-    $interval(updatePlayerPositions, 1000);
 
 });

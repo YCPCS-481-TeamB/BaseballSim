@@ -24,6 +24,10 @@ var GameService = App.service('GameService', function($http, UserTokenFactory){
         return $http.get('/api/games/events/' + event_id + '/positions',{headers: {"x-access-token" : UserTokenFactory.getToken()}});
     }
 
+    this.getLatestGamePositionByGameId = function(game_id){
+        return $http.get('/'+ game_id +'/positions/latest', {headers: {"x-access-token" : UserTokenFactory.getToken()}});
+    }
+
     this.startGameEvent = function(game_id){
         return $http.post('/api/games/' + game_id + '/start', {},{headers: {"x-access-token" : UserTokenFactory.getToken()}});
     }
