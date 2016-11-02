@@ -20,3 +20,20 @@ exports.query = function(query, args){
            });
        });
 }
+
+//exports.insert = function(table, obj){
+//    return new Promise(function(resolve, reject){
+//
+//        var keys = obj.keys();
+//        var sql = "INSERT INTO $1 (";
+//
+//        for(var i = 0;i<keys.length;i++){
+//            sql += keys[i];
+//            if(i != keys.length){
+//                sql += ",";
+//            }else{
+//                sql += ")";
+//            }
+//        }
+//    });
+//}

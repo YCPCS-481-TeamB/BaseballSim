@@ -1,27 +1,27 @@
 var bluebird = require('bluebird');
 var Promise = bluebird.Promise;
-var DatabaseController = require('./DatabaseController');
-
+//var DatabaseController = require('./DatabaseController');
+var GameModel = require('./../Models/Game');
 var PlayerController = require('./PlayersController');
 var ApprovalsController = require('./ApprovalsController');
 var PermissionController = require('./PermissionController');
 var TeamsController = require('./TeamsController');
-
 var LineupController = require('./LineupController');
 
 // Don't yell at me Brandon I wanted some global variables
 //var numBalls = 0;
 //var numStrikes = 0;
-exports.getGames = function(limit, offset){
-    return new Promise(function(resolve, reject){
-        DatabaseController.query("SELECT * from games LIMIT $1 OFFSET $2", [limit | 1000, offset | 0]).then(function(data){
-            resolve(data.rows);
-        }).catch(function(err){
-            reject(err);
-        });
-    });
-}
+//exports.getGames = function(limit, offset){
+//    return new Promise(function(resolve, reject){
+//        DatabaseController.query("SELECT * from games LIMIT $1 OFFSET $2", [limit | 1000, offset | 0]).then(function(data){
+//            resolve(data.rows);
+//        }).catch(function(err){
+//            reject(err);
+//        });
+//    });
+//}
 
+//TODO: Remove
 exports.getGameByUserId = function(user_id){
     return new Promise(function(resolve, reject){
         DatabaseController.query("SELECT * from games WHERE id in (SELECT item_id FROM permissions WHERE item_type='games' AND user_id=$1)", [user_id]).then(function(data){
@@ -29,34 +29,21 @@ exports.getGameByUserId = function(user_id){
         }).catch(function(err){
             reject(err);
         });
-
     });
 }
 
 exports.createGame = function(team1_id, team2_id, field_id, league_id){
     return new Promise(function(resolve, reject){
         if(team1_id && team2_id){
-            DatabaseController.query("INSERT INTO games (team1_id, team2_id, field_id, league_id) VALUES ($1, $2, $3, $4) RETURNING *", [team1_id, team2_id, field_id | 0, league_id | 0]).then(function(data){
-                PermissionController.getOwnerForItem('teams', team1_id).then(function(response){
-                    var user1_id = response.rows[0].user_id;
-
-                    PermissionController.getOwnerForItem('teams', team2_id).then(function(response2){
-                        var user2_id = response2.rows[0].user_id;
-                        ApprovalsController.createApproval('games', data.rows[0].id, user2_id).then(function(approval){
-                            PermissionController.addPermission('games', data.rows[0].id, user1_id).then(function(user1_perm){
-                                PermissionController.addPermission('games', data.rows[0].id, user2_id).then(function(user1_perm){
-                                    resolve(data.rows[0]);
-                                });
-                            });
-
-                        }).catch(function(err){
-                            reject(err);
-                        });
-
+            GameModel.create(team1_id,team2_id, field_id, league_id).then(function(game){
+                Promise.all([PermissionController.getOwnerForItem('teams', team1_id), PermissionController.getOwnerForItem('teams', team2_id)]).then(function(result){
+                    var user1_id = result[0].rows[0].user_id;
+                    var user2_id = result[1].rows[0].user_id;
+                    Promise.all([ApprovalsController.createApproval('games', game.id, user2_id), PermissionController.addPermission('games', game.id, user1_id), PermissionController.addPermission('games', game.id, user2_id)]).then(function(result){
+                        resolve(game);
                     }).catch(function(err){
                         reject(err);
                     });
-
                 }).catch(function(err){
                     reject(err);
                 });
@@ -69,15 +56,15 @@ exports.createGame = function(team1_id, team2_id, field_id, league_id){
     });
 }
 
-exports.getEventsByGameId = function(game_id){
-    return new Promise(function(resolve, reject){
-        DatabaseController.query("SELECT * FROM game_action WHERE game_id = $1", [game_id]).then(function(data){
-            resolve(data.rows);
-        }).catch(function(err){
-            reject(err);
-        });
-    });
-}
+//exports.getEventsByGameId = function(game_id){
+//    return new Promise(function(resolve, reject){
+//        DatabaseController.query("SELECT * FROM game_action WHERE game_id = $1", [game_id]).then(function(data){
+//            resolve(data.rows);
+//        }).catch(function(err){
+//            reject(err);
+//        });
+//    });
+//}
 
 exports.isGameStarted = function(game_id){
     return new Promise(function(resolve, reject){
@@ -221,6 +208,7 @@ function updateCountsByEventResult(game_action_id, player_id, game_result){
             var inning = game_action.inning;
 
             var changeoutplayer = false;
+            var gameOver = false;
 
             if(game_result == 'strike' || (game_result == 'foul' && strikes != 2)){
                 strikes++;
@@ -266,10 +254,6 @@ function updateCountsByEventResult(game_action_id, player_id, game_result){
                     outs = 0;
                     balls = 0;
                     console.log("Current Inning: " + inning);
-                    if (inning == 18){
-                        // Game Over
-                        console.log("GAME OVER");
-                    }
                 }
             }
             // Result is a hit of some sort
@@ -278,10 +262,24 @@ function updateCountsByEventResult(game_action_id, player_id, game_result){
                 strikes = 0;
             }
 
+            if (inning == 18){
+                // Game Over
+                gameOver = true;
+            }
+
             DatabaseController.query("UPDATE game_action SET balls = $1, strikes = $2, outs = $3, inning = $4 WHERE id = $5 RETURNING *",
                 [balls, strikes, outs, inning, game_action_id]).then(function(result){
                 if(changeoutplayer === true){
                     updateGameLineupByResult(game_action.game_id).then(function(data){
+
+                        //TODO: Add Game Event, 'end' if there are 18 innings played
+
+                        if(gameOver === true){
+                            //exports.
+                        }else{
+
+                        }
+
                         resolve(result.rows[0]);
                     }).catch(function(err){
                         reject("Error updating game lineup: " + err)
@@ -300,7 +298,6 @@ function updateCountsByEventResult(game_action_id, player_id, game_result){
 }
 
 function updateGameLineupByResult(game_id) {
-    console.log("UPDATE GAME LINEUP");
     return new Promise(function (resolve, reject) {
         exports.getGameById(game_id).then(function (game) {
             exports.getLatestEventForGame(game_id).then(function (game_event) {
@@ -465,34 +462,41 @@ exports.getGameById = function(id){
     });
 }
 
-exports.doGameEvent = function(game_id, player1_id, player2_id){
-    return new Promise(function(resolve, reject){
-        basicPlayerEvent(player1_id, player2_id).then(function(result){
-            var game_message = generateMessage(player1_id, player2_id, game_id, result);
-            exports.getLatestEventForGame(game_id).then(function(lastGameEvent){
-                createGameActionFromPrevious(game_id, result, game_message).then(function(data){
-                var game_action = data[0];
-                    copyPlayerPositions(lastGameEvent.id, game_action.id).then(function(player_pos_result){
-                        updatePlayerPositionByEventResult(game_action.id, player1_id, result).then(function(position_data){
-                            updateCountsByEventResult(game_action.id, player1_id, result).then(function(update_game_action_data){
-                                resolve(data);
-                            }).catch(function(err){
-                                reject("Error updating counts: ", err);
+exports.doGameEvent = function(game_id, player1_id, player2_id) {
+    return new Promise(function (resolve, reject) {
+        //TODO: Check if game is 'started' and that the last event was not 'end'
+        exports.getLatestEventForGame(game_id).then(function (lastGameEvent) {
+            console.log(lastGameEvent);
+            if (lastGameEvent.type == 'end' && lastGameEvent != undefined) {
+                reject("The Game has Ended");
+                //TODO: Prevent game from being played further
+            } else {
+                basicPlayerEvent(player1_id, player2_id).then(function (result) {
+                    var game_message = generateMessage(player1_id, player2_id, game_id, result);
+                    createGameActionFromPrevious(game_id, result, game_message).then(function (data) {
+                        var game_action = data[0];
+                        copyPlayerPositions(lastGameEvent.id, game_action.id).then(function (player_pos_result) {
+                            updatePlayerPositionByEventResult(game_action.id, player1_id, result).then(function (position_data) {
+                                updateCountsByEventResult(game_action.id, player1_id, result).then(function (update_game_action_data) {
+                                    resolve(data);
+                                }).catch(function (err) {
+                                    reject("Error updating counts: ", err);
+                                });
+                            }).catch(function (err) {
+                                reject("Error updating player positions: " + err);
                             });
-                        }).catch(function(err){
-                            reject("Error updating player positions: " + err);
+                        }).catch(function (err) {
+                            reject("Error creating player positions: " + err);
                         });
-                    }).catch(function(err){
-                        reject("Error creating player positions: " + err);
+                    }).catch(function (err) {
+                        reject("Error creating new duplicate game event: " + err);
                     });
-                }).catch(function(err){
-                    reject("Error creating new duplicate game event: " + err);
+                }).catch(function (err) {
+                    reject("Error calculating event: " + err);
                 });
-            }).catch(function(err){
-                reject("Error getting last event: " + err);
-            })
-        }).catch(function(err){
-            reject("Error calculating event: " + err);
+            }
+        }).catch(function (err) {
+            reject(err);
         });
     });
 }
@@ -500,7 +504,6 @@ exports.doGameEvent = function(game_id, player1_id, player2_id){
 function generateMessage(player1_id, player2_id, game_id, result){
     return "Player " + player1_id + " got a " + result + " against " + player2_id;
 }
-
 
 /*
  * Different method of doing the basicPlayerEvent, uses game_id instead of only players
