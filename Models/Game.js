@@ -14,7 +14,7 @@ module.exports =  {
      */
     create : function(team1_id, team2_id, field_id, league_id){
         return new Promise(function(resolve, reject){
-            DatabaseController.query("INSERT INTO games (team1_id, team2_id, field_id, league_id) VALUES ($1, $2, $3, $4) RETURNING *", [team1_id, team2_id, field_id | 0, league_id | 0]).then(function(result){
+            DatabaseController.insert('games', {team1_id: team1_id, team2_id: team2_id, field_id: field_id, league_id: league_id}).then(function(result){
                 resolve(result.rows[0]);
             }).catch(function(err){
                 reject(err);
@@ -72,7 +72,7 @@ module.exports =  {
     getAllByUserPermission : function(user_id){
         return new Promise(function(resolve, reject){
             DatabaseController.query("SELECT * from games WHERE id in (SELECT item_id FROM permissions WHERE item_type='games' AND user_id=$1)", [user_id]).then(function(result){
-                resolve(data.rows);
+                resolve(result.rows);
             }).catch(function(err){
                 reject(err);
             });
@@ -80,7 +80,7 @@ module.exports =  {
     },
     hasEventWithType : function(id, type){
         return new Promise(function(resolve, reject){
-            DatabaseController.query("SELECT * from games WHERE id = $1 AND type = $2", [id, type]).then(function(data){
+            DatabaseController.query("SELECT * from game_action WHERE game_id = $1 AND type = $2", [id, type]).then(function(result){
                 resolve(result.rows.length != 0);
             }).catch(function(err){
                 reject(err);

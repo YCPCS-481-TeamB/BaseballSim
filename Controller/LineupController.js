@@ -2,6 +2,8 @@ var Promise = require('bluebird').Promise;
 var DatabaseController = require('./DatabaseController');
 var TeamsController = require('./TeamsController');
 
+var LineupModel = require('./../Models/Lineup');
+
 exports.setDefaultLineup = function(team_id, game_id){
     return new Promise(function(resolve, reject){
         exports.createLineup(team_id, game_id).then(function(lineup){
@@ -36,22 +38,15 @@ exports.markLastPlayerAsPlayed = function(game_id, player_id, team_id){
 
 exports.getNextLineupPlayerByGameAndTeamId = function(game_id, team_id){
     return new Promise(function(resolve, reject){
-        DatabaseController.query("SELECT * FROM players WHERE id IN (SELECT player_id FROM lineup_items WHERE already_played = false AND lineup_id IN (SELECT id FROM lineups WHERE game_id = $1 AND team_id = $2) ORDER BY lineup_index ASC LIMIT 1)",[game_id, team_id]).then(function(result){
-            if(result.rows.length > 0){
-                resolve(result.rows[0]);
-            }else{
-                DatabaseController.query("UPDATE lineup_items SET already_played = false WHERE already_played = true AND lineup_id IN (SELECT id FROM lineups WHERE game_id = $1 AND team_id = $2)",[game_id, team_id]).then(function(result){
-                    DatabaseController.query("SELECT * FROM players WHERE id IN (SELECT player_id FROM lineup_items WHERE already_played = false AND lineup_id IN (SELECT id FROM lineups WHERE game_id = $1 AND team_id = $2) ORDER BY lineup_index ASC LIMIT 1)",[game_id, team_id]).then(function(result){
-                        resolve(result.rows[result.rows.length-1]);
-                    }).catch(function(err){
-                        reject(err);
-                    });
-                }).catch(function(err){
-                    reject("No Players Left To Play: " + err);
-                });
-            }
+        LineupModel.getByGameAndTeamId(game_id, team_id).then(function(lineup){
+            console.log("Lineup", lineup);
+            LineupModel.getNextLineupPlayerByLineupId(lineup.id).then(function(player){
+                resolve(player);
+            }).catch(function(err){
+                reject(err);
+            });
         }).catch(function(err){
-           reject(err);
+            reject(err);
         });
     });
 }

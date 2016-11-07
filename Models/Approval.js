@@ -67,6 +67,15 @@ module.exports =  {
             });
         });
     },
+    checkApprovalStatusByItemAndId : function(item_type, item_id){
+        return new Promise(function(resolve, reject){
+            DatabaseController.query("SELECT * FROM approvals WHERE item_type = $1 AND item_id = $2 AND approved != 'approved'", [item_type, item_id]).then(function(result){
+                resolve(result.rows.length == 0);
+            }).catch(function(err){
+                reject(err);
+            });
+        });
+    },
     deleteById : function(id){
         return new Promise(function(resolve, reject){
             DatabaseController.query("SELECT * FROM approvals WHERE id = $1", [id]).then(function(result){

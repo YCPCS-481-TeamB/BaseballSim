@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 
+var ApprovalsModel = require('./../Models/Approval');
 var ApprovalsController = require('./../Controller/ApprovalsController');
 
 /**
@@ -41,7 +42,8 @@ router.get('/user', function(req, res, next) {
 router.get('/user/pending', function(req, res, next) {
     var limit = req.query.limit;
     var offset = req.query.offset;
-    ApprovalsController.getApprovalByUserIdAndStatus(req.userdata.id, 'pending').then(function(data){
+
+    ApprovalsModel.getAllByUserIdAndStatus(req.userdata.id, 'pending').then(function(data){
         res.status(200).json({success: true, approvals: data});
     }).catch(function(err){
         res.status(200).json({success: false, message:""+ err});
@@ -56,7 +58,8 @@ router.get('/user/pending', function(req, res, next) {
 router.get('/:itemtype/:itemid', function(req, res, next) {
     var item_type = req.params.itemtype;
     var item_id = req.params.itemid;
-    ApprovalsController.getApprovalByItemTypeAndId(item_type, item_id).then(function(data){
+
+    ApprovalsModel.getAllByTypeAndItemId(item_type, item_id).then(function(data){
         res.status(200).json({success: true, approvals: data});
     }).catch(function(err){
         res.status(200).json({success: false, message:""+ err});
@@ -65,13 +68,12 @@ router.get('/:itemtype/:itemid', function(req, res, next) {
 
 /**
  * POST For setting approval status to true
- * @query limit - limit on the number of record pulled
- * @query offset - offset on pulling items
  */
-router.post('/:itemid/status', function(req, res, next) {
+router.post('/:id/status', function(req, res, next) {
     var status = req.body.status;
-    var item_id = req.params.itemid;
-    ApprovalsController.setApprovalStatus(item_id, status).then(function(data){
+    var id = req.params.id;
+
+    ApprovalsModel.update(id, status).then(function(data){
         res.status(200).json({success: true, approvals: data});
     }).catch(function(err){
         res.status(200).json({success: false, message:""+ err});

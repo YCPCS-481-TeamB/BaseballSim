@@ -13,6 +13,7 @@ module.exports = {
             });
         });
     },
+    //TODO: Implement
     update : function(){
         return new Promise(function(resolve, reject){
 
@@ -30,16 +31,16 @@ module.exports = {
     getAll : function(limit, offset){
         return new Promise(function(resolve, reject){
             DatabaseController.query("SELECT * FROM lineups LIMIT $1 OFFSET $2", [limit, offset]).then(function(result){
-
+                resolve(result.rows);
             }).catch(function(err){
-
+                reject(err);
             });
         });
     },
     getById : function(id){
         return new Promise(function(resolve, reject){
             DatabaseController.query("SELECT * FROM lineup_items WHERE lineup_id=$1 ORDER BY lineup_index ASC;", [lineup_id]).then(function(result){
-                resolve(result.rows);
+                resolve(result.rows[0]);
             }).catch(function(err){
                 reject(err);
             });
@@ -48,7 +49,7 @@ module.exports = {
     getByGameAndTeamId : function(game_id, team_id){
         return new Promise(function(resolve, reject){
             DatabaseController.query("SELECT * FROM lineups WHERE game_id = $1 AND team_id = $2",[game_id, team_id]).then(function(result){
-                resolve(result.rows);
+                resolve(result.rows[0]);
             }).catch(function(err){
                 reject(err);
             });
@@ -63,10 +64,28 @@ module.exports = {
             });
         });
     },
+    getByGameAndUserId : function(game_id, user_id){
+        return new Promise(function(resolve, reject){
+            DatabaseController.query("SELECT * FROM lineup_items WHERE game_id=$1 AND team_id IN (SELECT id FROM teams WHERE id IN (SELECT item_id FROM permissions WHERE user_id=1))").then(function(result){
+                resolve(result.rows[0]);
+            }).catch(function(err){
+                reject(err);
+            });
+        });
+    },
+    getNextLineupPlayerByLineupId : function(lineup_id){
+        return new Promise(function(resolve, reject){
+            DatabaseController.query("SELECT * FROM players WHERE id IN (SELECT player_id FROM lineup_items WHERE lineup_id in (SELECT id FROM lineups WHERE id = $1) ORDER BY lineup_index ASC LIMIT 1)",[lineup_id]).then(function(result){
+                resolve(result.rows[0]);
+            }).catch(function(err){
+                reject(err);
+            });
+        });
+    },
     deleteById : function(id){
         return new Promise(function(resolve, reject){
             DatabaseController.query("DELETE lineup_items WHERE lineup_id=$1 ORDER BY lineup_index ASC;", [lineup_id]).then(function(result){
-                resolve(result.rows);
+                resolve(result.rows[0]);
             }).catch(function(err){
                 reject(err);
             });

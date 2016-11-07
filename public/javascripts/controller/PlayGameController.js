@@ -46,7 +46,6 @@ var PlayGameController = App.controller('PlayGameController', function($scope,$i
         UserTokenFactory.getUserData().then(function(user){
             GameService.getLineup(id, user.id).then(function(data){
                 $scope.lineup = data.data;
-                console.log("LINEUP", $scope.lineup);
             }).catch(function(err){
                 console.log(err);
             });

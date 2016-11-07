@@ -12,17 +12,26 @@ module.exports =  {
      * @param league_id
      * @returns {bluebird.Promise} A Promise containing the created game
      */
-    create : function(game_id, team_at_bat, action_type, message){
+    create : function(game_id, team_at_bat, type, message){
         return new Promise(function(resolve, reject){
-            if(!game_id || !team_at_bat || ! action_type || !message){
+            if(!game_id || !team_at_bat || !type || !message){
                 reject("Missing a required parameter");
             }else{
-                DatabaseController.query("INSERT INTO game_action (game_id, team_at_bat, action_type, message) VALUES ($1, $2, $3, $4) RETURNING *", [game_id, team_at_bat, action_type, message]).then(function(result){
+                DatabaseController.query("INSERT INTO game_action (game_id, team_at_bat, type, message) VALUES ($1, $2, $3, $4) RETURNING *", [game_id, team_at_bat, type, message]).then(function(result){
                     resolve(result.rows[0]);
                 }).catch(function(err){
                     reject(err);
                 });
             }
+        });
+    },
+    update : function(id, obj){
+        return new Promise(function(resolve, reject){
+            DatabaseController.update('game_action',id, obj).then(function(result){
+                resolve(result.rows[0]);
+            }).catch(function(err){
+                reject(err);
+            });
         });
     },
     /**
@@ -106,7 +115,8 @@ module.exports =  {
                 var event = data.rows[0];
                 DatabaseController.query("INSERT INTO game_action (game_id, team_at_bat,team1_score,team2_score, balls, strikes, outs, type, message, inning)" +
                     "VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *", [game_id, event.team_at_bat, event.team1_score, event.team2_score, event.balls, event.strikes, event.outs, result, game_message, event.inning]).then(function(result){
-                    resolve(result.rows);
+                    console.log(result.rows[0]);
+                    resolve(result.rows[0]);
                 }).catch(function(err){
                     reject(err);
                 });
