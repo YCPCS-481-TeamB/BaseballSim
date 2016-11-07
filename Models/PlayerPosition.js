@@ -24,7 +24,6 @@ module.exports =  {
     },
     update : function(id, obj){
         return new Promise(function(resolve, reject){
-            console.log(obj);
             DatabaseController.update('game_player_positions', id, obj).then(function(result){
                 resolve(result.rows[0]);
             }).catch(function(err){
@@ -36,6 +35,8 @@ module.exports =  {
         return new Promise(function(resolve, reject){
             DatabaseController.query("SELECT * from game_player_positions LIMIT $1 OFFSET $2", [limit || 1000, offset || 0]).then(function(data){
                 resolve(data.rows);
+            }).catch(function(err){
+                reject(err);
             });
         });
     },
@@ -43,13 +44,17 @@ module.exports =  {
         return new Promise(function(resolve, reject){
             DatabaseController.query("SELECT * from game_player_positions WHERE id = $1", [id]).then(function(data){
                 resolve(data.rows[0]);
+            }).catch(function(err){
+                reject(err);
             });
         });
     },
     getByGameActionId : function(game_action_id){
         return new Promise(function(resolve, reject){
             DatabaseController.query("SELECT * from game_player_positions WHERE game_action_id = $1", [game_action_id]).then(function(data){
-                resolve(data.rows);
+                resolve(data.rows[0]);
+            }).catch(function(err){
+                reject(err);
             });
         });
     },

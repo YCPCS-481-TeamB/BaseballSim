@@ -116,20 +116,29 @@ function createInitialGamePlayerPositions(game_action_id){
 //    });
 //}
 
-//TODO: Update the method in other places
 function updateGameScore(game_action_id, score){
-    GameActionModel.getById(game_action_id).then(function(game_action){
-        GameModel.getById(game_action.game_id).then(function(game){
-            if(game.team1_id == game_action.team_at_bat){
-                GameActionModel.update(game_action_id, {team1_score : score});
-            }else{
-                GameActionModel.update(game_action_id, {team2_score : score});
-            }
+    return new Promise(function(resolve, reject){
+        GameActionModel.getById(game_action_id).then(function(game_action){
+            GameModel.getById(game_action.game_id).then(function(game){
+                if(game.team1_id == game_action.team_at_bat){
+                    GameActionModel.update(game_action_id, {team1_score : score}).then(function(updatedGameAction){
+                        resolve(updatedGameAction);
+                    }).catch(function(err){
+                       reject(err);
+                    });
+                }else{
+                    GameActionModel.update(game_action_id, {team2_score : score}).then(function(updatedGameAction){
+                        resolve(updatedGameAction);
+                    }).catch(function(err){
+                        reject(err);
+                    });
+                }
+            }).catch(function(err){
+                reject(err);
+            });
         }).catch(function(err){
             reject(err);
         });
-    }).catch(function(err){
-        reject(err);
     });
 }
 
@@ -138,7 +147,6 @@ function updatePlayerPositionByEventResult(game_action_id, player_id, game_resul
     return new Promise(function(resolve, reject){
         GameActionModel.getById(game_action_id).then(function(game_action){
             PlayerPositionModel.getByGameActionId(game_action.id).then(function(player_positions){
-                console.log("player_positions: ", player_positions);
                 var player_pos_arr = [player_positions.onfirst_id, player_positions.onsecond_id, player_positions.onthird_id];
                 var movements = 0;
 
@@ -177,7 +185,6 @@ function updatePlayerPositionByEventResult(game_action_id, player_id, game_resul
                         player_pos_arr[movements-1] = player_id;
                     }
                 }
-                console.log(player_pos_arr);
                 PlayerPositionModel.update(player_positions.id, {onfirst_id: player_pos_arr[0], onsecond_id: player_pos_arr[1], onthird_id: player_pos_arr[2]}).then(function(updated_player_position){
                     updateGameScore(game_action_id, score).then(function(data) {
                         if (changeoutplayer === true) {
@@ -208,8 +215,7 @@ function updatePlayerPositionByEventResult(game_action_id, player_id, game_resul
 function updateCountsByEventResult(game_action_id, player_id, game_result){
     //'ball', 'strike', 'foul'
     return new Promise(function(resolve, reject){
-        GameActionModel.getById(game_action_id).then(function(data){
-            var game_action = data.rows[0];
+        GameActionModel.getById(game_action_id).then(function(game_action){
             var balls = game_action.balls;
             var strikes = game_action.strikes;
             var outs = game_action.outs;
@@ -287,12 +293,12 @@ function updateCountsByEventResult(game_action_id, player_id, game_result){
 
                         }
 
-                        resolve(result.rows[0]);
+                        resolve(result);
                     }).catch(function(err){
                         reject("Error updating game lineup: " + err)
                     });
                 }else {
-                    resolve(result.rows[0]);
+                    resolve(result);
                 }
             }).catch(function(err){
                 reject("Error updating game action: " + err);
@@ -420,15 +426,15 @@ exports.startGame = function(game_id){
     });
 }
 
-exports.getActionsByGameId = function(game_id, limit, offset){
-    return new Promise(function(resolve, reject){
-        DatabaseController.query("SELECT * from game_actions WHERE game_id=$3 LIMIT $1 OFFSET $2", [limit | 1000, offset | 0, game_id]).then(function(data){
-            resolve(data.rows);
-        }).catch(function(err){
-            reject(err);
-        });
-    });
-}
+//exports.getActionsByGameId = function(game_id, limit, offset){
+//    return new Promise(function(resolve, reject){
+//        DatabaseController.query("SELECT * from game_actions WHERE game_id=$3 LIMIT $1 OFFSET $2", [limit | 1000, offset | 0, game_id]).then(function(data){
+//            resolve(data.rows);
+//        }).catch(function(err){
+//            reject(err);
+//        });
+//    });
+//}
 //
 //exports.deleteGamesById = function(id){
 //    return new Promise(function(resolve, reject){
@@ -453,10 +459,18 @@ exports.doGameEvent = function(game_id, player1_id, player2_id) {
                     createGameActionFromPrevious(game_id, result, game_message).then(function(game_action){
                         console.log("LAST GAME EVENT: ", lastGameEvent);
                         console.log("GAME ACTION: ", game_action);
-                        Promise.each([PlayerPositionModel.createCopy(lastGameEvent.id, game_action.id),updateCountsByEventResult(game_action.id, player1_id, result), updatePlayerPositionByEventResult(game_action.id, player1_id, result)]).then(function(result){
-                            resolve(game_action);
+                        PlayerPositionModel.createCopy(lastGameEvent.id, game_action.id).then(function(result){
+                            updateCountsByEventResult(game_action.id, player1_id, result).then(function(result2){
+                                updatePlayerPositionByEventResult(game_action.id, player1_id, result).then(function(result3){
+                                    resolve(game_action);
+                                }).catch(function(err){
+                                    reject("update player pos: ", err);
+                                })
+                            }).catch(function(err){
+                                reject("update counts: "+ err);
+                            });
                         }).catch(function(err){
-                            reject(err);
+                            reject("create copy", err);
                         });
                     }).catch(function(err){
                         reject("error creating game action: " + err);

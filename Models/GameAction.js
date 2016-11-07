@@ -61,6 +61,8 @@ module.exports =  {
             }else{
                 DatabaseController.query("SELECT * from game_action WHERE id = $1", [id]).then(function(data){
                     resolve(data.rows[0]);
+                }).catch(function(err){
+                    reject(err);
                 });
             }
         });

@@ -16,7 +16,7 @@ module.exports = {
     //TODO: Implement
     update : function(){
         return new Promise(function(resolve, reject){
-
+            reject("NOT IMPLEMENTED");
         });
     },
     setLineupPositon : function(id, player_id, lineup_index){
@@ -66,7 +66,7 @@ module.exports = {
     },
     getByGameAndUserId : function(game_id, user_id){
         return new Promise(function(resolve, reject){
-            DatabaseController.query("SELECT * FROM lineup_items WHERE game_id=$1 AND team_id IN (SELECT id FROM teams WHERE id IN (SELECT item_id FROM permissions WHERE user_id=1))").then(function(result){
+            DatabaseController.query("SELECT * FROM lineup_items WHERE lineup_id IN (SELECT id FROM lineups WHERE game_id=$1 AND team_id IN (SELECT id FROM teams WHERE id IN (SELECT item_id FROM permissions WHERE user_id=$2)) )", [game_id, user_id]).then(function(result){
                 resolve(result.rows[0]);
             }).catch(function(err){
                 reject(err);

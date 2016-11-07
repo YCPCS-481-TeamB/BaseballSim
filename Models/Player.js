@@ -21,10 +21,10 @@ module.exports =  {
     },
     getAll : function(limit, offset){
         return new Promise(function(resolve, reject){
-            return new Promise(function(resolve, reject){
-                DatabaseController.query("SELECT * from players LIMIT $1 OFFSET $2", [limit || 1000, offset || 0]).then(function(result){
-                    resolve(result.rows);
-                });
+            DatabaseController.query("SELECT * from players LIMIT $1 OFFSET $2", [limit || 1000, offset || 0]).then(function(result){
+                resolve(result.rows);
+            }).catch(function(err){
+                reject(err);
             });
         });
     },
