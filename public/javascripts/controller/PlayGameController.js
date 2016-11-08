@@ -2,6 +2,11 @@ var PlayGameController = App.controller('PlayGameController', function($scope,$i
     var url = $location.absUrl();
     var id = url.substring(url.lastIndexOf('/')+1);
     $scope.game_id = id;
+
+    var temp = ['strike','ball','foul','single','double','triple','home_run','out'];
+
+    $scope.opts = {};
+
     $scope.startGame = function(){
         UserTokenFactory.getUserData().then(function(user) {
             GameService.startGameEvent(id).then(function (response) {
@@ -58,12 +63,19 @@ var PlayGameController = App.controller('PlayGameController', function($scope,$i
         $scope.balls = $scope.gameEvents[0].balls;
         $scope.strikes = $scope.gameEvents[0].strikes;
         $scope.outs = $scope.gameEvents[0].outs;
+        $scope.team_at_bat = $scope.gameEvents[0].team_at_bat;
     }
 
     var updateGameEvents = function(){
         GameService.loadEventsByGameId(id).then(function (response) {
             $scope.gameEvents = response.data;
             $scope.gameEvents.reverse();
+
+            for(var i = 0;i<temp.length;i++){
+                $scope.opts[temp[i]] = $scope.gameEvents.filter(function(item){
+                    return item.type == temp[i];
+                }).length;
+            }
         });
     }
 

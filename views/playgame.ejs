@@ -17,6 +17,8 @@
 
     <div class="row">
         <div class="col-sm-4">
+            <strong>Team at Bat: {{team_at_bat}}</strong>
+            <BR>
             <strong>Team 1: {{team1_score}}</strong>
             <strong>Team 2: {{team2_score}}</strong>
             <BR>
@@ -29,6 +31,7 @@
             <strong>Base 1: {{player_positions.onfirst_id}}</strong>
             <strong>Base 2: {{player_positions.onsecond_id}}</strong>
             <strong>Base 3: {{player_positions.onthird_id}}</strong>
+            <BR>
             <button class="btn btn-success" ng-show="showNextButton" ng-click="nextGameEvent()">Next Game Action</button>
 
             <table class="table table-condensed">
@@ -51,6 +54,11 @@
             </div>
         </div>
     </div>
+
+    <!-- strike ball foul single double triple home_run out-->
+
+    TEST
+    {{opts}}
 
 
 </div>

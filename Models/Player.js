@@ -55,9 +55,18 @@ module.exports =  {
             });
         });
     },
-    deleteById : function(id){
+    deleteByTeamId : function(team_id){
         return new Promise(function(resolve, reject){
             DatabaseController.query("DELETE FROM players WHERE team_id = $1 RETURNING *;", [team_id]).then(function(result){
+                resolve(result.rows);
+            }).catch(function(err){
+                reject(err);
+            });
+        });
+    },
+    deleteById : function(id){
+        return new Promise(function(resolve, reject){
+            DatabaseController.query("DELETE FROM players WHERE id = $1 RETURNING *;", [id]).then(function(result){
                 resolve(result.rows[0]);
             }).catch(function(err){
                 reject(err);

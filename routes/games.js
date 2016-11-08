@@ -145,35 +145,11 @@ router.post('/:id/events/next', function(req, res, next){
     var id = req.params.id;
     var player1_id = req.body.player1_id;
     var player2_id = req.body.player2_id;
-
-    if(player1_id && player2_id){
-        GameController.doGameEvent(id, player1_id, player2_id).then(function(data){
-            res.status(200).json(data);
-        }).catch(function(err){
-            res.status(500).json("" + err);
-        });
-    }else {
-        console.log("next event for game", id);
-        GameModel.getById(id).then(function (game) {
-            console.log("found game!", game);
-            GameActionModel.getLatestByGameId(id).then(function (gameEvent) {
-                console.log("Got last game event", gameEvent);
-                Promise.all([LineupController.getNextLineupPlayerByGameAndTeamId(game.id, game.team1_id), LineupController.getNextLineupPlayerByGameAndTeamId(game.id, game.team2_id)]).then(function (result) {
-                    console.log("Got lineups", result);
-                    GameController.doGameEvent(id, result[0].id, result[1].id).then(function(data){
-                        console.log("game event done");
-                        res.status(200).json(data);
-                    }).catch(function(err){
-                        res.status(500).json("" + err);
-                    });
-                }).catch(function (err) {
-                    res.status(500).json("Lineup Cannot be determined: " + err);
-                });
-            }).catch(function (err) {
-                res.status(500).json("Game Not Found: " + err);
-            });
-        });
-    }
+    GameController.doGameEvent(id, player1_id, player2_id).then(function(data){
+        res.status(200).json(data);
+    }).catch(function(err){
+        res.status(500).json("" + err);
+    });
 });
 
 router.get('/:id/events/latest', function(req, res, next){
@@ -190,8 +166,12 @@ router.get("/:id/teams/:team_id/lineup", function(req, res, next){
     var id = req.params.id;
     var team_id = req.params.team_id;
 
-    LineupModel.getByGameAndTeamId(id, team_id).then(function(data){
-        res.status(200).json(data);
+    LineupModel.getByGameAndTeamId(id, team_id).then(function(lineup){
+        LineupModel.getLineupPlayersById(lineup.id).then(function(players){
+            res.status(200).json(players);
+        }).catch(function(err){
+           reject(err);
+        });
     }).catch(function(err){
         res.status(500).json("" + err);
     });
@@ -201,8 +181,12 @@ router.get("/:id/users/:user_id/lineup", function(req, res, next){
     var id = req.params.id;
     var user_id = req.params.user_id;
 
-    LineupModel.getByGameAndUserId(id, user_id).then(function(data){
-        res.status(200).json(data);
+    LineupModel.getByGameAndUserId(id, user_id).then(function(lineup){
+        LineupModel.getLineupPlayersById(lineup.id).then(function(players){
+            res.status(200).json(players);
+        }).catch(function(err){
+            res.status(500).json(err);
+        });
     }).catch(function(err){
         res.status(500).json("" + err);
     });

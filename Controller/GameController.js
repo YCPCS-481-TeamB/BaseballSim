@@ -2,6 +2,7 @@ var bluebird = require('bluebird');
 var Promise = bluebird.Promise;
 //var DatabaseController = require('./DatabaseController');
 var GameModel = require('./../Models/Game');
+var LineupModel = require('./../Models/Lineup');
 var GameActionModel = require('./../Models/GameAction');
 var PlayerPositionModel = require('./../Models/PlayerPosition');
 var ApprovalModel = require('./../Models/Approval');
@@ -115,6 +116,32 @@ function createInitialGamePlayerPositions(game_action_id){
 //        });
 //    });
 //}
+function toggleTeamAtBat(game_action_id){
+    return new Promise(function(resolve, reject){
+       GameActionModel.getById(game_action_id).then(function(game_action){
+           GameModel.getById(game_action.game_id).then(function(game){
+
+               var newTeamAtBat = 0;
+
+               if(game.team1_id == game_action.team_at_bat){
+                   newTeamAtBat = game.team2_id;
+               }else{
+                   newTeamAtBat = game.team1_id;
+               }
+
+               GameActionModel.update(game_action_id, {team_at_bat: newTeamAtBat}).then(function(result){
+                    resolve(result);
+               }).catch(function(err){
+                  reject(err);
+               });
+           }).catch(function(err){
+                reject(err);
+           });
+       }).catch(function(err){
+            reject(err);
+       });
+    });
+}
 
 function updateGameScore(game_action_id, score){
     return new Promise(function(resolve, reject){
@@ -191,7 +218,7 @@ function updatePlayerPositionByEventResult(game_action_id, player_id, game_resul
                             updateGameLineupByResult(game_action.game_id).then(function(lineup_data){
                                 resolve(updated_player_position);
                             }).catch(function(err){
-                                console.log(err);
+                                reject(err);
                             });
                         } else {
                             resolve(updated_player_position);
@@ -222,13 +249,13 @@ function updateCountsByEventResult(game_action_id, player_id, game_result){
             var inning = game_action.inning;
 
             var changeoutplayer = false;
+            var toggleAtBat = false;
             var gameOver = false;
 
             if(game_result == 'strike' || (game_result == 'foul' && strikes != 2)){
                 strikes++;
                 if (strikes >= 3){
                     // Strikeout
-                    console.log("AND HE STRIKES OUT!")
                     strikes = 0;
                     balls = 0;
                     changeoutplayer = true;
@@ -236,12 +263,11 @@ function updateCountsByEventResult(game_action_id, player_id, game_result){
                     if (outs >= 3 && outs != 0) {
                         // Swap Teams here maybe?
                         inning += 1;
+                        toggleAtBat = true;
                         outs = 0;
                         balls = 0;
-                        console.log("Current Inning: " + inning);
                         if (inning == 18){
                             // Game Over
-                            console.log("GAME OVER");
                         }
                     }
                 }
@@ -249,7 +275,6 @@ function updateCountsByEventResult(game_action_id, player_id, game_result){
                 balls++;
                 if (balls >= 4) {
                     // Walk
-                    console.log("AND HE WALKS!");
                     balls = 0;
                     strikes = 0;
                 }
@@ -265,9 +290,9 @@ function updateCountsByEventResult(game_action_id, player_id, game_result){
                 if (outs >= 3 && outs != 0) {
                     // Swap Teams here maybe?
                     inning += 1;
+                    toggleAtBat = true;
                     outs = 0;
                     balls = 0;
-                    console.log("Current Inning: " + inning);
                 }
             }
             // Result is a hit of some sort
@@ -280,20 +305,44 @@ function updateCountsByEventResult(game_action_id, player_id, game_result){
                 // Game Over
                 gameOver = true;
             }
-
+            console.log("CHANGE OUT PLAYER: ", changeoutplayer);
             GameActionModel.update(game_action_id, {balls: balls, strikes: strikes, outs: outs, inning: inning}).then(function(result){
                 if(changeoutplayer === true){
                     updateGameLineupByResult(game_action.game_id).then(function(data){
-
-                        //TODO: Add Game Event, 'end' if there are 18 innings played
-
                         if(gameOver === true){
-                            //exports.
+                            GameActionModel.createFromPrevious(game_action.game_id, 'end', 'Game Over!').then(function(end_action){
+                                if(toggleAtBat === true){
+                                    toggleTeamAtBat(game_action.id).then(function(at_bat_toggle_action){
+                                        resolve(result);
+                                    }).catch(function(err){
+                                        reject(err);
+                                    });
+                                }else{
+                                    resolve(result);
+                                }
+                            }).catch(function(err){
+                               reject(err);
+                            });
                         }else{
-
+                            if(gameOver === true) {
+                                GameActionModel.createFromPrevious(game_action.game_id, 'end', 'Game Over!').then(function (end_action) {
+                                    resolve(result);
+                                }).catch(function (err) {
+                                    reject(err);
+                                });
+                            }else{
+                                if(toggleAtBat === true){
+                                    toggleTeamAtBat(game_action.id).then(function(at_bat_toggle_action){
+                                        resolve(result);
+                                    }).catch(function(err){
+                                        reject(err);
+                                    });
+                                }else{
+                                    resolve(result);
+                                }
+                            }
                         }
 
-                        resolve(result);
                     }).catch(function(err){
                         reject("Error updating game lineup: " + err)
                     });
@@ -312,10 +361,10 @@ function updateCountsByEventResult(game_action_id, player_id, game_result){
 
 function updateGameLineupByResult(game_id) {
     return new Promise(function (resolve, reject) {
-        GameModel.getById(game_id).then(function (game) {
-            GameActionModel.getLatestByGameId(game_id).then(function (game_event) {
-                LineupController.getNextLineupPlayerByGameAndTeamId(game_id, game_event.team_at_bat).then(function(player){
-                    LineupController.markLastPlayerAsPlayed(game_id, player.id, game_event.team_at_bat).then(function(result){
+        GameActionModel.getLatestByGameId(game_id).then(function (game_event) {
+            LineupModel.getByGameAndTeamId(game_id, game_event.team_at_bat).then(function(lineup){
+                LineupModel.getNextLineupPlayerByLineupId(lineup.id).then(function(player){
+                    LineupModel.markLastPlayerAsPlayed(game_id, player.id, game_event.team_at_bat).then(function(result){
                         resolve(result);
                     }).catch(function(err){
                         reject(err);
@@ -326,7 +375,7 @@ function updateGameLineupByResult(game_id) {
             }).catch(function(err){
                 reject(err);
             });
-        }).catch(function (err) {
+        }).catch(function(err){
             reject(err);
         });
     });
@@ -350,54 +399,6 @@ function createApprovalsForEvent(game_id, event_id){
            console.log(err);
        });
    });
-}
-
-//exports.getLatestEventForGame = function(game_id){
-//    return new Promise(function(resolve, reject){
-//        DatabaseController.query("SELECT * FROM game_action WHERE game_id=$1 ORDER BY date_created DESC LIMIT 1;", [game_id]).then(function(data){
-//            resolve(data.rows[0]);
-//        }).catch(function(err){
-//            reject(err);
-//        });
-//    });
-//}
-
-exports.getLatestEventApprovalsForGame = function(game_id){
-    return new Promise(function(resolve, reject){
-        GameActionModel.getLatestByGameId(game_id).then(function(data){
-            ApprovalsController.getApprovalByItemTypeAndId('events', data.id).then(function(approvals){
-                resolve(approvals);
-            }).catch(function(err){
-              reject(err);
-            })
-        }).catch(function(err){
-            reject(err);
-        });
-    });
-}
-
-exports.getLatestGameActionByGameId = function(game_id){
-    return new Promise(function(resolve, reject){
-        DatabaseController.query("SELECT * FROM game_action WHERE game_id = $1 ORDER BY date_created DESC LIMIT 1", [game_id]).then(function(result){
-            resolve(result.rows[0]);
-        }).catch(function(err){
-            reject(err);
-        });
-    });
-}
-
-function createGameActionFromPrevious(game_id, result, game_message){
-    return new Promise(function(resolve, reject){
-        GameActionModel.getLatestByGameId(game_id).then(function(event){
-            GameActionModel.createFromPrevious(game_id, result, game_message).then(function(result){
-                resolve(result);
-            }).catch(function(err){
-                reject(err);
-            });
-        }).catch(function(err){
-            reject(err);
-        });
-    });
 }
 
 exports.startGame = function(game_id){
@@ -426,28 +427,36 @@ exports.startGame = function(game_id){
     });
 }
 
-//exports.getActionsByGameId = function(game_id, limit, offset){
-//    return new Promise(function(resolve, reject){
-//        DatabaseController.query("SELECT * from game_actions WHERE game_id=$3 LIMIT $1 OFFSET $2", [limit | 1000, offset | 0, game_id]).then(function(data){
-//            resolve(data.rows);
-//        }).catch(function(err){
-//            reject(err);
-//        });
-//    });
-//}
-//
-//exports.deleteGamesById = function(id){
-//    return new Promise(function(resolve, reject){
-//        DatabaseController.query("DELETE FROM games WHERE id = $1 RETURNING *;", [id]).then(function(data){
-//            resolve({game: data.rows});
-//        }).catch(function(err){
-//            reject(err);
-//        });
-//    });
-//}
-
 exports.doGameEvent = function(game_id, player1_id, player2_id) {
     return new Promise(function (resolve, reject) {
+        if(player1_id == undefined || player2_id == undefined){
+            GameActionModel.getLatestByGameId(game_id).then(function (gameEvent) {
+                //TODO: UPDATE SO PLAYERS DONT PLAY AGAINST THEMSELVES
+                Promise.all([LineupController.getNextLineupPlayerByGameAndTeamId(game_id, gameEvent.team_at_bat), LineupController.getNextLineupPlayerByGameAndTeamId(game_id, gameEvent.team_at_bat)]).then(function (result) {
+                    var player1_id = result[0].id;
+                    var player2_id = result[1].id;
+
+                    doGameEventLogic(game_id,player1_id, player2_id).then(function(game_action){
+                        resolve(game_action);
+                    }).catch(function(err){
+                       reject(err);
+                    });
+                }).catch(function (err) {
+                    reject(err);
+                });
+            });
+        }else{
+            doGameEventLogic(game_id, player1_id, player2_id).then(function(game_action){
+                resolve(game_action);
+            }).catch(function(err){
+                reject(err);
+            });
+        }
+    });
+}
+
+function doGameEventLogic(game_id, player1_id, player2_id){
+    return new Promise(function(resolve, reject){
         GameActionModel.getLatestByGameId(game_id).then(function(lastGameEvent){
             if (lastGameEvent == undefined) {
                 reject("Game has not been started");
@@ -456,31 +465,29 @@ exports.doGameEvent = function(game_id, player1_id, player2_id) {
             }else{
                 basicPlayerEvent(player1_id, player2_id).then(function(result) {
                     var game_message = generateMessage(player1_id, player2_id, game_id, result)
-                    createGameActionFromPrevious(game_id, result, game_message).then(function(game_action){
-                        console.log("LAST GAME EVENT: ", lastGameEvent);
-                        console.log("GAME ACTION: ", game_action);
-                        PlayerPositionModel.createCopy(lastGameEvent.id, game_action.id).then(function(result){
-                            updateCountsByEventResult(game_action.id, player1_id, result).then(function(result2){
-                                updatePlayerPositionByEventResult(game_action.id, player1_id, result).then(function(result3){
+                    GameActionModel.createFromPrevious(game_id, result, game_message).then(function(game_action){
+                        PlayerPositionModel.createCopy(lastGameEvent.id, game_action.id).then(function(copyResult){
+                            updateCountsByEventResult(game_action.id, player1_id, result).then(function(countsResult){
+                                updatePlayerPositionByEventResult(game_action.id, player1_id, result).then(function(playerPosResult){
                                     resolve(game_action);
                                 }).catch(function(err){
-                                    reject("update player pos: ", err);
+                                    reject(err);
                                 })
                             }).catch(function(err){
-                                reject("update counts: "+ err);
+                                reject(err);
                             });
                         }).catch(function(err){
-                            reject("create copy", err);
+                            reject(err);
                         });
                     }).catch(function(err){
-                        reject("error creating game action: " + err);
+                        reject(err);
                     });
                 }).catch(function(err){
-                    reject("Error doing basic player event: " + err);
+                    reject(err);
                 });
             }
         }).catch(function(err){
-            reject("Error getting last game: " + err);
+            reject(err);
         });
     });
 }
@@ -516,7 +523,6 @@ function gameAlgorithmController(game_id, player1_id, player2_id) {
  */
 function basicPlayerEvent(player1_id, player2_id){
     return new Promise(function(resolve, reject){
-
         Promise.all([PlayerModel.getById(player1_id), PlayerModel.getById(player2_id)]).then(function(result){
             var player1 = result[0];
             var player2 = result[1];
@@ -596,7 +602,6 @@ function basicPlayerEvent(player1_id, player2_id){
                 else if (num >= (ball + single + double + triple) && num < (ball + single + double + triple + home_run)) {
                     // Returns Home Run
                     rng = 4;
-                    //outcome = exports.ballsAndStrikesCounter(options[rng]);
                 }
                 else if (num >= (ball + single + double + triple + home_run) && num < (ball + single + double + triple + home_run + strike)) {
                     // Returns Strike
@@ -610,9 +615,7 @@ function basicPlayerEvent(player1_id, player2_id){
                     // Returns Foul
                     rng = 7;
                 }
-                console.log(totalattrs);
                 outcome = options[rng];
-                //console.log("RAND: " + outcome);
 
                 // Tracks stats based on outcome
                 PlayerController.statTracker(player1, player2, options[rng]);
@@ -635,58 +638,6 @@ function checkAllForApprovalStatus(approvals){
     });
     return approvals.length == 0;
 }
-
-/*
- * params - outcome of basicPlayerEvent
- * returns - specific outcome after totaling balls & strikes
- * adds strike_out and walk outcome possibilities
- */
-//exports.ballsAndStrikesCounter = function(outcome) {
-//    console.log('Outcome: ' + outcome);
-//    if (outcome == 'ball' && numBalls != 3) {
-//        numBalls += 1;
-//
-//    }
-//    else if (outcome == 'strike' && numStrikes != 2) {
-//        numStrikes += 1;
-//    }
-//    else if (outcome == 'out') {
-//        numStrikes = 0;
-//        numBalls = 0;
-//    }
-//    else if (outcome == 'foul') {
-//        if (numStrikes == 2) {
-//            numStrikes = 2;
-//        }
-//        else {
-//            numStrikes += 1;
-//        }
-//    }
-//    else if (outcome == 'ball' && numBalls == 3) {
-//        outcome = 'walk';
-//        numBalls = 0;
-//        numStrikes = 0;
-//    }
-//    else if (outcome == 'strike' && numStrikes == 2) {
-//        outcome = 'strike_out';
-//        numBalls = 0;
-//        numStrikes = 0;
-//    }
-//    else {
-//        numBalls = 0;
-//        numStrikes = 0;
-//        return outcome;
-//    }
-//    console.log('Count: ' + numBalls + ' balls, ' + numStrikes + ' strikes.');
-//    //DatabaseController.query("INSERT INTO game_action
-//    console.log('Outcome Final: ' + outcome);
-//    return outcome;
-//}
-/*
-exports.getStrikesAndBalls = function(outcome) {
-    DatabaseController.query()
-}
-*/
 
 /**
  * Things to keep track of during the game:

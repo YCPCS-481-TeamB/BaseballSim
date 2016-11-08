@@ -90,7 +90,7 @@ module.exports =  {
             if(!game_id){
                 reject("game_id is a required parameter");
             }else{
-                DatabaseController.query("SELECT * FROM game_action WHERE game_id = $1", [game_id]).then(function(data){
+                DatabaseController.query("SELECT * FROM game_action WHERE game_id = $1 ORDER BY date_created ASC", [game_id]).then(function(data){
                     resolve(data.rows);
                 }).catch(function(err){
                     reject(err);
@@ -115,9 +115,10 @@ module.exports =  {
         return new Promise(function(resolve, reject){
             DatabaseController.query("SELECT * FROM game_action WHERE game_id=$1 ORDER BY date_created DESC LIMIT 1;", [game_id]).then(function(data){
                 var event = data.rows[0];
+
                 DatabaseController.query("INSERT INTO game_action (game_id, team_at_bat,team1_score,team2_score, balls, strikes, outs, type, message, inning)" +
                     "VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *", [game_id, event.team_at_bat, event.team1_score, event.team2_score, event.balls, event.strikes, event.outs, result, game_message, event.inning]).then(function(result){
-                    console.log(result.rows[0]);
+                    console.log("NEW GAME ACTION: ", result.rows[0]);
                     resolve(result.rows[0]);
                 }).catch(function(err){
                     reject(err);

@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 
 var GameModel = require('./../Models/Game');
+var TeamModel = require('./../Models/Team');
 
 var UserController = require('./../Controller/UserController');
 var TeamsController = require('./../Controller/TeamsController');
@@ -27,7 +28,7 @@ router.get('/:id/teams', function(req, res, next){
   var id = req.params.id;
   var limit = req.query.limit;
   var offset = req.query.offset;
-  TeamsController.getTeamByUserId(id).then(function(data){
+  TeamModel.getByUserId(id).then(function(data){
     res.status(200).json({success: true, teams:data});
   }).catch(function(err){
     res.status(200).json({success: false, message:""+ err});
