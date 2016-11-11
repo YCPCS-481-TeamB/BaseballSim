@@ -1,0 +1,998 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for Controller/PlayersController.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../prettify.css" />
+    <link rel="stylesheet" href="../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../index.html">all files</a> / <a href="index.html">Controller/</a> PlayersController.js
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">11.76% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>16/136</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>0/38</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>0/47</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">11.76% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>16/136</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line low'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238
+239
+240
+241
+242
+243
+244
+245
+246
+247
+248
+249
+250
+251
+252
+253
+254
+255
+256
+257
+258
+259
+260
+261
+262
+263
+264
+265
+266
+267
+268
+269
+270
+271
+272
+273
+274
+275
+276
+277
+278
+279
+280
+281
+282
+283
+284
+285
+286
+287
+288
+289
+290
+291
+292
+293
+294
+295
+296
+297
+298
+299
+300
+301
+302
+303
+304
+305
+306
+307
+308
+309
+310
+311
+312</td><td class="line-coverage quiet"><span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">var DatabaseController = require('./DatabaseController');
+var bluebird = require('bluebird');
+var Promise = bluebird.Promise;
+&nbsp;
+/**
+ * Creates the player with the given parameters
+ * @param firstname
+ * @param lastname
+ * @param position
+ * @param team_id
+ * @Returning Promise.&lt;Object&gt; Returns a promise containing the returned player data
+ */
+exports.createPlayer = <span class="fstat-no" title="function not covered" >function(firstname, lastname, position, team_id){</span>
+<span class="cstat-no" title="statement not covered" >    return DatabaseController.query("INSERT INTO players (firstname,lastname,position,team_id) VALUES($1, $2, $3, $4)", [firstname, lastname, position, team_id]);</span>
+}
+&nbsp;
+/**
+ * Creates a randomised player with random first and last name from the database
+ * @param team_id
+ * @returns {Promise}
+ */
+exports.createRandomPlayer = <span class="fstat-no" title="function not covered" >function(team_id){</span>
+<span class="cstat-no" title="statement not covered" >    var team_id = team_id || 0;</span>
+<span class="cstat-no" title="statement not covered" >    return new Promise(<span class="fstat-no" title="function not covered" >function(resolve, reject){</span></span>
+<span class="cstat-no" title="statement not covered" >        DatabaseController.query("SELECT name FROM player_names WHERE isLast = 'n' OFFSET floor(random()*(SELECT COUNT(name) FROM player_names WHERE isLast = 'n')) LIMIT 1").then(<span class="fstat-no" title="function not covered" >function(firstname_data){</span></span>
+<span class="cstat-no" title="statement not covered" >            var firstname = firstname_data.rows[0].name;</span>
+<span class="cstat-no" title="statement not covered" >            DatabaseController.query("SELECT name FROM player_names WHERE isLast = 'y' OFFSET floor(random()*(SELECT COUNT(name) FROM player_names WHERE isLast = 'y')) LIMIT 1").then(<span class="fstat-no" title="function not covered" >function(lastname_data){</span></span>
+<span class="cstat-no" title="statement not covered" >                var lastname = lastname_data.rows[0].name;</span>
+<span class="cstat-no" title="statement not covered" >                DatabaseController.query("INSERT INTO players (firstname,lastname,position,team_id) VALUES($1, $2, $3, $4) RETURNING *", [firstname, lastname, assignPlayerPosition(), team_id]).then(<span class="fstat-no" title="function not covered" >function(player){</span></span>
+<span class="cstat-no" title="statement not covered" >                    var player = player.rows[0];</span>
+<span class="cstat-no" title="statement not covered" >                    createRandomAttr(player.id, player.position).then(<span class="fstat-no" title="function not covered" >function(attr){</span></span>
+<span class="cstat-no" title="statement not covered" >                        createPlayerStats(player.id).then(<span class="fstat-no" title="function not covered" >function(stats) {</span></span>
+<span class="cstat-no" title="statement not covered" >                            resolve(player);</span>
+                        }).catch(<span class="fstat-no" title="function not covered" >function(err){</span>
+<span class="cstat-no" title="statement not covered" >                            reject(err);</span>
+                        });
+                    })
+                });
+            });
+        }).catch(<span class="fstat-no" title="function not covered" >function(err){</span>
+<span class="cstat-no" title="statement not covered" >            reject("" + err);</span>
+        });
+    });
+}
+&nbsp;
+/**
+ * @params void
+ * @returns string of player position
+ */
+&nbsp;
+<span class="fstat-no" title="function not covered" >function assignPlayerPosition() {</span>
+<span class="cstat-no" title="statement not covered" >    var num = Math.floor(Math.random() * 9);</span>
+<span class="cstat-no" title="statement not covered" >    var positionStringArray = ['pitcher', 'catcher', 'first_baseman', 'second_baseman', 'third_baseman','shortstop', 'left_fielder', 'center_fielder', 'right_fielder'];</span>
+<span class="cstat-no" title="statement not covered" >    return positionStringArray[num];</span>
+}
+&nbsp;
+/**
+ *
+ * @param player_id
+ * @returns {Promise}
+ */
+exports.getPlayerAttributesById = <span class="fstat-no" title="function not covered" >function(player_id){</span>
+<span class="cstat-no" title="statement not covered" >    var team_id = team_id || 0;</span>
+<span class="cstat-no" title="statement not covered" >    return new Promise(<span class="fstat-no" title="function not covered" >function(resolve, reject){</span></span>
+<span class="cstat-no" title="statement not covered" >        DatabaseController.query("SELECT * FROM attributes WHERE player_id = $1", [player_id]).then(<span class="fstat-no" title="function not covered" >function(attrs){</span></span>
+<span class="cstat-no" title="statement not covered" >            resolve(attrs.rows[0]);</span>
+        }).catch(<span class="fstat-no" title="function not covered" >function(err){</span>
+<span class="cstat-no" title="statement not covered" >            reject("" + err);</span>
+        });
+    });
+}
+&nbsp;
+<span class="fstat-no" title="function not covered" >function createRandomAttr(player_id, player_position){</span>
+<span class="cstat-no" title="statement not covered" >    return new Promise(<span class="fstat-no" title="function not covered" >function(resolve, reject) {</span></span>
+        // Total Points: 50, Use 11 to give each stat 1
+<span class="cstat-no" title="statement not covered" >        var points = 39;</span>
+<span class="cstat-no" title="statement not covered" >        var totalAttributes = {technique: 1, pitch_speed: 1, endurance: 1, contact: 1, swing_speed: 1, bat_power: 1, catching: 1, throwing: 1, awareness: 1, speed: 1, clutch: 1};</span>
+        // Giving Batters no Pitching Stats, Giving Pitchers no Batting Stats
+<span class="cstat-no" title="statement not covered" >        var batterAttributes = {contact: 1, swing_speed: 1, bat_power: 1, catching: 1, throwing: 1, awareness: 1, speed: 1, clutch: 1};</span>
+<span class="cstat-no" title="statement not covered" >        var pitcherAttributes = {technique: 1, pitch_speed: 1, endurance: 1, catching: 1, throwing: 1, awareness: 1, speed: 1, clutch: 1};</span>
+        // Determine Dominant Arm, Right-Handed favored
+<span class="cstat-no" title="statement not covered" >        var arm = 'right';</span>
+<span class="cstat-no" title="statement not covered" >        var rngArm = Math.floor(Math.random() * 3);</span>
+<span class="cstat-no" title="statement not covered" >        if (rngArm == 2) {</span>
+<span class="cstat-no" title="statement not covered" >            arm = 'left';</span>
+        }
+<span class="cstat-no" title="statement not covered" >        while (points &gt; 0) {</span>
+            // Player is a Pitcher
+<span class="cstat-no" title="statement not covered" >            if (player_position == 'pitcher') {</span>
+<span class="cstat-no" title="statement not covered" >                var rngPitcher = Math.floor(Math.random() * 11);</span>
+<span class="cstat-no" title="statement not covered" >                if (rngPitcher &gt;= 3 &amp;&amp; rngPitcher &lt;=5) {</span>
+<span class="cstat-no" title="statement not covered" >                    rngPitcher = Math.floor(Math.random() * 11);</span>
+                }
+<span class="cstat-no" title="statement not covered" >                totalAttributes[Object.keys(totalAttributes)[rngPitcher]] += 1;</span>
+&nbsp;
+            }
+            // Player is a Batter
+            else {
+<span class="cstat-no" title="statement not covered" >                var rngBatter = Math.floor(Math.random() * 11);</span>
+<span class="cstat-no" title="statement not covered" >                if (rngBatter &lt;= 2) {</span>
+<span class="cstat-no" title="statement not covered" >                    rngBatter = Math.floor(Math.random() * 11);</span>
+                }
+<span class="cstat-no" title="statement not covered" >                totalAttributes[Object.keys(totalAttributes)[rngBatter]] += 1;</span>
+&nbsp;
+            }
+<span class="cstat-no" title="statement not covered" >            points--;</span>
+        }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        DatabaseController.query("INSERT INTO attributes (player_id, technique, pitch_speed, endurance, contact, swing_speed, bat_power, catching, throwing, awareness, speed, clutch, arm)" +</span>
+            "VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING *", [player_id, totalAttributes.technique, totalAttributes.pitch_speed, totalAttributes.endurance,
+            totalAttributes.contact, totalAttributes.swing_speed, totalAttributes.bat_power, totalAttributes.catching, totalAttributes.throwing, totalAttributes.awareness,
+            totalAttributes.speed, totalAttributes.clutch, arm]).then(<span class="fstat-no" title="function not covered" >function(attrs){</span>
+<span class="cstat-no" title="statement not covered" >                resolve(attrs);</span>
+            }).catch(<span class="fstat-no" title="function not covered" >function(err){</span>
+<span class="cstat-no" title="statement not covered" >                reject("" + err);</span>
+        });
+    });
+}
+&nbsp;
+/**
+ * Deletes the player from the database
+ * @param id
+ */
+exports.deletePlayersById = <span class="fstat-no" title="function not covered" >function(id){</span>
+<span class="cstat-no" title="statement not covered" >    return new Promise(<span class="fstat-no" title="function not covered" >function(resolve, reject){</span></span>
+<span class="cstat-no" title="statement not covered" >        DatabaseController.query("DELETE FROM players WHERE id = $1 RETURNING *;", [id]).then(<span class="fstat-no" title="function not covered" >function(data){</span></span>
+<span class="cstat-no" title="statement not covered" >            resolve({player: data.rows});</span>
+        }).catch(<span class="fstat-no" title="function not covered" >function(err){</span>
+<span class="cstat-no" title="statement not covered" >            reject(err);</span>
+        });
+    });
+}
+&nbsp;
+/**
+ * Deletes the player from the database
+ * @param team_id
+ */
+exports.deletePlayerByTeamId = <span class="fstat-no" title="function not covered" >function(team_id){</span>
+<span class="cstat-no" title="statement not covered" >    return new Promise(<span class="fstat-no" title="function not covered" >function(resolve, reject){</span></span>
+<span class="cstat-no" title="statement not covered" >        DatabaseController.query("DELETE FROM players WHERE team_id = $1 RETURNING *;", [team_id]).then(<span class="fstat-no" title="function not covered" >function(data){</span></span>
+<span class="cstat-no" title="statement not covered" >            resolve({player: data.rows});</span>
+        }).catch(<span class="fstat-no" title="function not covered" >function(err){</span>
+<span class="cstat-no" title="statement not covered" >            reject(err);</span>
+        });
+    });
+}
+&nbsp;
+/**
+ * Returns a Promise of an array of players based on the limit and offset
+ * @param limit
+ * @param offset
+ * @returns {Promise}
+ */
+exports.getPlayers = <span class="fstat-no" title="function not covered" >function(limit, offset) {</span>
+<span class="cstat-no" title="statement not covered" >    return new Promise(<span class="fstat-no" title="function not covered" >function(resolve, reject){</span></span>
+<span class="cstat-no" title="statement not covered" >        DatabaseController.query("SELECT * from players LIMIT $1 OFFSET $2", [limit || 1000, offset || 0]).then(<span class="fstat-no" title="function not covered" >function(data){</span></span>
+<span class="cstat-no" title="statement not covered" >            resolve({limit: limit, offset: offset, players: data.rows});</span>
+        });
+    });
+}
+&nbsp;
+/**
+ * Returns a promise that contains an array of the players with the requested id
+ * @param id - The players id
+ * @returns {Promise}
+ */
+exports.getPlayersById = <span class="fstat-no" title="function not covered" >function(id){</span>
+<span class="cstat-no" title="statement not covered" >    return new Promise(<span class="fstat-no" title="function not covered" >function(resolve, reject){</span></span>
+<span class="cstat-no" title="statement not covered" >        DatabaseController.query("SELECT * from players WHERE id = $1", [id]).then(<span class="fstat-no" title="function not covered" >function(data){</span></span>
+<span class="cstat-no" title="statement not covered" >            if(data.rows[0]){</span>
+<span class="cstat-no" title="statement not covered" >                resolve(data.rows[0]);</span>
+            }else{
+<span class="cstat-no" title="statement not covered" >                reject("Player " + id + " not found");</span>
+            }
+&nbsp;
+        });
+    });
+}
+&nbsp;
+/**
+ * Returns a Promise of an array of players with the requested team id
+ * @param team_id
+ * @returns {Promise}
+ */
+exports.getPlayersByTeamId = <span class="fstat-no" title="function not covered" >function(team_id) {</span>
+<span class="cstat-no" title="statement not covered" >    return new Promise(<span class="fstat-no" title="function not covered" >function(resolve, reject){</span></span>
+<span class="cstat-no" title="statement not covered" >        DatabaseController.query("SELECT * from players WHERE team_id = $1", [team_id]).then(<span class="fstat-no" title="function not covered" >function(data){</span></span>
+<span class="cstat-no" title="statement not covered" >            if(data.rows){</span>
+<span class="cstat-no" title="statement not covered" >                resolve(data.rows);</span>
+            }
+        });
+    });
+}
+&nbsp;
+/**
+ * Returns a promise that contains an array of player's stats with the requested id
+ * @param id - the players id
+ * @returns {Promise}
+ */
+exports.getStatsByPlayerId = <span class="fstat-no" title="function not covered" >function(id){</span>
+<span class="cstat-no" title="statement not covered" >    return new Promise(<span class="fstat-no" title="function not covered" >function(resolve, reject) {</span></span>
+<span class="cstat-no" title="statement not covered" >            DatabaseController.query("SELECT * from stats WHERE player_id = $1", [id]).then(<span class="fstat-no" title="function not covered" >function(data) {</span></span>
+<span class="cstat-no" title="statement not covered" >                if (data.rows[0]) {</span>
+<span class="cstat-no" title="statement not covered" >                    resolve(data.rows[0]);</span>
+                }
+                else {
+<span class="cstat-no" title="statement not covered" >                    reject("Player " + id + " not found");</span>
+                }
+            }).catch(<span class="fstat-no" title="function not covered" >function(err){</span>
+<span class="cstat-no" title="statement not covered" >                reject(err);</span>
+            });
+    });
+}
+&nbsp;
+/**
+ * Returns a promise that returns the stats for the new player
+ * @param id
+ * @returns {Promise}
+ */
+createPlayerStats = <span class="fstat-no" title="function not covered" >function(id) {</span>
+<span class="cstat-no" title="statement not covered" >    return new Promise(<span class="fstat-no" title="function not covered" >function(resolve, reject) {</span></span>
+<span class="cstat-no" title="statement not covered" >        var statsMap = {hits: 0, doubles:0, games_played: 0, at_bats: 0, runs: 0, triples: 0,</span>
+            homeruns: 0, runs_batted_in: 0, stolen_bases: 0, on_base_percentage: .000, batting_average: .000,
+            strikeouts: 0, walks: 0, wins: 0, losses: 0, hits_allowed: 0, innings_pitched: 0.0,
+            runs_allowed: 0, walks_allowed : 0, earned_runs: 0, earned_run_average: 0.00, strikeouts_thrown: 0,
+            saves: 0};
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        DatabaseController.query("INSERT INTO stats (player_id, hits, doubles, games_played, at_bats, runs, triples, homeruns, runs_batted_in, stolen_bases, on_base_percentage, batting_average, strikeouts, walks, wins, losses, hits_allowed, innings_pitched, runs_allowed, walks_allowed, earned_runs, earned_run_average, strikeouts_thrown, saves)" +</span>
+            "VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24) RETURNING *", [id, statsMap.hits, statsMap.doubles,
+            statsMap.games_played, statsMap.at_bats, statsMap.runs, statsMap.triples, statsMap.homeruns, statsMap.runs_batted_in, statsMap.stolen_bases, statsMap.on_base_percentage,
+            statsMap.batting_average, statsMap.strikeouts, statsMap.walks, statsMap.wins, statsMap.losses, statsMap.hits_allowed, statsMap.innings_pitched, statsMap.runs_allowed,
+            statsMap.walks_allowed, statsMap.earned_runs, statsMap.earned_run_average, statsMap.strikeouts_thrown, statsMap.saves]).then(<span class="fstat-no" title="function not covered" >function(stats){</span>
+<span class="cstat-no" title="statement not covered" >            resolve(stats);</span>
+        }).catch(<span class="fstat-no" title="function not covered" >function(err){</span>
+<span class="cstat-no" title="statement not covered" >            reject("" + err);</span>
+        });
+    });
+}
+&nbsp;
+/*
+ * Calculates stats based on outcome in DoGameEvent in the Game Controller
+ * @params player1, player2, outcome
+ * Tracks stats in the database table - stats
+ */
+exports.statTracker = <span class="fstat-no" title="function not covered" >function(player1, player2, outcome) {</span>
+    //console.log('Entered Stat Tracker');
+    //console.log(outcome);
+<span class="cstat-no" title="statement not covered" >    var pitch_count = 0;</span>
+<span class="cstat-no" title="statement not covered" >    Promise.all([exports.getStatsByPlayerId(player1.id),exports.getStatsByPlayerId(player2.id)]).spread(<span class="fstat-no" title="function not covered" >function(player1, player2) {</span></span>
+<span class="cstat-no" title="statement not covered" >        if (outcome == 'single') {</span>
+<span class="cstat-no" title="statement not covered" >            player1.at_bats += 1;</span>
+<span class="cstat-no" title="statement not covered" >            player1.hits += 1;</span>
+<span class="cstat-no" title="statement not covered" >            player2.hits_allowed += 1;</span>
+<span class="cstat-no" title="statement not covered" >            pitch_count += 1;</span>
+        }
+        else <span class="cstat-no" title="statement not covered" >if (outcome == 'double') {</span>
+<span class="cstat-no" title="statement not covered" >            player1.at_bats += 1;</span>
+<span class="cstat-no" title="statement not covered" >            player1.hits += 1;</span>
+<span class="cstat-no" title="statement not covered" >            player1.doubles += 1;</span>
+<span class="cstat-no" title="statement not covered" >            player2.hits_allowed += 1;</span>
+<span class="cstat-no" title="statement not covered" >            pitch_count += 1;</span>
+        }
+        else <span class="cstat-no" title="statement not covered" >if (outcome == 'triple') {</span>
+<span class="cstat-no" title="statement not covered" >            player1.at_bats += 1;</span>
+<span class="cstat-no" title="statement not covered" >            player1.hits += 1;</span>
+<span class="cstat-no" title="statement not covered" >            player1.triples += 1;</span>
+<span class="cstat-no" title="statement not covered" >            player2.hits_allowed += 1;</span>
+<span class="cstat-no" title="statement not covered" >            pitch_count += 1;</span>
+        }
+        else <span class="cstat-no" title="statement not covered" >if (outcome == 'home_run') {</span>
+<span class="cstat-no" title="statement not covered" >            player1.at_bats += 1;</span>
+<span class="cstat-no" title="statement not covered" >            player1.hits += 1;</span>
+<span class="cstat-no" title="statement not covered" >            player1.homeruns += 1;</span>
+<span class="cstat-no" title="statement not covered" >            player2.hits_allowed += 1;</span>
+<span class="cstat-no" title="statement not covered" >            player2.earned_runs += 1;</span>
+<span class="cstat-no" title="statement not covered" >            player2.runs_allowed += 1;</span>
+<span class="cstat-no" title="statement not covered" >            pitch_count += 1;</span>
+        }
+        else <span class="cstat-no" title="statement not covered" >if (outcome == 'out') {</span>
+<span class="cstat-no" title="statement not covered" >            player1.at_bats += 1;</span>
+<span class="cstat-no" title="statement not covered" >            player2.innings_pitched += 0.1;</span>
+<span class="cstat-no" title="statement not covered" >            pitch_count += 1;</span>
+        }
+        else <span class="cstat-no" title="statement not covered" >if (outcome == 'strike_out') {</span>
+<span class="cstat-no" title="statement not covered" >            player1.strikeouts += 1;</span>
+<span class="cstat-no" title="statement not covered" >            player1.at_bats += 1;</span>
+<span class="cstat-no" title="statement not covered" >            player2.innings_pitched += 0.1;</span>
+<span class="cstat-no" title="statement not covered" >            player2.strikeouts_thrown += 1;</span>
+        }
+        else <span class="cstat-no" title="statement not covered" >if (outcome == 'walk') {</span>
+<span class="cstat-no" title="statement not covered" >            player1.walks += 1;</span>
+<span class="cstat-no" title="statement not covered" >            player1.at_bats += 1;</span>
+<span class="cstat-no" title="statement not covered" >            player2.walks_allowed += 1;</span>
+        }
+        else {
+<span class="cstat-no" title="statement not covered" >            pitch_count += 1;</span>
+        }
+        //console.log('Num At_Bats: ' + player1.at_bats);
+<span class="cstat-no" title="statement not covered" >        DatabaseController.query('UPDATE stats SET hits = $2, doubles = $3, triples = $4, homeruns = $5, at_bats = $6, batting_average = $7, on_base_percentage = $8', +</span>
+            'walks = $9, strikeouts = $10 WHERE id = $1', [player1.id, player1.hits, player1.doubles,
+            player1.triples, player1.homeruns, player1.at_bats, (player1.hits / player1.at_bats), ((player1.hits + player1.walks)/player1.at_bats),
+            player1.walks, player1.strikeouts]);
+<span class="cstat-no" title="statement not covered" >        DatabaseController.query('UPDATE stats SET hits_allowed = $2, innings_pitched = $3, earned_runs = $4, runs_allowed = $5,' +</span>
+            'earned_run_average = $6, strikeouts_thrown = $7, walks_allowed = $8 WHERE id = $1', [player2.id, player2.hits_allowed,
+        player2.innings_pitched, player2.earned_runs, player2.runs_allowed, ((player2.earned_runs / player2.innings_pitched) * 9), player2.strikeouts_thrown, player2.walks_allowed])
+        //console.log(player1);
+    }).catch(<span class="fstat-no" title="function not covered" >function(err) {</span>
+<span class="cstat-no" title="statement not covered" >        reject(err);</span>
+    });
+}
+&nbsp;
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Mon Oct 24 2016 16:05:31 GMT+0000 (UTC)
+</div>
+</div>
+<script src="../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../sorter.js"></script>
+</body>
+</html>
