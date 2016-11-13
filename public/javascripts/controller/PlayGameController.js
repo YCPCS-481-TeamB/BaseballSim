@@ -13,6 +13,7 @@ var PlayGameController = App.controller('PlayGameController', function($scope,$i
                 if (typeof response.data == 'object') {
                     $scope.gameEvents.push(response.data);
                 } else {
+                    console.log(response.data);
                     alert(response.data);
                 }
             }).catch(function (err) {

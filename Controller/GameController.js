@@ -14,30 +14,6 @@ var PermissionController = require('./PermissionController');
 var TeamsController = require('./TeamsController');
 var LineupController = require('./LineupController');
 
-// Don't yell at me Brandon I wanted some global variables
-//var numBalls = 0;
-//var numStrikes = 0;
-//exports.getGames = function(limit, offset){
-//    return new Promise(function(resolve, reject){
-//        DatabaseController.query("SELECT * from games LIMIT $1 OFFSET $2", [limit | 1000, offset | 0]).then(function(data){
-//            resolve(data.rows);
-//        }).catch(function(err){
-//            reject(err);
-//        });
-//    });
-//}
-
-//TODO: Remove
-//exports.getGameByUserId = function(user_id){
-//    return new Promise(function(resolve, reject){
-//        DatabaseController.query("SELECT * from games WHERE id in (SELECT item_id FROM permissions WHERE item_type='games' AND user_id=$1)", [user_id]).then(function(data){
-//            resolve(data.rows);
-//        }).catch(function(err){
-//            reject(err);
-//        });
-//    });
-//}
-
 exports.createGame = function(team1_id, team2_id, field_id, league_id){
     return new Promise(function(resolve, reject){
         if(team1_id && team2_id){
@@ -63,39 +39,15 @@ exports.createGame = function(team1_id, team2_id, field_id, league_id){
     });
 }
 
-//exports.getEventsByGameId = function(game_id){
-//    return new Promise(function(resolve, reject){
-//        DatabaseController.query("SELECT * FROM game_action WHERE game_id = $1", [game_id]).then(function(data){
-//            resolve(data.rows);
-//        }).catch(function(err){
-//            reject(err);
-//        });
-//    });
-//}
-
 function isGameStarted(game_id){
     return new Promise(function(resolve, reject){
         GameModel.hasEventWithType(game_id, 'start').then(function(result){
-            resolve(result.length != 0);
+            resolve(result);
         }).catch(function(err){
             reject(err);
         });
     });
 }
-
-//exports.getPlayerPositionByGameEventId = function(game_event_id){
-//    return new Promise(function(resolve, reject){
-//        DatabaseController.query("SELECT * from game_player_positions WHERE game_action_id = $1", [game_event_id]).then(function(result){
-//            resolve(result.rows[0]);
-//        }).catch(function(err){
-//            reject(err);
-//        });
-//    });
-//}
-
-//function updatePlayerPosition(game_action_id, firstbase_player_id, secondbase_player_id, thirdbase_player_id){
-//    return DatabaseController.query("INSERT INTO game_player_positions (game_action_id, onfirst_id, onsecond_id, onthird_id) VALUES ($1, $2, $3, $4)", [game_action_id, firstbase_player_id, secondbase_player_id, thirdbase_player_id]);
-//}
 
 function createInitialGamePlayerPositions(game_action_id){
     return new Promise(function(resolve, reject){
@@ -107,15 +59,6 @@ function createInitialGamePlayerPositions(game_action_id){
     });
 }
 
-//function copyPlayerPositions(lastActionId, currentActionId){
-//    return new Promise(function(resolve, reject){
-//        DatabaseController.query("INSERT INTO game_player_positions (game_action_id, onfirst_id, onsecond_id, onthird_id) SELECT $1, onfirst_id, onsecond_id, onthird_id FROM game_player_positions WHERE game_action_id = $2 RETURNING *", [currentActionId, lastActionId]).then(function(result){
-//            resolve(result.rows[0]);
-//        }).catch(function(err){
-//            reject(err);
-//        });
-//    });
-//}
 function toggleTeamAtBat(game_action_id){
     return new Promise(function(resolve, reject){
        GameActionModel.getById(game_action_id).then(function(game_action){
@@ -130,7 +73,15 @@ function toggleTeamAtBat(game_action_id){
                }
 
                GameActionModel.update(game_action_id, {team_at_bat: newTeamAtBat}).then(function(result){
-                    resolve(result);
+                   PlayerPositionModel.getByGameActionId(game_action_id).then(function(player_position){
+                       PlayerPositionModel.clearBasesById(player_position.id).then(function(clear_bases_position){
+                           resolve(result);
+                       }).catch(function(err){
+                            reject(err);
+                       });
+                   }).catch(function(err){
+                      reject(err);
+                   });
                }).catch(function(err){
                   reject(err);
                });

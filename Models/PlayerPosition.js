@@ -58,6 +58,13 @@ module.exports =  {
             });
         });
     },
+    clearBasesById : function(id){
+        DatabaseController.update('game_player_positions', id, {onfirst_id: 0, onsecond_id:0, onthird_id:0}).then(function(result){
+            resolve(result.rows[0]);
+        }).catch(function(err){
+            reject(err);
+        });
+    },
     deleteById : function(id){
         return new Promise(function(resolve, reject){
             DatabaseController.query("DELETE FROM game_player_positions WHERE id = $1 RETURNING *;", [id]).then(function(data){
