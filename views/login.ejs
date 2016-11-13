@@ -9,9 +9,21 @@
         <meta name="author" content="">
         <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
         <link rel="stylesheet" href="stylesheets/style.css">
+        <style>
+            .overlay {
+                padding-top: 10px;
+                color: black;
+            }
+            .background {
+                background-color: seagreen;
+                color: white;
+            }
+
+        </style>
     </head>
-    <body ng-app="app">
+    <body ng-app="app" class="background">
         <%include navbar %>
+        <div class="page">
         <div class="container" ng-controller="LoginController">
             <form class="form-signin">
                 {{errorMessage}}
@@ -23,10 +35,14 @@
                 <div class="checkbox">
 
                     <label>
-                        <a ng-click="showAccountCreate=true">Create Account</a>
+                       <!-- <a ng-click="showAccountCreate=true">Create Account</a> -->
                     </label>
                 </div>
-                <button class="btn btn-lg btn-primary btn-block" ng-click="login(usernameInput, passwordInput)">Sign in</button>
+                <!-- <button class="btn btn-lg btn-primary btn-block" ng-click="login(usernameInput, passwordInput)">Sign in</button> -->
+                <button type="button" class="btn btn-primary btn-warning" ng-click="login(usernameInput, passwordInput)">Login</button>
+                <button type="button" class="btn btn-primary btn-warning" ng-click="showAccountCreate=true">Create Account</button>
+                <br>
+                <a href="#">Forgot Password?</a>
             </form>
 
             <div ng-show="showAccountCreate" class="overlay">
@@ -45,10 +61,11 @@
                     <input type="text" id="createInputLastname" class="form-control" placeholder="Last Name" ng-model="createInputLastname">
                     <label for="createInputEmail" >Email</label>
                     <input type="text" id="createInputEmail" class="form-control" placeholder="Email" ng-model="createInputEmail">
-
+                    <br>
                     <button class="btn btn-success" style="width: 100%" ng-click="createUser(createInputUsername, createInputPassword, createInputFirstname, createInputLastname,createInputEmail)">Create User and Login</button>
                 </form>
             </div>
+        </div>
         </div>
     </body>
     <script src="jquery/jquery.min.js"></script>
