@@ -26,6 +26,7 @@ exports['test_create_user'] = function(test)
     
     user.then(
         function(value) {
+            
             var userValues = value.rows[0];
             user_id = userValues.id;
             

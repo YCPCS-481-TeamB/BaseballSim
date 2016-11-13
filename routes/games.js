@@ -101,7 +101,7 @@ router.get('/:id/positions/latest', function(req, res, next){
 router.get('/:id/events', function(req, res, next){
     var id = req.params.id;
     GameActionModel.getAllByGameId(id).then(function(data){
-        res.status(200).json(data);
+        res.status(200).json({events: data});
     }).catch(function(err){
         res.status(200).json(err);
     });
@@ -115,7 +115,7 @@ router.get('/:id/events/latest', function(req, res, next){
     var id = req.params.id;
 
     GameActionModel.getLatestByGameId(id).then(function(data){
-        res.status(200).json(data);
+        res.status(200).json({events: data});
     }).catch(function(err){
         res.status(200).json(err);
     });
@@ -129,7 +129,7 @@ router.get('/:id/approvals/state', function(req, res, next){
     var id = req.params.id;
 
     ApprovalModel.getAllByTypeAndItemId('games', id).then(function(data){
-        res.status(200).json(data);
+        res.status(200).json({approvals: data});
     }).catch(function(err){
         res.status(200).json(err);
     });
