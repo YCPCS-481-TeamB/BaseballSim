@@ -49,6 +49,18 @@ function isGameStarted(game_id){
     });
 }
 
+exports.autoPlay = function(game_id){
+    GameModel.getById(game_id).then(function(game){
+        GameModel.hasEventWithType(game_id, 'start').then(function(isStarted){
+            console.log("IS GAME STARTED: ", isStarted);
+        }).catch(function(err){
+            reject(err);
+        });
+    }).catch(function(err){
+        reject(err);
+    });
+}
+
 function createInitialGamePlayerPositions(game_action_id){
     return new Promise(function(resolve, reject){
         PlayerPositionModel.create(game_action_id).then(function(result){
@@ -62,34 +74,43 @@ function createInitialGamePlayerPositions(game_action_id){
 function toggleTeamAtBat(game_action_id){
     return new Promise(function(resolve, reject){
        GameActionModel.getById(game_action_id).then(function(game_action){
+
+           console.log("GameAction: ", game_action);
+
            GameModel.getById(game_action.game_id).then(function(game){
+               console.log("Game: ", game);
 
                var newTeamAtBat = 0;
 
                if(game.team1_id == game_action.team_at_bat){
+                   console.log("TOGGLE TO TEAM 2");
                    newTeamAtBat = game.team2_id;
                }else{
+                   console.log("TOGGLE TO TEAM 1");
                    newTeamAtBat = game.team1_id;
                }
 
                GameActionModel.update(game_action_id, {team_at_bat: newTeamAtBat}).then(function(result){
+                   console.log("RESULT: ", result);
                    PlayerPositionModel.getByGameActionId(game_action_id).then(function(player_position){
+                       console.log("Player position: ", player_position);
                        PlayerPositionModel.clearBasesById(player_position.id).then(function(clear_bases_position){
+                           console.log("clear bases position: ", clear_bases_position);
                            resolve(result);
                        }).catch(function(err){
-                            reject(err);
+                            reject("clear bases: " + err);
                        });
                    }).catch(function(err){
-                      reject(err);
+                      reject("get player position: " + err);
                    });
                }).catch(function(err){
-                  reject(err);
+                  reject("Update GameAction: " + err);
                });
            }).catch(function(err){
-                reject(err);
+                reject("Get Game: " + err);
            });
        }).catch(function(err){
-            reject(err);
+            reject("Get GameAction: " + err);
        });
     });
 }
@@ -256,7 +277,7 @@ function updateCountsByEventResult(game_action_id, player_id, game_result){
                 // Game Over
                 gameOver = true;
             }
-            console.log("CHANGE OUT PLAYER: ", changeoutplayer);
+            //console.log("CHANGE OUT PLAYER: ", changeoutplayer);
             GameActionModel.update(game_action_id, {balls: balls, strikes: strikes, outs: outs, inning: inning}).then(function(result){
                 if(changeoutplayer === true){
                     updateGameLineupByResult(game_action.game_id).then(function(data){
@@ -266,27 +287,27 @@ function updateCountsByEventResult(game_action_id, player_id, game_result){
                                     toggleTeamAtBat(game_action.id).then(function(at_bat_toggle_action){
                                         resolve(result);
                                     }).catch(function(err){
-                                        reject(err);
+                                        reject("toggle team: ", err);
                                     });
                                 }else{
                                     resolve(result);
                                 }
                             }).catch(function(err){
-                               reject(err);
+                               reject("Create from prev: ", err);
                             });
                         }else{
                             if(gameOver === true) {
                                 GameActionModel.createFromPrevious(game_action.game_id, 'end', 'Game Over!').then(function (end_action) {
                                     resolve(result);
                                 }).catch(function (err) {
-                                    reject(err);
+                                    reject("game over?", err);
                                 });
                             }else{
                                 if(toggleAtBat === true){
                                     toggleTeamAtBat(game_action.id).then(function(at_bat_toggle_action){
                                         resolve(result);
                                     }).catch(function(err){
-                                        reject(err);
+                                        reject("Toggle at bat: ", err);
                                     });
                                 }else{
                                     resolve(result);
@@ -387,6 +408,8 @@ exports.doGameEvent = function(game_id, player1_id, player2_id) {
                     var player1_id = result[0].id;
                     var player2_id = result[1].id;
 
+                    console.log("LINEUP PLAYER IDS: " + player1_id + ", " + player2_id);
+
                     doGameEventLogic(game_id,player1_id, player2_id).then(function(game_action){
                         resolve(game_action);
                     }).catch(function(err){
@@ -422,23 +445,23 @@ function doGameEventLogic(game_id, player1_id, player2_id){
                                 updatePlayerPositionByEventResult(game_action.id, player1_id, result).then(function(playerPosResult){
                                     resolve(game_action);
                                 }).catch(function(err){
-                                    reject(err);
-                                })
+                                    reject("Player Position: "+ err);
+                                });
                             }).catch(function(err){
-                                reject(err);
+                                reject("Update Counts: "+ err);
                             });
                         }).catch(function(err){
-                            reject(err);
+                            reject("Create Copy: "+ err);
                         });
                     }).catch(function(err){
-                        reject(err);
+                        reject("Create from previous: "+ err);
                     });
                 }).catch(function(err){
-                    reject(err);
+                    reject("Basic Player Event: "+ err);
                 });
             }
         }).catch(function(err){
-            reject(err);
+            reject("Get latest game event: "+ err);
         });
     });
 }
@@ -474,6 +497,7 @@ function gameAlgorithmController(game_id, player1_id, player2_id) {
  */
 function basicPlayerEvent(player1_id, player2_id){
     return new Promise(function(resolve, reject){
+        console.log(player1_id, player2_id);
         Promise.all([PlayerModel.getById(player1_id), PlayerModel.getById(player2_id)]).then(function(result){
             var player1 = result[0];
             var player2 = result[1];
@@ -497,6 +521,9 @@ function basicPlayerEvent(player1_id, player2_id){
 
 
             Promise.all([PlayerModel.getAttributesById(player1_id),PlayerModel.getAttributesById(player2_id)]).spread(function(player1, player2) {
+                console.log("Player 1: ", player1);
+                console.log("Player 2: ", player2);
+
                 var outcome = ' ';
                 var options = ['ball', 'single', 'double', 'triple', 'home_run', 'strike', 'out', 'foul', 'strike_out', 'walk'];
 

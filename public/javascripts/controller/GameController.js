@@ -16,7 +16,6 @@ var GameController = App.controller('GameController', function($scope, UserToken
     });
 
    TeamService.getAll().then(function(response){
-       console.log(response);
        $scope.theirTeams = response.data.teams;
    });
 

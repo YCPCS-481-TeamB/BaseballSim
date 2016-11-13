@@ -3,6 +3,8 @@ var Promise = bluebird.Promise;
 
 var DatabaseController = require("./../Controller/DatabaseController");
 
+var PlayerModel = require('./../Models/Player');
+
 module.exports = {
     create : function(team_id, game_id){
         return new Promise(function(resolve, reject){
@@ -87,7 +89,11 @@ module.exports = {
             DatabaseController.query("SELECT * FROM players WHERE id IN (SELECT player_id FROM lineup_items WHERE lineup_id in (SELECT id FROM lineups WHERE id = $1) AND already_played != true ORDER BY lineup_index ASC LIMIT 1)",[lineup_id]).then(function(result){
                 if(result.rows.length <= 0){
                     DatabaseController.query("UPDATE lineup_items SET already_played=$2 WHERE lineup_id = $1 RETURNING *", [lineup_id,false]).then(function(result){
-                        resolve(result.rows[0]);
+                        PlayerModel.getById(result.rows[0].player_id).then(function(player){
+                            resolve(player);
+                        }).catch(function(err){
+                            reject(err);
+                        });
                     }).catch(function(err){
                         reject(err);
                     });

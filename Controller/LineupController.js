@@ -41,6 +41,7 @@ exports.getNextLineupPlayerByGameAndTeamId = function(game_id, team_id){
     return new Promise(function(resolve, reject){
         LineupModel.getByGameAndTeamId(game_id, team_id).then(function(lineup){
             LineupModel.getNextLineupPlayerByLineupId(lineup.id).then(function(player){
+                console.log("LINEUP PLAYER: ", player);
                 resolve(player);
             }).catch(function(err){
                 reject(err);

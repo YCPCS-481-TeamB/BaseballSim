@@ -2,6 +2,7 @@ var PlayGameController = App.controller('PlayGameController', function($scope,$i
     var url = $location.absUrl();
     var id = url.substring(url.lastIndexOf('/')+1);
     $scope.game_id = id;
+    $scope.showNextButton = true;
 
     var temp = ['strike','ball','foul','single','double','triple','home_run','out'];
 
@@ -27,7 +28,7 @@ var PlayGameController = App.controller('PlayGameController', function($scope,$i
             GameService.nextGameEvent(id).then(function (data) {
             }).catch(function (err) {
                 console.log(err);
-                alert(err);
+                alert(err.data);
             });
         });
     }
@@ -35,12 +36,11 @@ var PlayGameController = App.controller('PlayGameController', function($scope,$i
     var checkNextActionPlayable = function(){
         UserTokenFactory.getUserData().then(function(user) {
             GameService.getPlayableState(id).then(function (response) {
-                if (response.data && response.data.filter(function (item) {
-                        return !item.approved == "approved";
-                    }).length == 0) {
-                    $scope.showNextButton = true;
-                } else {
-                    $scope.showNextButton = false;
+                var approvals = response.data.approvals;
+                if (approvals){
+                    $scope.showNextButton = approvals.filter(function (item) {return !item.approved == "approved";}).length == 0;
+                }else{
+                    console.log("error: ", response);
                 }
             }).catch(function (err) {
                 console.log(err);
@@ -69,7 +69,7 @@ var PlayGameController = App.controller('PlayGameController', function($scope,$i
 
     var updateGameEvents = function(){
         GameService.loadEventsByGameId(id).then(function (response) {
-            $scope.gameEvents = response.data;
+            $scope.gameEvents = response.data.events;
             $scope.gameEvents.reverse();
 
             for(var i = 0;i<temp.length;i++){

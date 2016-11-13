@@ -59,10 +59,12 @@ module.exports =  {
         });
     },
     clearBasesById : function(id){
-        DatabaseController.update('game_player_positions', id, {onfirst_id: 0, onsecond_id:0, onthird_id:0}).then(function(result){
-            resolve(result.rows[0]);
-        }).catch(function(err){
-            reject(err);
+        return new Promise(function(resolve, reject){
+            DatabaseController.update('game_player_positions', id, {onfirst_id: 0, onsecond_id:0, onthird_id:0}).then(function(result){
+                resolve(result.rows[0]);
+            }).catch(function(err){
+                reject(err);
+            });
         });
     },
     deleteById : function(id){
