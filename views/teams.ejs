@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="stylesheets/style.css">
     <style>
         .page {
-            background-color: seagreen;
+            background-color: forestgreen;
             color: white;
         }
         .page-header {
@@ -22,6 +22,15 @@
         }
         .form-group {
             color: black;
+            text-align: center;
+            width: 100%;
+            padding-left: 100px;
+            padding-right: 100px;
+        }
+        .form-control {
+            text-align: center;
+            padding-left: 100px;
+            padding-right: 100px;
         }
         .playerTable {
             font-size: 80%;
@@ -96,9 +105,13 @@
         <form class="form-group">
             <h2 class="form-signin-heading">Create Team</h2>
             <label for="teamNameInput">Team Name</label>
+            <br>
             <input type="text" id="teamNameInput" class="form-control" ng-model="teamNameInput" placeholder="Team Name"/>
+            <br>
             <label for="LeagueIdInput">League ID</label>
+            <br>
             <input type="text" id="LeagueIdInput" class="form-control" ng-model="leagueIdInput" placeholder="League Id"/>
+            <br>
             <button class="btn btn-success form-control" ng-click="createNewTeam(teamNameInput, leagueIdInput); showTeamCreate=false">Create Team</button>
         </form>
     </div>

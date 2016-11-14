@@ -7,7 +7,6 @@ CREATE TYPE permission_type AS ENUM ('owner', 'edit', 'view', 'delete');
 CREATE TYPE approval_status AS ENUM ('approved', 'declined', 'pending');
 
 CREATE TYPE game_action_type AS ENUM ('start', 'end', 'home_run', 'triple', 'double', 'single', 'ball', 'strike', 'foul', 'strike_out', 'out', 'walk');
-
 CREATE TABLE users (id SERIAL, username VARCHAR(255), password VARCHAR(255), firstname VARCHAR(255), lastname VARCHAR(255), email VARCHAR(255), date_created TIMESTAMP DEFAULT NOW());
 
 CREATE TABLE user_tokens (id SERIAL, user_id INTEGER, token TEXT, date_created TIMESTAMP DEFAULT NOW());
