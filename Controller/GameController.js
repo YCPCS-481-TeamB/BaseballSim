@@ -49,15 +49,46 @@ function isGameStarted(game_id){
     });
 }
 
+function foo(game_id) {
+    function doo() {
+        // always return a promise
+        GameModel.hasEventWithType(game_id, 'end').then(function(isEnded) {
+            if (!isEnded) {
+                return exports.doGameEvent(game_id).then(doo);
+            } else {
+                return Promise.resolve();
+            }
+        }).catch(function(err){
+           reject(err);
+        });
+    }
+    return doo(); // returns a promise
+}
+
 exports.autoPlay = function(game_id){
-    GameModel.getById(game_id).then(function(game){
-        GameModel.hasEventWithType(game_id, 'start').then(function(isStarted){
-            console.log("IS GAME STARTED: ", isStarted);
+    return new Promise(function(resolve, reject){
+        GameModel.getById(game_id).then(function(game){
+            GameModel.hasEventWithType(game_id, 'start').then(function(isStarted){
+                console.log("IS GAME STARTED: ", isStarted);
+                exports.startGame(game_id).then(function(start_event){
+                    foo(game_id).then(function(result){
+                        GameActionModel.getAllByGameId(game_id).then(function(game_actions){
+                            resolve(result);
+                        }).catch(function(err){
+                            reject(err);
+                        });
+                    }).catch(function(err){
+                        reject(err);
+                    });
+                }).catch(function(err){
+                   reject(err);
+                });
+            }).catch(function(err){
+                reject(err);
+            });
         }).catch(function(err){
             reject(err);
         });
-    }).catch(function(err){
-        reject(err);
     });
 }
 
@@ -75,27 +106,17 @@ function toggleTeamAtBat(game_action_id){
     return new Promise(function(resolve, reject){
        GameActionModel.getById(game_action_id).then(function(game_action){
 
-           console.log("GameAction: ", game_action);
-
            GameModel.getById(game_action.game_id).then(function(game){
-               console.log("Game: ", game);
-
                var newTeamAtBat = 0;
-
                if(game.team1_id == game_action.team_at_bat){
-                   console.log("TOGGLE TO TEAM 2");
                    newTeamAtBat = game.team2_id;
                }else{
-                   console.log("TOGGLE TO TEAM 1");
                    newTeamAtBat = game.team1_id;
                }
 
                GameActionModel.update(game_action_id, {team_at_bat: newTeamAtBat}).then(function(result){
-                   console.log("RESULT: ", result);
                    PlayerPositionModel.getByGameActionId(game_action_id).then(function(player_position){
-                       console.log("Player position: ", player_position);
                        PlayerPositionModel.clearBasesById(player_position.id).then(function(clear_bases_position){
-                           console.log("clear bases position: ", clear_bases_position);
                            resolve(result);
                        }).catch(function(err){
                             reject("clear bases: " + err);
@@ -407,8 +428,6 @@ exports.doGameEvent = function(game_id, player1_id, player2_id) {
                 Promise.all([LineupController.getNextLineupPlayerByGameAndTeamId(game_id, gameEvent.team_at_bat), LineupController.getNextLineupPlayerByGameAndTeamId(game_id, gameEvent.team_at_bat)]).then(function (result) {
                     var player1_id = result[0].id;
                     var player2_id = result[1].id;
-
-                    console.log("LINEUP PLAYER IDS: " + player1_id + ", " + player2_id);
 
                     doGameEventLogic(game_id,player1_id, player2_id).then(function(game_action){
                         resolve(game_action);

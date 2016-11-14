@@ -229,5 +229,15 @@ router.delete('/:id', function(req, res, next){
     });
 });
 
+router.post('/:id/autoplay', function(req, res, next){
+    var id = req.params.id;
+
+    GameController.autoPlay(id).then(function(result){
+        res.status(200).json(result);
+    }).catch(function(err){
+        res.status(500).json(err);
+    })
+});
+
 
 module.exports = router;
