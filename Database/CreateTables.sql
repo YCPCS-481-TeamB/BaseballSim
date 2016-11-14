@@ -70,3 +70,15 @@ CREATE TABLE approvals (id SERIAL, approved approval_status DEFAULT 'pending', a
 
 INSERT INTO player_names (name, isLast) VALUES ('Brandon', 'n');
 INSERT INTO player_names (name, isLast) VALUES ('Walton', 'y');
+INSERT INTO player_names (name, isLast) VALUES ('Scott', 'n');
+INSERT INTO player_names (name, isLast) VALUES ('Fitzpatrick', 'y');
+INSERT INTO player_names (name, isLast) VALUES ('Cooper', 'n');
+INSERT INTO player_names (name, isLast) VALUES ('Luetje', 'y');
+INSERT INTO player_names (name, isLast) VALUES ('Kyle', 'n');
+INSERT INTO player_names (name, isLast) VALUES ('Meyers', 'y');
+INSERT INTO player_names (name, isLast) VALUES ('Ben', 'n');
+INSERT INTO player_names (name, isLast) VALUES ('Coover', 'y');
+INSERT INTO player_names (name, isLast) VALUES ('James', 'n');
+INSERT INTO player_names (name, isLast) VALUES ('Moscola', 'y');
+INSERT INTO player_names (name, isLast) VALUES ('David', 'n');
+INSERT INTO player_names (name, isLast) VALUES ('Hovemeyer', 'y');
