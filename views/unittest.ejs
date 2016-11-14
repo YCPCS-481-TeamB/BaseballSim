@@ -1,0 +1,59 @@
+<html>
+<head>
+    <title><%= title %></title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/stylesheets/webconsole.css">
+    <style>
+        .page {
+            background-color: forestgreen;
+
+        }
+        .container {
+            color: black;
+        }
+    </style>
+</head>
+<body ng-app="app" class="page">
+
+<div class="container" ng-controller="UnitTestDemoController">
+    <h1>Unit Tests</h1>
+
+    <div ng-show="showCached">
+        <p>User 1:  {{user1}} </p>
+        <p>User 2:  {{user2}} </p>
+
+        <p>User 1 Token:  {{user1Token}} </p>
+        <p>User 2 Token:  {{user2Token}} </p>
+    </div>
+
+    <table class="table">
+        <tr ng-repeat="message in messages" ng-class="{success:message.success, danger: !message.success}">
+            <td>{{message.message}}</td>
+        </tr>
+    </table>
+
+    <button class="btn btn-success" ng-click="startTesting()">Start Test</button>
+    <button class="btn btn-success" ng-click="showCached = !showCached">Toggle Cache Visibility</button>
+</div>
+</body>
+
+<script src="/jquery/jquery.min.js"></script>
+<script src="/bootstrap/js/bootstrap.min.js"></script>
+<script src="/angular/angular.min.js"></script>
+<script src="/angular-cookies/angular-cookies.min.js"></script>
+<script src="/javascripts/app.js"></script>
+<script src="/javascripts/service/UserTokenFactory.js"></script>
+<script src="/javascripts/service/UserService.js"></script>
+<script src="/javascripts/service/GameService.js"></script>
+<script src="/javascripts/service/TeamService.js"></script>
+<script src="/javascripts/service/PlayerService.js"></script>
+<script src="/javascripts/service/PlayerService.js"></script>
+<script src="/javascripts/Controller/UnitTestDemoController.js"></script>
+
+</html>

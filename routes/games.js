@@ -229,6 +229,21 @@ router.delete('/:id', function(req, res, next){
     });
 });
 
+router.post('/:id/lineup', function(req, res, next){
+    var id = req.params.id;
+    var lineup = JSON.parse(req.body.lineup);
+    var team_id = req.body.team_id;
+
+    console.log("LINEUP: ", lineup);
+
+    LineupController.createNewLineupByGameAndTeamId(id, team_id, lineup).then(function(result){
+        res.status(200).json({lineup: result});
+    }).catch(function(err){
+        res.status(200).json(err);
+    })
+
+});
+
 router.post('/:id/autoplay', function(req, res, next){
     var id = req.params.id;
 

@@ -12,7 +12,11 @@ router.use(function (req, res, next) {
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
+  res.render('index', { title: 'Express' , loggedIn: false});
+});
+
+router.get('/demo/test', function(req, res, next) {
+  res.render('unittest', { title: 'Unit Test Demo'});
 });
 
 /* GET web console page. */

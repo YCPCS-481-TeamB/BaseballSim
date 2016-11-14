@@ -18,7 +18,7 @@ exports.createGame = function(team1_id, team2_id, field_id, league_id){
     return new Promise(function(resolve, reject){
         if(team1_id && team2_id){
             GameModel.create(team1_id,team2_id, field_id, league_id).then(function(game){
-                console.log(game);
+                //console.log(game);
                 Promise.all([PermissionController.getOwnerForItem('teams', team1_id), PermissionController.getOwnerForItem('teams', team2_id)]).then(function(result){
                     var user1_id = result[0].rows[0].user_id;
                     var user2_id = result[1].rows[0].user_id;
@@ -298,7 +298,7 @@ function updateCountsByEventResult(game_action_id, player_id, game_result){
                 // Game Over
                 gameOver = true;
             }
-            //console.log("CHANGE OUT PLAYER: ", changeoutplayer);
+
             GameActionModel.update(game_action_id, {balls: balls, strikes: strikes, outs: outs, inning: inning}).then(function(result){
                 if(changeoutplayer === true){
                     updateGameLineupByResult(game_action.game_id).then(function(data){
@@ -383,13 +383,15 @@ function createApprovalsForEvent(game_id, event_id){
                promises.push(ApprovalsController.createApproval('events', event_id, users[i].user_id));
            }
            Promise.all(promises).then(function(data){
-                console.log(data);
+                //console.log(data);
                 resolve(data);
            }).catch(function(err){
-                console.log(err);
+               reject(err);
+                //console.log(err);
            });
        }).catch(function(err){
-           console.log(err);
+           reject(err);
+           //console.log(err);
        });
    });
 }
@@ -409,7 +411,8 @@ exports.startGame = function(game_id){
                         reject(err);
                     });
                 }).catch(function(err){
-                    console.log(err);
+                    reject(err);
+                    //console.log(err);
                 });
             }).catch(function(err){
                 reject(err);
@@ -424,7 +427,6 @@ exports.doGameEvent = function(game_id, player1_id, player2_id) {
     return new Promise(function (resolve, reject) {
         if(player1_id == undefined || player2_id == undefined){
             GameActionModel.getLatestByGameId(game_id).then(function (gameEvent) {
-                //TODO: UPDATE SO PLAYERS DONT PLAY AGAINST THEMSELVES
                 Promise.all([LineupController.getNextLineupPlayerByGameAndTeamId(game_id, gameEvent.team_at_bat), LineupController.getNextLineupPlayerByGameAndTeamId(game_id, gameEvent.team_at_bat)]).then(function (result) {
                     var player1_id = result[0].id;
                     var player2_id = result[1].id;
@@ -516,7 +518,7 @@ function gameAlgorithmController(game_id, player1_id, player2_id) {
  */
 function basicPlayerEvent(player1_id, player2_id){
     return new Promise(function(resolve, reject){
-        console.log(player1_id, player2_id);
+       // console.log(player1_id, player2_id);
         Promise.all([PlayerModel.getById(player1_id), PlayerModel.getById(player2_id)]).then(function(result){
             var player1 = result[0];
             var player2 = result[1];
@@ -540,8 +542,8 @@ function basicPlayerEvent(player1_id, player2_id){
 
 
             Promise.all([PlayerModel.getAttributesById(player1_id),PlayerModel.getAttributesById(player2_id)]).spread(function(player1, player2) {
-                console.log("Player 1: ", player1);
-                console.log("Player 2: ", player2);
+                //console.log("Player 1: ", player1);
+                //console.log("Player 2: ", player2);
 
                 var outcome = ' ';
                 var options = ['ball', 'single', 'double', 'triple', 'home_run', 'strike', 'out', 'foul', 'strike_out', 'walk'];
@@ -616,7 +618,7 @@ function basicPlayerEvent(player1_id, player2_id){
 
                 // Tracks stats based on outcome
                 PlayerController.statTracker(player1, player2, options[rng]);
-                console.log("OUTCOME", outcome);
+               // console.log("OUTCOME", outcome);
                 resolve(outcome);
 
             }).catch(function(err){

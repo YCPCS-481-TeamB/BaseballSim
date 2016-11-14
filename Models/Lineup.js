@@ -30,6 +30,9 @@ module.exports = {
             });
         });
     },
+    checkLineupCreatedByGameAndTeamId : function(game_id, team_id){
+
+    },
     getAll : function(limit, offset){
         return new Promise(function(resolve, reject){
             DatabaseController.query("SELECT * FROM lineups LIMIT $1 OFFSET $2", [limit, offset]).then(function(result){
