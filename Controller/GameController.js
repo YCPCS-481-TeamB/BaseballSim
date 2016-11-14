@@ -117,6 +117,7 @@ function toggleTeamAtBat(game_action_id){
                GameActionModel.update(game_action_id, {team_at_bat: newTeamAtBat}).then(function(result){
                    PlayerPositionModel.getByGameActionId(game_action_id).then(function(player_position){
                        PlayerPositionModel.clearBasesById(player_position.id).then(function(clear_bases_position){
+                           console.log("UPDATE TOGGLE AT BAT: ", result);
                            resolve(result);
                        }).catch(function(err){
                             reject("clear bases: " + err);
@@ -231,6 +232,8 @@ function updatePlayerPositionByEventResult(game_action_id, player_id, game_resul
         });
     });
 }
+
+//function updateTeamToggle(game_action_id, game_result){}
 
 function updateCountsByEventResult(game_action_id, player_id, game_result){
     //'ball', 'strike', 'foul'
@@ -400,22 +403,30 @@ exports.startGame = function(game_id){
     return new Promise(function(resolve, reject){
         if(game_id){
             GameModel.getById(game_id).then(function(game){
-                Promise.all([ApprovalModel.checkApprovalStatusByItemAndId('games', game_id), isGameStarted(game_id)]).then(function(result){
-                    GameActionModel.create(game_id, game.team1_id, 'start', 'Game Started!').then(function(game_action){
-                        Promise.all(LineupController.setDefaultLineup(game.team1_id, game_id), LineupController.setDefaultLineup(game.team2_id, game_id), createInitialGamePlayerPositions(game_action.id)).then(function(result){
-                            resolve(game_action);
+                ApprovalModel.checkApprovalStatusByItemAndId('games', game_id).then(function(status){
+                    if(status == true){
+                        Promise.all([ApprovalModel.checkApprovalStatusByItemAndId('games', game_id), isGameStarted(game_id)]).then(function(result){
+                            GameActionModel.create(game_id, game.team1_id, 'start', 'Game Started!').then(function(game_action){
+                                Promise.all(LineupController.setDefaultLineup(game.team1_id, game_id), LineupController.setDefaultLineup(game.team2_id, game_id), createInitialGamePlayerPositions(game_action.id)).then(function(result){
+                                    resolve(game_action);
+                                }).catch(function(err){
+                                    reject(err);
+                                });
+                            }).catch(function(err){
+                                reject(err);
+                            });
                         }).catch(function(err){
                             reject(err);
+                            //console.log(err);
                         });
-                    }).catch(function(err){
-                        reject(err);
-                    });
+                    }else{
+                        reject("All players must approve");
+                    }
                 }).catch(function(err){
                     reject(err);
-                    //console.log(err);
                 });
             }).catch(function(err){
-                reject(err);
+               reject(err);
             });
         }else{
             reject("Game ID is Required");
@@ -425,28 +436,46 @@ exports.startGame = function(game_id){
 
 exports.doGameEvent = function(game_id, player1_id, player2_id) {
     return new Promise(function (resolve, reject) {
-        if(player1_id == undefined || player2_id == undefined){
-            GameActionModel.getLatestByGameId(game_id).then(function (gameEvent) {
-                Promise.all([LineupController.getNextLineupPlayerByGameAndTeamId(game_id, gameEvent.team_at_bat), LineupController.getNextLineupPlayerByGameAndTeamId(game_id, gameEvent.team_at_bat)]).then(function (result) {
-                    var player1_id = result[0].id;
-                    var player2_id = result[1].id;
+        GameModel.hasEventWithType(game_id, 'start').then(function(status){
+            if(status == true){
+                if(player1_id == undefined || player2_id == undefined){
+                    GameActionModel.getLatestByGameId(game_id).then(function (gameEvent) {
+                        GameModel.getById(game_id).then(function(game){
+                            var other_team_id = 0;
+                            if(game.team1_id == gameEvent.team_at_bat){
+                                other_team_id = game.team2_id;
+                            }else{
+                                other_team_id = game.team1_id;
+                            }
+                            Promise.all([LineupController.getNextLineupPlayerByGameAndTeamId(game_id, gameEvent.team_at_bat), LineupController.getNextLineupPlayerByGameAndTeamId(game_id, other_team_id)]).then(function (result) {
+                                var player1_id = result[0].id;
+                                var player2_id = result[1].id;
 
-                    doGameEventLogic(game_id,player1_id, player2_id).then(function(game_action){
+                                doGameEventLogic(game_id,player1_id, player2_id).then(function(game_action){
+                                    resolve(game_action);
+                                }).catch(function(err){
+                                    reject(err);
+                                });
+                            }).catch(function (err) {
+                                reject(err);
+                            });
+                        }).catch(function(err){
+                            reject(err);
+                        });
+                    });
+                }else{
+                    doGameEventLogic(game_id, player1_id, player2_id).then(function(game_action){
                         resolve(game_action);
                     }).catch(function(err){
-                       reject(err);
+                        reject(err);
                     });
-                }).catch(function (err) {
-                    reject(err);
-                });
-            });
-        }else{
-            doGameEventLogic(game_id, player1_id, player2_id).then(function(game_action){
-                resolve(game_action);
-            }).catch(function(err){
-                reject(err);
-            });
-        }
+                }
+            }else{
+                reject("Game Not Started");
+            }
+        }).catch(function(err){
+           reject(err);
+        });
     });
 }
 
@@ -459,24 +488,30 @@ function doGameEventLogic(game_id, player1_id, player2_id){
                 reject("The game has ended");
             }else{
                 basicPlayerEvent(player1_id, player2_id).then(function(result) {
-                    var game_message = generateMessage(player1_id, player2_id, game_id, result)
-                    GameActionModel.createFromPrevious(game_id, result, game_message).then(function(game_action){
-                        PlayerPositionModel.createCopy(lastGameEvent.id, game_action.id).then(function(copyResult){
-                            updateCountsByEventResult(game_action.id, player1_id, result).then(function(countsResult){
+                    var game_message = "";
+                    generateMessage(player1_id, player2_id, game_id, result).then(function(msg){
+                        game_message = msg;
+                        GameActionModel.createFromPrevious(game_id, result, game_message).then(function(game_action){
+                            PlayerPositionModel.createCopy(lastGameEvent.id, game_action.id).then(function(copyResult){
                                 updatePlayerPositionByEventResult(game_action.id, player1_id, result).then(function(playerPosResult){
-                                    resolve(game_action);
+                                    updateCountsByEventResult(game_action.id, player1_id, result).then(function(countsResult){
+                                            resolve(game_action);
+                                    }).catch(function(err){
+                                        reject("Update Counts: "+ err);
+                                    });
                                 }).catch(function(err){
                                     reject("Player Position: "+ err);
                                 });
                             }).catch(function(err){
-                                reject("Update Counts: "+ err);
+                                reject("Create Copy: "+ err);
                             });
                         }).catch(function(err){
-                            reject("Create Copy: "+ err);
+                            reject("Create from previous: "+ err);
                         });
                     }).catch(function(err){
-                        reject("Create from previous: "+ err);
-                    });
+                        reject(err);
+                    })
+
                 }).catch(function(err){
                     reject("Basic Player Event: "+ err);
                 });
@@ -487,8 +522,16 @@ function doGameEventLogic(game_id, player1_id, player2_id){
     });
 }
 
-function generateMessage(player1_id, player2_id, game_id, result){
-    return "Player " + player1_id + " got a " + result + " against " + player2_id;
+function generateMessage(player1_id, player2_id, game_id, game_result){
+    return new Promise(function(resolve, reject){
+        Promise.all([PlayerModel.getById(player1_id), PlayerModel.getById(player2_id)]).then(function(result){
+            var player1_name = result[0].firstname + " " + result[0].lastname;
+            var player2_name = result[1].firstname + " " + result[1].lastname;
+            resolve("Player " + player1_name + " ("+result[0].id+") got a " + game_result + " against " + player2_name+ " ("+result[1].id+")");
+        }).catch(function(err){
+            reject(err);
+        });
+    });
 }
 
 /*
