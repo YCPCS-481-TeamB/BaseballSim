@@ -81,14 +81,18 @@
                 <td>ID</td>
                 <td>Player Name</td>
                 <td>Position</td>
-                <td>Team ID</td>
+                <td>Team Name</td>
+                <td>Skills</td>
                 <td>Drop</td>
             </tr>
             <tr class="playerTable" ng-repeat="player in team.players">
                 <td ng-if="team.view == true">{{player.id}}</td>
                 <td ng-if="team.view == true">{{player.firstname}} {{player.lastname}}</td>
                 <td ng-if="team.view == true">{{player.position}}</td>
-                <td ng-if="team.view == true">{{player.team_id}}</td>
+                <td ng-if="team.view == true">{{team.name}}</td>
+                <td ng-if="team.view == true">
+                    <button type="button" class="btn btn-primary" ng-click="team.view=!team.view">View</button>
+                </td>
                 <td ng-if="team.view == true">
                     <button class="btn  btn-danger glyphicon glyphicon-trash" ng-click="#"></button>
                 </td>

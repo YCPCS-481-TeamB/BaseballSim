@@ -27,6 +27,9 @@
             color: black;
             height: 50%;
         }
+        .input-group {
+            width: 100%;
+        }
         .count {
             color: white;
             background-color: white;
@@ -37,9 +40,6 @@
             margin-right: 20%;
         }
         .container-fluid {
-
-        }
-        .centered {
 
         }
     </style>
@@ -56,7 +56,7 @@
             <div class="scoreboard">
                 <!--<h2>Team 1: {{team1_score}}</h2>-->
                 <!--<h2>Team 2: {{team2_score}}</h2>-->
-                <table class="table table-condensed">
+                <table class="table table-striped table-hover">
                     <tr>
                         <td>Inning</td>
                         <td>1</td>
@@ -102,12 +102,12 @@
 
             <div class="container-fluid">
                 <div class="count col-lg-4 col-md-4 col-sm-4 col-xs-4">
-                    <table class="table table-condensed">
+                    <table class="table table-striped table-hover table-condensed">
                         <tr><th>Balls: </th><td>{{balls}}</td></tr>
                         <tr><th>Strikes: </th><td>{{strikes}}</td></tr>
                         <tr><th>Outs: </th><td>{{outs}}</td></tr>
                         <tr><th>Pitcher Name: </th><td>Pitcher</td></tr>
-                        <tr><th>Last Play: </th><td>{{event.type}}</td></tr>
+                        <tr><th>Last Play: </th><td>{{gameEvents.type}}</td></tr>
                     </table>
                 </div>
                 <div class="gameScreen">
@@ -150,11 +150,12 @@
             <div class="scroll-view">
                 <button class="btn btn-success form-control" ng-show="gameEvents.length == 0" ng-click="startGame()">Start Game</button> <!-- ng-show="gameEvents.length == 0" -->
                 <div class="alert alert-success" ng-repeat="event in gameEvents">
-                    <div class="input-group input-group-md">
-                        <span class="input-group-addon">{{event.type}}</span>
+                    <div class="input-group input-group-lg">
+                        <div class="well well-sm">{{event.type}}</div>
                         <div class="well well-lg">{{event.message}}</div>
                     </div>
                     <!--{{event.type}} {{event.message}}-->
+                    
                     Team 1 Score: {{event.team1_score}}
                     Balls: {{event.balls}}
                     Strikes: {{event.strikes}}

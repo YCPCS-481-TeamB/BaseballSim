@@ -4,7 +4,7 @@ var router = express.Router();
 var TeamsController = require('./../Controller/TeamsController');
 var PlayersController = require('./../Controller/PlayersController');
 var PermissionModel = require('./../Models/Permission');
-
+PlayersController.getPlayerAttributesById()
 
 var TeamModel = require('./../Models/Team');
 
