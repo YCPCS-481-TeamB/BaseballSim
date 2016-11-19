@@ -1,0 +1,324 @@
+>>>>>-- GAMES --<<<<<
+  +
+  +GET - api/games
+  +params -
+  +form-data - N/A
+  +description - returns all games
+  +
+  +RETURNS:
+  {
+    "success": true,
+    "result": [
+      {
+        "id": 1,
+        "team1_id": 1,
+        "team2_id": 2,
+        "field_id": 0,
+        "league_id": 0,
+        "date_created": "2016-11-14T03:19:24.821Z"
+      },
+      {
+        "id": 2,
+        "team1_id": 1,
+        "team2_id": 2,
+        "field_id": 0,
+        "league_id": 0,
+        "date_created": "2016-11-16T00:37:01.446Z"
+      }
+    ]
+  }
+  +
+  +---------------------
+  +
+  +POST - api/games
+  +params -
+  +form data - team1_id, team2_id, field_id, league_id
+  +team1_id - ID for Team 1
+  +team2_id - ID for Team 2
+  +field_id - ID for a field (can be set to 0)
+  +league_id - ID for the League (can be set to 0)
+  +description - posts the new game
+  +
+  +RETURNS:
+    {
+      "success": true,
+      "game": {
+        "id": 3,
+        "team1_id": 1,
+        "team2_id": 2,
+        "field_id": 0,
+        "league_id": 0,
+        "date_created": "2016-11-19T01:22:54.872Z"
+      }
+    }
+  +
+  +---------------------
+  +
+  +POST - api/:id/start
+  +params:
+  +	:id - the game_id
+  +form data - game_id
+  +description - posts the game's start
+  +
+  +RETURNS:
+  {
+    "id": 70,
+    "game_id": 3,
+    "team_at_bat": 1,
+    "team1_score": 0,
+    "team2_score": 0,
+    "balls": 0,
+    "strikes": 0,
+    "outs": 0,
+    "inning": 1,
+    "type": "start",
+    "message": "Game Started!",
+    "date_created": "2016-11-19T01:32:34.417Z"
+  }
+  +
+  +---------------------
+  +
+  +GET - api/events/:event_id/positions
+  +params:
+  +	:event_id - the event_id
+  +description - returns positions of the base runners
+  +			by the event's ID
+  +
+  +RETURNS:
+  {
+    "positions": {
+      "id": 1,
+      "game_action_id": 1,
+      "onfirst_id": 0,
+      "onsecond_id": 0,
+      "onthird_id": 0,
+      "date_created": "2016-11-14T03:19:34.063Z"
+    }
+  }
+  +
+  +
+  +
+  +---------------------
+  +
+  +GET - api/:id/positions/latest
+  +params:
+  +	:id - the game_event ID
+  +description - returns the lastest positions of
+  +			the base runners by the event's ID
+  +
+  +RETURNS:
+  {
+    "positions": {
+      "id": 19,
+      "game_action_id": 19,
+      "onfirst_id": 29,
+      "onsecond_id": 0,
+      "onthird_id": 28,
+      "date_created": "2016-11-16T00:35:33.819Z"
+    }
+  }
+  +
+  +---------------------
+  +
+  +GET - api/:id/events
+  +params:
+  +	:id - the game ID
+  +description - returns all game events for a game
+  +
+  +RETURNS:
+  +events: {
+  +
+  +}
+  +
+  +---------------------
+  +
+  +GET - api/:id/events/latest
+  +params:
+  +	:id - the game ID
+  +description - returns the last game event for a game
+  +
+  +RETURNS:
+  {
+    "events": {
+      "id": 19,
+      "game_id": 1,
+      "team_at_bat": 2,
+      "team1_score": 0,
+      "team2_score": 0,
+      "balls": 0,
+      "strikes": 0,
+      "outs": 2,
+      "inning": 2,
+      "type": "strike",
+      "message": "Player James Coover (30) got a strike against Brandon Walton (6)",
+      "date_created": "2016-11-16T00:35:33.772Z"
+    }
+  }
+  +
+  +---------------------
+  +
+  +GET - api/:id/approvals/state
+  +params:
+  +	:id - the game ID
+  +description - returns the last game event approval
+  +			for a game
+  +
+  +RETURNS:
+  {
+    "approvals": [
+      {
+        "id": 1,
+        "approved": "approved",
+        "approver_user_id": 1,
+        "item_type": "games",
+        "item_id": 1,
+        "auto_approved": false,
+        "date_created": "2016-11-14T03:19:24.875Z"
+      }
+    ]
+  }
+  +
+  +---------------------
+  +
+  +POST - api/:id/events/next
+  +params:
+  +	:id - the game_id
+  +form data - game_id, player1_id, player2_id
+  +game_id - the game ID
+  (-Optional-)
+  +player1_id - the ID of player 1
+  +player2_id - the ID of player 2
+  +description - posts the next game action
+  +
+  +RETURNS:
+  {
+    "id": 72,
+    "game_id": 3,
+    "team_at_bat": 1,
+    "team1_score": 0,
+    "team2_score": 0,
+    "balls": 1,
+    "strikes": 0,
+    "outs": 0,
+    "inning": 1,
+    "type": "strike",
+    "message": "Player Ben Meyers (1) got a strike against James Coover (26)",
+    "date_created": "2016-11-19T01:33:47.727Z"
+  }
+  +
+  +---------------------
+  +
+  +GET - api/:id/events/latest
+  +params:
+  +	:id - the game ID
+  +description - returns the last game action
+  +			for a game
+  +
+  +RETURNS:
+  {
+    "events": {
+      "id": 72,
+      "game_id": 3,
+      "team_at_bat": 1,
+      "team1_score": 0,
+      "team2_score": 0,
+      "balls": 1,
+      "strikes": 1,
+      "outs": 0,
+      "inning": 1,
+      "type": "strike",
+      "message": "Player Ben Meyers (1) got a strike against James Coover (26)",
+      "date_created": "2016-11-19T01:33:47.727Z"
+    }
+  }
+  +
+  +
+  +---------------------
+  +
+  +GET - api/:id/teams/:team_id/lineup
+  +params:
+  +	:id - the game ID
+  +	:team_id - the team ID
+  +description - returns the lineup of the
+  +			team in the game (batting order)
+  +
+  +RETURNS:
+  [
+    {
+      "id": 101,
+      "lineup_id": 5,
+      "player_id": 1,
+      "lineup_index": 1,
+      "already_played": false,
+      "active": true,
+      "is_pitcher": false,
+      "date_created": "2016-11-19T01:32:34.612Z"
+    },
+    etc.
+  +
+  +---------------------
+  +
+  +GET - api/:id/users/:user_id/lineup
+  +params:
+  +	:id - the game ID
+  +	:user_id - the user ID
+  +description - returns the lineup of the
+  +			user in the game (batting order)
+  +
+  +RETURNS:
+  [
+    {
+      "id": 126,
+      "lineup_id": 6,
+      "player_id": 26,
+      "lineup_index": 1,
+      "already_played": false,
+      "active": true,
+      "is_pitcher": false,
+      "date_created": "2016-11-19T01:32:34.719Z"
+    },
+    etc.
+  +
+  +---------------------
+  +
+  +GET - api/:id
+  +params:
+  +	:id - the game ID
+  +description - returns a game by ID
+  +
+  +RETURNS:
+  {
+    "id": "3",
+    "game": {
+      "id": 3,
+      "team1_id": 1,
+      "team2_id": 2,
+      "field_id": 0,
+      "league_id": 0,
+      "date_created": "2016-11-19T01:22:54.872Z"
+    }
+  }
+  +
+  +---------------------
+  +
+  +DELETE - api/:id
+  +params:
+  +	:id - the game ID
+  +description - deletes a game by ID
+  +
+  +RETURNS:
+  {
+    "id": "3",
+    "game": {
+      "game": [
+        {
+          "id": 3,
+          "team1_id": 1,
+          "team2_id": 2,
+          "field_id": 0,
+          "league_id": 0,
+          "date_created": "2016-11-19T01:22:54.872Z"
+        }
+      ]
+    }
+  }
