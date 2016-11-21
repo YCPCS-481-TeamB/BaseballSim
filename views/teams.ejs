@@ -91,7 +91,10 @@
                 <td ng-if="team.view == true">{{player.position}}</td>
                 <td ng-if="team.view == true">{{team.name}}</td>
                 <td ng-if="team.view == true">
-                    <button type="button" class="btn btn-primary" ng-click="team.view=!team.view">View</button>
+                    <button type="button" class="btn btn-primary" ng-click="team.view=!team.view; loadPlayerAttrs(player)">Show</button>
+                    <h2 ng-repeat="attr in player.attrs">
+                        {{attr.name}}
+                    </h2>
                 </td>
                 <td ng-if="team.view == true">
                     <button class="btn  btn-danger glyphicon glyphicon-trash" ng-click="#"></button>

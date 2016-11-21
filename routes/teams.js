@@ -4,7 +4,6 @@ var router = express.Router();
 var TeamsController = require('./../Controller/TeamsController');
 var PlayersController = require('./../Controller/PlayersController');
 var PermissionModel = require('./../Models/Permission');
-PlayersController.getPlayerAttributesById()
 
 var TeamModel = require('./../Models/Team');
 
@@ -81,5 +80,6 @@ router.get('/:id/players', function(req, res, next){
 		res.status(200).json({success: false, id: id, message:""+ err});
 	});
 });
+
 
 module.exports = router;
