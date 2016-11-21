@@ -1,0 +1,90 @@
+<style>
+    .field{
+        position: absolute;
+        top: 25%;
+        left:25%;
+        width: 50%;
+        height: 50%;
+        background-color: green;
+        transform: rotate(45deg);
+    }
+
+    .firstactive > .outer > .field > .firstbase{
+        background-color: red;
+    }
+
+    .secondactive > .outer > .field > .secondbase{
+        background-color: red;
+    }
+
+    .thirdactive > .outer > .field > .thirdbase{
+        background-color: red;
+    }
+
+    .firstbase{
+        position: absolute;
+        top: 0px;
+        right: 0px;
+        width: 10%;
+        height: 10%;
+        background-color: black;
+    }
+
+    .secondbase{
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        width: 10%;
+        height: 10%;
+        background-color: black;
+    }
+
+    .thirdbase{
+        position: absolute;
+        bottom: 0px;
+        left: 0px;
+        width: 10%;
+        height: 10%;
+        background-color: black;
+    }
+
+    .homebase{
+        position: absolute;
+        bottom: 0px;
+        right: 0px;
+        width: 10%;
+        height: 10%;
+        background-color: black;
+    }
+
+    .active{
+        background-color: red;
+    }
+
+    .outer{
+        display: inline-block;
+        position: relative;
+        width: 200px;
+        height: 200px;
+        background-color: white;
+        border: solid black 1px;
+        text-align: center;
+    }
+</style>
+
+<div class="outer">
+    <div class="field">
+        <div class="firstbase">
+
+        </div>
+        <div class="secondbase">
+
+        </div>
+        <div class="thirdbase">
+
+        </div>
+        <div class="homebase">
+
+        </div>
+    </div>
+</div>

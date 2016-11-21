@@ -37,7 +37,7 @@ var AutoPlayController = App.controller('AutoPlayController', function($scope,$i
                     }).catch(function(err){
                         console.log(err);
                         alert(err);
-                        break;
+                       // break;
                     });
 
                     while(wait){

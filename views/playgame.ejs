@@ -13,15 +13,17 @@
         .page {
             background-color: forestgreen;
         }
+
+        .played{
+            display: none;
+        }
+
         .bases {
             float: right;
             color: white;
         }
-        .container {
+        .center {
             text-align:center;
-            color: white;
-        }
-        .scroll-view {
         }
         .lineups {
             color: black;
@@ -30,144 +32,181 @@
         .input-group {
             width: 100%;
         }
-        .count {
-            color: white;
+        .count{
             background-color: white;
+            border-radius: 5px;
         }
         .scoreboard {
             background-color: white;
-            margin-left: 20%;
-            margin-right: 20%;
+            border-radius: 5px;
         }
-        .container-fluid {
+        .alert > label{
+            position: absolute;
+            color: white;
+            top: 0px;
+            left: 0px;
+            height: 100%;
+            width: 10%;
+            background-color: green;
+            border-radius:5px;
+            text-align: center;
+        }
 
+        .valign-center{
+            transform: translateY(75%);
+        }
+
+        .alert{
+            padding-left: 10%;
+            position: relative;
+            vertical-align: middle;
+        }
+
+        .hidden-panel-component{
+            display:none;
+            text-align: center;
+        }
+
+        .hidden-panel-show:hover + .hidden-panel-component{
+            display: block;
+        }
+
+        .hidden-panel-component:hover{
+            display: block;
+        }
+
+        .scrollable{
+            overflow-y: scroll;
         }
     </style>
 </head>
 <body ng-app="app" class="page">
 <% include navbar %>
 
-<div class="container" ng-controller="PlayGameController">
+<!--<div class="container" ng-controller="PlayGameController">-->
+<div ng-controller="PlayGameController">
 
     <div class="row">
-        <div class="col-sm-12">
-            <!-- <strong>Team at Bat: {{team_at_bat}}</strong> -->
-            <BR>
-            <div class="scoreboard">
-                <!--<h2>Team 1: {{team1_score}}</h2>-->
-                <!--<h2>Team 2: {{team2_score}}</h2>-->
-                <table class="table table-striped table-hover">
-                    <tr>
-                        <td>Inning</td>
-                        <td>1</td>
-                        <td>2</td>
-                        <td>3</td>
-                        <td>4</td>
-                        <td>5</td>
-                        <td>6</td>
-                        <td>7</td>
-                        <td>8</td>
-                        <td>9</td>
-                        <td>Score</td>
-
-                    </tr>
-                    <tr><th>Team 1</th>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>{{team1_score}}</td>
-
-                    </tr>
-                    <tr><th>Team 2</th>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>{{team2_score}}</td>
-                    </tr>
-                </table>
-            </div>
-
-
-            <div class="container-fluid">
-                <div class="count col-lg-4 col-md-4 col-sm-4 col-xs-4">
-                    <table class="table table-striped table-hover table-condensed">
-                        <tr><th>Balls: </th><td>{{balls}}</td></tr>
-                        <tr><th>Strikes: </th><td>{{strikes}}</td></tr>
-                        <tr><th>Outs: </th><td>{{outs}}</td></tr>
-                        <tr><th>Pitcher Name: </th><td>Pitcher</td></tr>
-                        <tr><th>Last Play: </th><td>{{gameEvents.type}}</td></tr>
-                    </table>
-                </div>
-                <div class="gameScreen">
-                    <div class="centered">
-                        <game-view-directive data-gameid="id">The Canvas Is Not Supported!</game-view-directive>
-                        <BR>
-
-                    </div>
-                    <div class="action">
-                        <div class="btn-group btn-group-lg" role="group" aria-label="...">
-                            <button type="button" class="btn btn-success">Substitution</button>
-                            <button type="button" class="btn btn-success">Toggle Auto Run</button>
-                            <button class="btn btn-success" ng-show="showNextButton" ng-click="nextGameEvent()">Next Game Action</button>
-                        </div>
-                    </div>
-                </div>
-                <br>
-                <!--<div class="lineups col-lg-4 col-md-4 col-sm-4 col-xs-4">-->
-                    <!--<table class="table table-condensed">-->
-                        <!--<tr><th>Player Name</th></tr>-->
-                        <!--<tr ng-repeat="player in lineup" ng-class="{active : player.already_played == false}">-->
-                            <!--<td>{{player.id}}</td>-->
-                            <!--<td>{{player.name}}</td>-->
-                        <!--</tr>-->
-                    <!--</table>-->
-                <!--</div>-->
-                <!--<div class="bases">-->
-                    <!--<strong>{{player_positions.onfirst_id}} - 1st</strong>-->
-                    <!--<BR>-->
-                    <!--<strong>{{player_positions.onsecond_id}} - 2nd</strong>-->
-                    <!--<BR>-->
-                    <!--<strong>{{player_positions.onthird_id}} - 3rd</strong>-->
-                <!--</div>-->
-            </div>
-
-
-        </div>
-        <br>
-        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-            <div class="scroll-view">
-                <button class="btn btn-success form-control" ng-show="gameEvents.length == 0" ng-click="startGame()">Start Game</button> <!-- ng-show="gameEvents.length == 0" -->
-                <div class="alert alert-success" ng-repeat="event in gameEvents">
-                    <div class="input-group input-group-lg">
-                        <div class="well well-sm">{{event.type}}</div>
-                        <div class="well well-lg">{{event.message}}</div>
-                    </div>
-                    <!--{{event.type}} {{event.message}}-->
-                    
-                    Team 1 Score: {{event.team1_score}}
-                    Balls: {{event.balls}}
-                    Strikes: {{event.strikes}}
-
-                    <br>
-                    Team 2 Score: {{event.team2_score}}
-                    Outs: {{event.outs}}
-                    Inning: {{event.inning}}
-                </div>
-            </div>
+        <div class="scoreboard">
+            <table class="table table-condensed">
+                <tr>
+                    <th>Inning</th>
+                    <th>1</th>
+                    <th>2</th>
+                    <th>3</th>
+                    <th>4</th>
+                    <th>5</th>
+                    <th>6</th>
+                    <th>7</th>
+                    <th>8</th>
+                    <th>9</th>
+                    <th>Score</th>
+                </tr>
+                <tr><th>Team 1</th>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>{{team1_score}}</td>
+                </tr>
+                <tr>
+                    <th>Team 2</th>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>{{team2_score}}</td>
+                </tr>
+            </table>
         </div>
     </div>
+    <div class="row">
+            <!--<div class="container-fluid">-->
+        <div class="col-sm-3 scoreboard">
+            <table class="table table-condensed">
+                <tr><th>Balls: </th><td>{{balls}}</td></tr>
+                <tr><th>Strikes: </th><td>{{strikes}}</td></tr>
+                <tr><th>Outs: </th><td>{{outs}}</td></tr>
+                <tr><th>Pitcher Name: </th><td>Pitcher</td></tr>
+                <tr><th>Last Play: </th><td>{{gameEvents.type}}</td></tr>
+            </table>
+        </div>
+                <!--<div class="gameScreen">-->
+        <div class="col-sm-6 center">
+            <div style="height: 200px; text-align: center">
+                <game-view-directive ng-class="{firstactive:player_positions.onfirst_id != 0, secondactive:player_positions.onsecond_id != 0, thirdactive:player_positions.onthird_id != 0}">Loading</game-view-directive>
+            </div>
+            <div class="row">
+                <div class="action">
+                    <div class="btn-group btn-group-md" role="group" aria-label="...">
+                        <button type="button" class="btn btn-success">Substitution</button>
+                        <button type="button" class="btn btn-success">Toggle Auto Run</button>
+                        <button class="btn btn-success" ng-show="showNextButton" ng-click="nextGameEvent()">Next Game Action</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-3 scoreboard">
+            <table class="table table-condensed">
+                <tr><th>Base 1: </th><td>{{player_positions.onfirst_id}}</td></tr>
+                <tr><th>Base 2: </th><td>{{player_positions.onsecond_id}}</td></tr>
+                <tr><th>Base 3: </th><td>{{player_positions.onthird_id}}</td></tr>
+            </table>
+        </div>
+
+    </div>
+    <div class="row" style="height: 250px">
+        <div class="col-sm-2 scrollable" style="height: 250px"" >
+            <table class="table">
+                <tr><th>Lineup</th></tr>
+                <tr ng-repeat="player in lineup" ng-class="{played: player.already_played}">
+                    <td>{{player.player_id}}</td>
+                </tr>
+            </table>
+        </div>
+        <div class="col-sm-8 scrollable" style="height: 250px">
+            <button class="btn btn-success form-control" ng-show="gameEvents.length == 0" ng-click="startGame()" ng-show="gameEvents.length == 0">Start Game</button>
+            <div class="alert alert-success" ng-repeat="event in gameEvents">
+                <label><div class="valign-center">{{event.type}}</div></label>
+                <div class="hidden-panel-show">
+                    {{event.message}}
+                </div>
+                <!--</div>-->
+                <div class="hidden-panel-component">
+                    <div class="well">
+                        Team 1 Score: {{event.team1_score}}
+                        Balls: {{event.balls}}
+                        Strikes: {{event.strikes}}
+
+                        <br>
+                        Team 2 Score: {{event.team2_score}}
+                        Outs: {{event.outs}}
+                        Inning: {{event.inning}}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-2 scrollable" style="height: 250px">
+            <table class="table">
+                <tr><th>Lineup</th></tr>
+                <tr ng-repeat="player in lineup" ng-class="{played: player.already_played}">
+                    <td>{{player.player_id}}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
 
     <!-- strike ball foul single double triple home_run out-->
 
@@ -178,19 +217,4 @@
 </body>
 
 <% include footer%>
-<script src="jquery/jquery.min.js"></script>
-<script src="bootstrap/js/bootstrap.min.js"></script>
-<script src="angular/angular.min.js"></script>
-<script src="angular-cookies/angular-cookies.min.js"></script>
-<script src="javascripts/app.js"></script>
-<script src="javascripts/service/UserTokenFactory.js"></script>
-<script src="javascripts/service/UserService.js"></script>
-<script src="javascripts/service/GameService.js"></script>
-<script src="javascripts/service/TeamService.js"></script>
-<script src="javascripts/service/PlayerService.js"></script>
-<script src="javascripts/controller/ConsoleController.js"></script>
-<script src="javascripts/service/ApprovalService.js"></script>
-<script src="javascripts/controller/NavbarController.js"></script>
-<script src="javascripts/controller/TeamController.js"></script>
-<script src="javascripts/controller/GameController.js"></script>
 </html>
