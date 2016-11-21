@@ -1,0 +1,144 @@
++---------------------
+  +
+  +GET - api/teams
+  +params: N/A
+  +
+  +description - displays all teams for a user
+  +
+  +RETURNS:
+  {
+    "success": true,
+    "teams": [
+      {
+        "id": 1,
+        "name": "Broskis",
+        "league_id": 0,
+        "date_created": "2016-11-14T03:17:53.734Z"
+      },
+      {
+        "id": 2,
+        "name": "Homies",
+        "league_id": 0,
+        "date_created": "2016-11-14T03:18:40.354Z"
+      }
+    ]
+  }
+  +
++---------------------
+  +
+  +POST - api/teams
+  +params: N/A
+  +form data - teamname, league_id
+  +description - creates a team based on form data
+  +
+  +RETURNS:
+  {
+    "success": true,
+    "teams": {
+      "id": 3,
+      "name": "Yolos",
+      "league_id": 0,
+      "date_created": "2016-11-21T03:28:21.375Z",
+      "players": [
+        {
+          "id": 60,
+          "firstname": "David",
+          "lastname": "Walton",
+          "position": "catcher",
+          "team_id": 3,
+          "date_created": "2016-11-21T03:28:21.845Z"
+        },
+        {
+          "id": 61,
+          "firstname": "Kyle",
+          "lastname": "Hovemeyer",
+          "position": "center_fielder",
+          "team_id": 3,
+          "date_created": "2016-11-21T03:28:21.935Z"
+        },
+        etc.
+  +
++---------------------
+  +
+  +PUT - api/teams
+  +params: N/A
+  +form data - teamname, league_id
+  +description - edits team settings
+  +
+  +RETURNS:
+  {
+    "success": true,
+    "team": {
+      "id": 3,
+      "name": "Yolos",
+      "league_id": 0,
+      "date_created": "2016-11-21T03:28:21.375Z"
+    }
+  }
+  +
++---------------------
+  +
+  +GET - api/teams/:id
+  +params:
+  +     :id - the team ID
+  +
+  +description - returns a team based off ID
+  +
+  +RETURNS:
+  {
+    "id": "1",
+    "team": [
+      {
+        "id": 1,
+        "name": "Broskis",
+        "league_id": 0,
+        "date_created": "2016-11-14T03:17:53.734Z"
+      }
+    ]
+  }
+  +
++---------------------
+  +
+  +DELETE - api/teams/:id
+  +params:
+  +     :id - the team ID
+  +
+  +description - deletes a team based off ID
+  +
+  +RETURNS:
+  {
+    "id": "3",
+    "message": "Team Deleted"
+  }
+  +
++---------------------
+  +
+  +GET - api/teams/:id/players
+  +params:
+  +     :id - the team ID
+  +
+  +description - returns players of a team based off ID
+  +
+  +RETURNS:
+  {
+    "id": "1",
+    "team": [
+      {
+        "id": 1,
+        "firstname": "Ben",
+        "lastname": "Meyers",
+        "position": "left_fielder",
+        "team_id": 1,
+        "date_created": "2016-11-14T03:17:53.924Z"
+      },
+      {
+        "id": 2,
+        "firstname": "Scott",
+        "lastname": "Hovemeyer",
+        "position": "third_baseman",
+        "team_id": 1,
+        "date_created": "2016-11-14T03:17:53.932Z"
+      },
+      etc.
+  +
++---------------------

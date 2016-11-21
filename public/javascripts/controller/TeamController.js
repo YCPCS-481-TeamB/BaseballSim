@@ -53,5 +53,15 @@ var TeamsController = App.controller('TeamsController', function($scope, UserTok
             console.log(err);
         });
     }
+
+    $scope.loadPlayerAttrs = function(player){
+        console.log("loading players");
+        if(player && player.id) {
+            var attrs = PlayerService.getAttrByPlayerId(player.id).then(function (response) {
+                console.log(response.data.attributes);
+                player.attrs = response.data.attributes;
+            });
+        }
+    }
 });
 
