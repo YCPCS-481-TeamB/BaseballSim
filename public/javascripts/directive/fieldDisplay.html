@@ -10,15 +10,47 @@
     }
 
     .firstactive > .outer > .field > .firstbase{
-        background-color: red;
+        animation-name: baseactive;
+        animation-duration: 2s;
+        animation-timing-function: linear;
+        animation-delay: 0s;
+        animation-fill-mode: forwards;
     }
 
     .secondactive > .outer > .field > .secondbase{
+        animation-name: baseactive;
+        animation-duration: 2s;
+        animation-timing-function: linear;
+        animation-delay: 0s;
+        animation-fill-mode: forwards;  }
+
+    .thirdactive > .outer > .field > .thirdbase{
+        animation-name: baseactive;
+        animation-duration: 2s;
+        animation-timing-function: linear;
+        animation-delay: 0s;
+        animation-fill-mode: forwards;  }
+
+
+    .firstactive > .outer > .field > .homebaseman{
+        display:block;
         background-color: red;
     }
 
-    .thirdactive > .outer > .field > .thirdbase{
+    .secondactive > .outer > .field > .firstbaseman{
+        display:block;
         background-color: red;
+    }
+
+    .thirdactive > .outer > .field > .secondbaseman{
+        display:block;
+        background-color: red;
+    }
+
+    @keyframes baseactive{
+        0% {background-color: black;}
+        98% {background-color: black;}
+        100% {background-color: red;}
     }
 
     .firstbase{
@@ -57,6 +89,92 @@
         background-color: black;
     }
 
+    /*-----------------*/
+
+    @keyframes firstbase {
+        0%   {top:90%; right:0px;}
+        50%  {top: 0px; right: 0px;}
+        100% {top:0px; right:90%;}
+    }
+
+    @keyframes secondbase {
+        0%   {top:90%; right:0px;}
+        50%  {top: 0px; right: 0px;}
+        75%  {top:0px; right:90%;}
+        100% {top:90%; right:90%;}
+    }
+
+    @keyframes thirdbase {
+        0%   {bottom:0px; left:0px;}
+        100% {left:90%; bottom:0px;}
+    }
+
+    @keyframes homebase {
+        0%   {bottom:0px; right:0px;}
+        100% {bottom:90%; right:0px;}
+    }
+
+    .firstbaseman{
+        display: none;
+        position: absolute;
+        top: 0px;
+        right: 0px;
+        width: 10%;
+        height: 10%;
+        background-color: cyan;
+        animation-name: firstbase;
+        animation-duration: 2s;
+        animation-timing-function: linear;
+        animation-delay: 0s;
+        animation-fill-mode: forwards;
+    }
+
+    .secondbaseman{
+        display: none;
+        position: absolute;
+        top: 0px;
+        right: 90%;
+        width: 10%;
+        height: 10%;
+        background-color: cyan;
+        animation-name: secondbase;
+        animation-duration: 2s;
+        animation-timing-function: linear;
+        animation-delay: 0s;
+        animation-fill-mode: forwards;
+    }
+
+    .thirdbaseman{
+        display: none;
+        position: absolute;
+        bottom: 0px;
+        left: 0px;
+        width: 10%;
+        height: 10%;
+        background-color: cyan;
+        animation-name: thirdbase;
+        animation-duration: 2s;
+        animation-timing-function: linear;
+        animation-delay: 0s;
+        animation-fill-mode: forwards;
+    }
+
+    .homebaseman{
+        display: none;
+        position: absolute;
+        bottom: 0px;
+        right: 0px;
+        width: 10%;
+        height: 10%;
+        background-color: cyan;
+        animation-name: homebase;
+        animation-duration: 2s;
+        animation-timing-function: linear;
+        animation-delay: 0s;
+        animation-fill-mode: forwards;
+    }
+    /*-----------------*/
+
     .active{
         background-color: red;
     }
@@ -84,6 +202,19 @@
 
         </div>
         <div class="homebase">
+
+        </div>
+
+        <div class="firstbaseman">
+
+        </div>
+        <div class="secondbaseman">
+
+        </div>
+        <div class="thirdbaseman">
+
+        </div>
+        <div class="homebaseman">
 
         </div>
     </div>
