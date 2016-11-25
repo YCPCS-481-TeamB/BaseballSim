@@ -34,6 +34,12 @@ router.get('/docs', function(req, res, next) {
   res.render('api', { title: 'API Docs' });
 });
 
+
+/* GET leagues page */
+router.get('/leagues', function(req, res, next){
+  res.render('leagues', {title: 'BaseballSim Leagues'})
+});
+
 /* GET teams page. */
 router.get('/teams',  function(req, res, next) {
   res.render('teams', {title: 'BaseballSim Teams'});

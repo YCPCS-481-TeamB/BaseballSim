@@ -14,13 +14,23 @@
         .page {
             background-color: forestgreen;
         }
+        .page-header {
+            text-align: center;
+            color: white;
+        }
     </style>
 
 
     </head>
 <body class="page">
 <%include navbar %>
-    <h1>Leagues</h1>
+
+<div class="container" ng-controller="LeaguesController">
+    <div class="page-header well-sm">
+        <h1>Your Leagues</h1>
+    </div>
+</div>
+
 
 
 </body>
