@@ -234,8 +234,6 @@ router.post('/:id/lineup', function(req, res, next){
     var lineup = JSON.parse(req.body.lineup);
     var team_id = req.body.team_id;
 
-    console.log("LINEUP: ", lineup);
-
     LineupController.createNewLineupByGameAndTeamId(id, team_id, lineup).then(function(result){
         res.status(200).json({lineup: result});
     }).catch(function(err){

@@ -22,7 +22,7 @@ exports.createGame = function(team1_id, team2_id, field_id, league_id){
                 Promise.all([PermissionController.getOwnerForItem('teams', team1_id), PermissionController.getOwnerForItem('teams', team2_id)]).then(function(result){
                     var user1_id = result[0].rows[0].user_id;
                     var user2_id = result[1].rows[0].user_id;
-                    Promise.all([ApprovalsController.createApproval('games', game.id, user2_id), PermissionController.addPermission('games', game.id, user1_id), PermissionController.addPermission('games', game.id, user2_id)]).then(function(result){
+                    Promise.all([ApprovalModel.create('games', game.id, user2_id), PermissionController.addPermission('games', game.id, user1_id), PermissionController.addPermission('games', game.id, user2_id)]).then(function(result){
                         resolve(game);
                     }).catch(function(err){
                         reject(err);
@@ -383,7 +383,7 @@ function createApprovalsForEvent(game_id, event_id){
        PermissionController.getOwnerForItem('games', game_id).then(function(data){
            var users = data.rows;
            for(var i = 0;i<data.rows.length;i++){
-               promises.push(ApprovalsController.createApproval('events', event_id, users[i].user_id));
+               promises.push(ApprovalModel.create('gameaction', event_id, users[i].user_id));
            }
            Promise.all(promises).then(function(data){
                 //console.log(data);
@@ -436,45 +436,56 @@ exports.startGame = function(game_id){
 
 exports.doGameEvent = function(game_id, player1_id, player2_id) {
     return new Promise(function (resolve, reject) {
-        GameModel.hasEventWithType(game_id, 'start').then(function(status){
-            if(status == true){
-                if(player1_id == undefined || player2_id == undefined){
-                    GameActionModel.getLatestByGameId(game_id).then(function (gameEvent) {
-                        GameModel.getById(game_id).then(function(game){
-                            var other_team_id = 0;
-                            if(game.team1_id == gameEvent.team_at_bat){
-                                other_team_id = game.team2_id;
-                            }else{
-                                other_team_id = game.team1_id;
-                            }
-                            Promise.all([LineupController.getNextLineupPlayerByGameAndTeamId(game_id, gameEvent.team_at_bat), LineupController.getNextLineupPlayerByGameAndTeamId(game_id, other_team_id)]).then(function (result) {
-                                var player1_id = result[0].id;
-                                var player2_id = result[1].id;
-
-                                doGameEventLogic(game_id,player1_id, player2_id).then(function(game_action){
-                                    resolve(game_action);
+        ApprovalsController.hasNoOutstandingApprovals('games', game_id).then(function(allApproved){
+            if(allApproved === true){
+                GameModel.hasEventWithType(game_id, 'start').then(function(status){
+                    if(status == true){
+                        if(player1_id == undefined || player2_id == undefined){
+                            GameActionModel.getLatestByGameId(game_id).then(function (gameEvent) {
+                                GameModel.getById(game_id).then(function(game){
+                                    var other_team_id = 0;
+                                    if(game.team1_id == gameEvent.team_at_bat){
+                                        other_team_id = game.team2_id;
+                                    }else{
+                                        other_team_id = game.team1_id;
+                                    }
+                                    Promise.all([LineupController.getNextLineupPlayerByGameAndTeamId(game_id, gameEvent.team_at_bat), LineupController.getNextLineupPlayerByGameAndTeamId(game_id, other_team_id)]).then(function (result) {
+                                        var player1_id = result[0].id;
+                                        var player2_id = result[1].id;
+                                        doGameEventLogic(game_id,player1_id, player2_id).then(function(game_action){
+                                            ApprovalsController.createGameApprovalByLastGameAction(game_action.id).then(function(approval){
+                                                resolve(game_action);
+                                            }).catch(function(err){
+                                                reject(err);
+                                            });
+                                        }).catch(function(err){
+                                            reject(err);
+                                        });
+                                    }).catch(function (err) {
+                                        reject(err);
+                                    });
                                 }).catch(function(err){
                                     reject(err);
                                 });
-                            }).catch(function (err) {
+                            });
+                        }else{
+                            doGameEventLogic(game_id, player1_id, player2_id).then(function(game_action){
+                                resolve(game_action);
+                            }).catch(function(err){
                                 reject(err);
                             });
-                        }).catch(function(err){
-                            reject(err);
-                        });
-                    });
-                }else{
-                    doGameEventLogic(game_id, player1_id, player2_id).then(function(game_action){
-                        resolve(game_action);
-                    }).catch(function(err){
-                        reject(err);
-                    });
-                }
+                        }
+                    }else{
+                        reject("Game Not Started");
+                    }
+                }).catch(function(err){
+                    reject(err);
+                });
             }else{
-                reject("Game Not Started");
+                reject("Approvals Needed");
             }
         }).catch(function(err){
-           reject(err);
+            reject(err);
         });
     });
 }

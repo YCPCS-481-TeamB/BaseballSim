@@ -30,6 +30,7 @@ module.exports =  {
     getOwnerForItem : function(item_type, item_id){
         return new Promise(function(resolve, reject){
             DatabaseController.query("SELECT user_id FROM permissions WHERE item_type=$1 AND item_id=$2", [item_type, item_id]).then(function(result){
+                console.log(result);
                 resolve(result.rows[0].user_id);
             }).catch(function(err){
                 reject(err);
