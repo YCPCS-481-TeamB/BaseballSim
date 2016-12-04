@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 
 var FieldsController = require('./../Controller/FieldsController');
+var TeamModel = require('./../Models/Team');
 
 /**
  * GET for getting all fields from database
@@ -26,11 +27,18 @@ router.get('/', function(req, res, next) {
  */
 router.post('/', function(req, res, next){
     var team_id = req.body.team_id;
-    FieldsController.createRandomField(team_id).then(function(data){
-        //Returns the first and last name for the created player
-        res.status(200).json(data.rows[0]);
+    TeamModel.getById(team_id).then(function(team){
+        if(team.length > 0) {
+            FieldsController.createField(team[0].name + '\'s field', team_id).then(function (data) {
+                res.status(200).json(data);
+            }).catch(function (err) {
+                res.status(500).json("" + err);
+            });
+        }else{
+            res.status(500).json({success: false, message: "Team with that id does not exist"});
+        }
     }).catch(function(err){
-       res.status(200).json(err);
+        res.status(500).json(""+err);
     });
 });
 

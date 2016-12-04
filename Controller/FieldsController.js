@@ -1,5 +1,6 @@
 var DatabaseController = require('./DatabaseController');
 
+
 /**
  * Creates the field with the given parameters
  * @param name
@@ -7,7 +8,13 @@ var DatabaseController = require('./DatabaseController');
  * @Returning Promise.<Object> Returns a promise containing the returned player data
  */
 exports.createField = function(name, team_id){
-    return DatabaseController.query("INSERT INTO fields (name,team_id) VALUES($1, $2)", [name, team_id]);
+    return new Promise(function(resolve, reject){
+        DatabaseController.query("INSERT INTO fields (name,team_id) VALUES($1, $2) RETURNING *", [name, team_id]).then(function(result){
+            resolve(result.rows[0]);
+        }).catch(function(err){
+            reject(err);
+        });
+    });
 }
 
 /**
@@ -21,6 +28,8 @@ exports.createRandomField = function(team_id){
         DatabaseController.query("SELECT name FROM field_names WHERE isLast = 'n' OFFSET floor(random()*4) LIMIT 1").then(function(name_data){
             var name = name_data.rows[0].name;
                 resolve(DatabaseController.query("INSERT INTO fields (name,team_id) VALUES($1, $2) RETURNING *", [name, team_id]));
+            }).catch(function(err) {
+                reject(err);
             });
     	});
 }

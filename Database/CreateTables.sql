@@ -7,7 +7,6 @@ CREATE TYPE permission_type AS ENUM ('owner', 'edit', 'view', 'delete');
 CREATE TYPE approval_status AS ENUM ('approved', 'declined', 'pending');
 
 CREATE TYPE game_action_type AS ENUM ('start', 'end', 'home_run', 'triple', 'double', 'single', 'ball', 'strike', 'foul', 'strike_out', 'out', 'walk');
-
 CREATE TABLE users (id SERIAL, username VARCHAR(255), password VARCHAR(255), firstname VARCHAR(255), lastname VARCHAR(255), email VARCHAR(255), date_created TIMESTAMP DEFAULT NOW());
 
 CREATE TABLE user_tokens (id SERIAL, user_id INTEGER, token TEXT, date_created TIMESTAMP DEFAULT NOW());
@@ -52,7 +51,7 @@ CREATE TABLE fields (id SERIAL, name VARCHAR(255), team_id INTEGER, date_created
 CREATE TABLE leagues (id SERIAL, name VARCHAR(255), date_created TIMESTAMP DEFAULT NOW());
 
 CREATE TABLE lineups (id SERIAL, team_id INTEGER, game_id INTEGER, date_created TIMESTAMP DEFAULT NOW());
-CREATE TABLE lineup_items (id SERIAL, lineup_id INTEGER, player_id INTEGER, lineup_index INTEGER, already_played BOOLEAN DEFAULT FALSE, date_created TIMESTAMP DEFAULT NOW());
+CREATE TABLE lineup_items (id SERIAL, lineup_id INTEGER, player_id INTEGER, lineup_index INTEGER, already_played BOOLEAN DEFAULT FALSE, active BOOLEAN DEFAULT TRUE, is_pitcher BOOLEAN DEFAULT FALSE, date_created TIMESTAMP DEFAULT NOW());
 
 --FOR SCHEDULE OF GAMES
 CREATE TABLE schedule (id SERIAL, league_id INTEGER, date_created TIMESTAMP DEFAULT NOW());
@@ -71,3 +70,15 @@ CREATE TABLE approvals (id SERIAL, approved approval_status DEFAULT 'pending', a
 
 INSERT INTO player_names (name, isLast) VALUES ('Brandon', 'n');
 INSERT INTO player_names (name, isLast) VALUES ('Walton', 'y');
+INSERT INTO player_names (name, isLast) VALUES ('Scott', 'n');
+INSERT INTO player_names (name, isLast) VALUES ('Fitzpatrick', 'y');
+INSERT INTO player_names (name, isLast) VALUES ('Cooper', 'n');
+INSERT INTO player_names (name, isLast) VALUES ('Luetje', 'y');
+INSERT INTO player_names (name, isLast) VALUES ('Kyle', 'n');
+INSERT INTO player_names (name, isLast) VALUES ('Meyers', 'y');
+INSERT INTO player_names (name, isLast) VALUES ('Ben', 'n');
+INSERT INTO player_names (name, isLast) VALUES ('Coover', 'y');
+INSERT INTO player_names (name, isLast) VALUES ('James', 'n');
+INSERT INTO player_names (name, isLast) VALUES ('Moscola', 'y');
+INSERT INTO player_names (name, isLast) VALUES ('David', 'n');
+INSERT INTO player_names (name, isLast) VALUES ('Hovemeyer', 'y');

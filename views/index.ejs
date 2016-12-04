@@ -1,11 +1,162 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title><%= title %></title>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
-  </head>
-  <body>
-    <h1><%= title %></h1>
-    <p>Welcome to <%= title %></p>
-  </body>
+<head>
+    <title>Baseball Sim</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="stylesheets/style.css">
+    <style>
+        .page {
+            background-color: forestgreen;
+        }
+        .page-header {
+            text-align: center;
+        }
+        .slide1{
+            background-image: url('images/terry.jpg');
+            height: 500px;
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: cover;
+        }
+        .slide2{
+            background-image: url('images/BaseballField.jpg');
+            height: 500px;
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: cover;
+        }
+        .slide3{
+            background-image: url('images/vernon.jpg');
+            height: 500px;
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: cover;
+        }
+        .carousel-caption h1{
+            font-size: 5.4em;
+            font-family: 'Pacifico', cursive;
+            padding-bottom: .4em;
+        }
+        .carousel-caption p{
+            font-size: 2em;
+        }
+        .news {
+            text-align: center;
+        }
+        .well {
+            background-color: white;
+        }
+    </style>
+</head>
+<body ng-app="app" class="page">
+<%include navbar %>
+    <div class="container">
+        <div class="page-header">
+            <div class="well well-sm">
+                <h1>Welcome to BaseballSim!</h1>
+
+                <div id="theCarousel" class="carousel slide" data-ride="carousel">
+
+                    <!-- Define how many slides to put in the carousel -->
+                    <ol class="carousel-indicators">
+                        <li data-target="#theCarousel" data-slide-to="0" class="active"> </li >
+                        <li data-target="#theCarousel" data-slide-to="1"> </li>
+                        <li data-target ="#theCarousel" data-slide-to="2"> </li>
+                    </ol >
+
+                    <!-- Define the text to place over the image -->
+                    <div class="carousel-inner">
+                        <div class="item active" >
+                            <div class ="slide1"></div>
+                            <div class="carousel-caption">
+                                <h1>Baseball Sim</h1>
+                                <p>The Best Baseball Game on the Web</p>
+                                <p><a href="/login" class="btn btn-primary btn-sm">Play Now!</a></p>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="slide2"></div>
+                            <div class="carousel-caption">
+                                <h1>Create Teams!</h1>
+                                <p>Pit your team against the best of the best</p>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="slide3"></div>
+                            <div class="carousel-caption">
+                                <h1>Manage your roster</h1>
+                                <p>Hire/Fire all your players!</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Set the actions to take when the arrows are clicked -->
+                    <a class="left carousel-control" href="#theCarousel" data-slide="prev">
+                        <span class="glyphicon glyphicon-chevron-left"> </span>
+                    </a>
+                    <a class="right carousel-control" href="#theCarousel" data-slide="next">
+                        <span class="glyphicon glyphicon-chevron-right"></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <br>
+        <div class="buttons">
+            <a href="/login" class="btn btn-warning btn-lg">Click Here to Login!</a>
+            <a href="/login" class="btn btn-warning btn-lg">Signup!</a>
+        </div>
+        <br>
+        <div class="news">
+            <div class="newsTitle">
+                <div class="well well-sm">
+                    <h2>BaseballSim News:</h2>
+                </div>
+            </div>
+
+            <div class="well well-sm">
+                <h2>What is BaseballSim?</h2>
+                <p>Exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt.</p>
+            </div>
+
+            <div class="well well-sm">
+                <h2>How to Play</h2>
+                <p>Exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt.</p>
+            </div>
+
+            <div class="well well-sm">
+                <h2>Questions?</h2>
+                <p>Exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt.</p>
+            </div>
+            <footer>
+                <p class="pull-right"><a href="#">Back to top</a></p>
+                <p>&copy; Code People  <a href="#">    Privacy</a> &middot; <a href="#">Terms</a></p>
+            </footer>
+        </div>
+    </div>
+
+<!-- Placed at the end of the document so the pages load faster -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>
+<script src="../../dist/js/bootstrap.min.js"></script>
+<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+<script src="../../assets/js/ie10-viewport-bug-workaround.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+<script src="jquery/jquery.min.js"></script>
+<script src="bootstrap/js/bootstrap.min.js"></script>
+<script src="angular/angular.min.js"></script>
+<script src="angular-cookies/angular-cookies.min.js"></script>
+<script src="javascripts/app.js"></script>
+<script src="javascripts/service/UserTokenFactory.js"></script>
+<script src="javascripts/service/UserService.js"></script>
+<script src="javascripts/service/ApprovalService.js"></script>
+<script src="javascripts/controller/LoginController.js"></script>
+<script src="javascripts/controller/NavbarController.js"></script>
+</body>
 </html>
+

@@ -1,10 +1,18 @@
 var express = require('express');
+var Promise = require('bluebird').Promise;
 var router = express.Router();
 
 var GameController = require("./../Controller/GameController");
 var PermissionController = require("./../Controller/PermissionController");
 var TeamsController = require("./../Controller/TeamsController");
 var LineupController = require("./../Controller/LineupController");
+
+var GameModel = require('./../Models/Game');
+var TeamModel = require('./../Models/Team');
+var LineupModel = require('./../Models/Lineup');
+var ApprovalModel = require('./../Models/Approval');
+var PlayerPositionModel = require('./../Models/PlayerPosition');
+var GameActionModel = require('./../Models/GameAction');
 
 /**
  * GET for getting all games from database
@@ -14,8 +22,8 @@ var LineupController = require("./../Controller/LineupController");
 router.get('/', function(req, res, next) {
     var limit = req.query.limit;
     var offset = req.query.offset;
-    GameController.getGames(limit, offset).then(function(data){
-        res.status(200).json({success: true, games: data});
+    GameModel.getAll(limit, offset).then(function(result){
+        res.status(200).json({success: true, result: result});
     }).catch(function(err){
         res.status(200).json({success: false, message:""+ err});
     });
@@ -34,8 +42,8 @@ router.post('/', function(req, res, next){
     var team2_id = req.body.team2_id;
     var field_id = req.body.field_id;
     var league_id = req.body.league_id;
-    GameController.createGame(team1_id, team2_id, field_id, league_id).then(function(data){
-        res.status(200).json({success: true, game: data});
+    GameController.createGame(team1_id, team2_id, field_id, league_id).then(function(result){
+        res.status(200).json({success: true, game: result});
     }).catch(function(err){
         res.status(200).json({success: false, error: err});
     });
@@ -62,7 +70,7 @@ router.post('/:id/start', function(req, res, next){
 router.get('/events/:event_id/positions', function(req, res, next){
     var event_id = req.params.event_id;
 
-    GameController.getPlayerPositionByGameEventId(event_id).then(function(data){
+    PlayerPositionModel.getByGameActionId(event_id).then(function(data){
         res.status(200).json({positions: data});
     }).catch(function(err){
         res.status(200).json(err);
@@ -75,15 +83,14 @@ router.get('/events/:event_id/positions', function(req, res, next){
  */
 router.get('/:id/positions/latest', function(req, res, next){
     var id = req.params.id;
-
-    GameController.getLatestEventForGame(id).then(function(result){
-        GameController.getPlayerPositionByGameEventId(result.id).then(function(data){
-            res.status(200).json({positions: data});
+    GameActionModel.getLatestByGameId(id).then(function(game_action){
+        PlayerPositionModel.getByGameActionId(game_action.id).then(function(player_position){
+            res.status(200).json({positions: player_position});
         }).catch(function(err){
             res.status(200).json(err);
         });
     }).catch(function(err){
-        res.status(500).json(err);
+        res.status(200).json(err);
     });
 });
 
@@ -94,9 +101,8 @@ router.get('/:id/positions/latest', function(req, res, next){
  */
 router.get('/:id/events', function(req, res, next){
     var id = req.params.id;
-
-    GameController.getEventsByGameId(id).then(function(data){
-        res.status(200).json(data);
+    GameActionModel.getAllByGameId(id).then(function(data){
+        res.status(200).json({events: data});
     }).catch(function(err){
         res.status(200).json(err);
     });
@@ -109,8 +115,8 @@ router.get('/:id/events', function(req, res, next){
 router.get('/:id/events/latest', function(req, res, next){
     var id = req.params.id;
 
-    GameController.getLatestEventForGame(id).then(function(data){
-        res.status(200).json(data);
+    GameActionModel.getLatestByGameId(id).then(function(data){
+        res.status(200).json({events: data});
     }).catch(function(err){
         res.status(200).json(err);
     });
@@ -122,8 +128,9 @@ router.get('/:id/events/latest', function(req, res, next){
  */
 router.get('/:id/approvals/state', function(req, res, next){
     var id = req.params.id;
-    GameController.getLatestEventApprovalsForGame(id).then(function(data){
-        res.status(200).json(data);
+
+    ApprovalModel.getAllByTypeAndItemId('games', id).then(function(data){
+        res.status(200).json({approvals: data});
     }).catch(function(err){
         res.status(200).json(err);
     });
@@ -139,40 +146,17 @@ router.post('/:id/events/next', function(req, res, next){
     var id = req.params.id;
     var player1_id = req.body.player1_id;
     var player2_id = req.body.player2_id;
-
-    if(player1_id && player2_id){
-        GameController.doGameEvent(id, player1_id, player2_id).then(function(data){
-            res.status(200).json(data);
-        }).catch(function(err){
-            res.status(200).json("" + err);
-        });
-    }else{
-        GameController.getGameById(id).then(function(game){
-                LineupController.getNextLineupPlayerByGameAndTeamId(game[0].id, game[0].team1_id).then(function(lineup_player1){
-                    console.log("Lineup Team 1: ", lineup_player1);
-                    LineupController.getNextLineupPlayerByGameAndTeamId(game[0].id, game[0].team2_id).then(function(lineup_player2){
-                        console.log("Lineup Team 2: ", lineup_player2);
-                        GameController.doGameEvent(id, lineup_player1.id, lineup_player2.id).then(function(data){
-                            res.status(200).json(data);
-                        }).catch(function(err){
-                            res.status(200).json("Game Event Cannot Happen: " + err);
-                        });
-                    }).catch(function(err){
-                        res.status(500).json("Lineup 2 cannot be determined: " + err);
-                    });
-                }).catch(function(err){
-                    res.status(500).json("Lineup 1 Cannot be determined: " + err);
-                });
-        }).catch(function(err){
-            res.status(200).json("Game Not Found: " + err);
-        });
-    }
+    GameController.doGameEvent(id, player1_id, player2_id).then(function(data){
+        res.status(200).json(data);
+    }).catch(function(err){
+        res.status(500).json("" + err);
+    });
 });
 
 router.get('/:id/events/latest', function(req, res, next){
     var id = req.params.id;
 
-    GameController.getLatestGameActionByGameId(id).then(function(data){
+    GameActionModel.getLatestByGameId(id).then(function(data){
         res.status(200).json(data);
     }).catch(function(err){
         res.status(200).json("" + err);
@@ -183,24 +167,55 @@ router.get("/:id/teams/:team_id/lineup", function(req, res, next){
     var id = req.params.id;
     var team_id = req.params.team_id;
 
-    LineupController.getLineupByGameAndTeamId(id, team_id).then(function(data){
-        res.status(200).json(data);
+    LineupModel.getByGameAndTeamId(id, team_id).then(function(lineup){
+        LineupModel.getLineupPlayersById(lineup.id).then(function(players){
+            res.status(200).json(players);
+        }).catch(function(err){
+           reject(err);
+        });
     }).catch(function(err){
         res.status(500).json("" + err);
     });
+});
+
+router.get("/:id/users/:user_id/team", function(req, res, next){
+    var id = req.params.id;
+    var user_id = req.params.user_id;
+
+    TeamModel.getByGameAndUserId(id, user_id).then(function(team){
+        TeamModel.getPlayers(team.id).then(function(players){
+            res.status(200).json({success: true, players: players});
+        }).catch(function(err){
+            res.status(500).json({success: false, message: "" + err});
+        });
+    }).catch(function(err){
+        res.status(500).json({success: false, message: "" + err});
+    })
 });
 
 router.get("/:id/users/:user_id/lineup", function(req, res, next){
     var id = req.params.id;
     var user_id = req.params.user_id;
 
-    LineupController.getLineupByGameAndTeamId(id, user_id).then(function(data){
-        res.status(200).json(data);
+    LineupModel.getByGameAndUserId(id, user_id).then(function(lineup){
+        LineupModel.getLineupPlayersById(lineup.id).then(function(players){
+            res.status(200).json(players);
+        }).catch(function(err){
+            res.status(500).json(err);
+        });
     }).catch(function(err){
         res.status(500).json("" + err);
     });
 });
 
+//router.post("/:id/autoplay", function(req, res, next){
+//    var id = req.params.id;
+//    GameController.autoPlay(id).then(function(result){
+//        res.status(200).json(result);
+//    }).catch(function(err){
+//       res.status(500).json(err);
+//    });
+//});
 
 /**
  * Returns he game from the database with the given id value
@@ -209,7 +224,7 @@ router.get("/:id/users/:user_id/lineup", function(req, res, next){
  */
 router.get('/:id', function(req, res, next){
     var id = req.params.id;
-    GameController.getGameById(id).then(function(data){
+    GameModel.getById(id).then(function(data){
         res.status(200).json({id: id, game: data});
     }).catch(function(err){
         res.status(200).json({success: false,id: id, message:""+ err});
@@ -223,11 +238,34 @@ router.get('/:id', function(req, res, next){
  */
 router.delete('/:id', function(req, res, next){
     var id = req.params.id;
-    GameController.deleteGamesById(id).then(function(data){
+    GameModel.deleteById(id).then(function(data){
         res.status(200).json({id: id, game: data});
     }).catch(function(err){
         res.status(200).json({success: false,id: id, message:""+ err});
     });
+});
+
+router.post('/:id/lineup', function(req, res, next){
+    var id = req.params.id;
+    var lineup = JSON.parse(req.body.lineup);
+    var team_id = req.body.team_id;
+
+    LineupController.createNewLineupByGameAndTeamId(id, team_id, lineup).then(function(result){
+        res.status(200).json({lineup: result});
+    }).catch(function(err){
+        res.status(200).json(err);
+    })
+
+});
+
+router.post('/:id/autoplay', function(req, res, next){
+    var id = req.params.id;
+
+    GameController.autoPlay(id).then(function(result){
+        res.status(200).json(result);
+    }).catch(function(err){
+        res.status(500).json(err);
+    })
 });
 
 

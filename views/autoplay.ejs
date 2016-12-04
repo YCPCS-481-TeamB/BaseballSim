@@ -1,0 +1,68 @@
+<html>
+<head>
+    <title><%=title%></title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/stylesheets/style.css">
+</head>
+<body ng-app="app">
+<% include navbar %>
+
+<div class="container" ng-controller="AutoPlayController">
+
+    <div class="row">
+        <div class="col-sm-4">
+            <strong>Team at Bat: {{team_at_bat}}</strong>
+            <BR>
+            <strong>Team 1: {{team1_score}}</strong>
+            <strong>Team 2: {{team2_score}}</strong>
+            <BR>
+            <strong>Balls: {{balls}}</strong>
+            <strong>Strikes: {{strikes}}</strong>
+            <strong>Outs: {{outs}}</strong>
+            <BR>
+            <game-view-directive data-gameid="id">The Canvas Is Not Supported!</game-view-directive>
+            <BR>
+            <strong>Base 1: {{player_positions.onfirst_id}}</strong>
+            <strong>Base 2: {{player_positions.onsecond_id}}</strong>
+            <strong>Base 3: {{player_positions.onthird_id}}</strong>
+            <BR>
+            <!--<button class="btn btn-success" ng-show="showNextButton" ng-click="nextGameEvent()">Next Game Action</button>-->
+
+            <table class="table table-condensed">
+                <tr><th>Player Name</th></tr>
+                <tr ng-repeat="player in lineup" ng-class="{active : player.already_played == false}"><td>{{player.player_id}}</td></tr>
+            </table>
+
+        </div>
+        <div class="col-sm-8">
+            <div class="scroll-view">
+                <button class="btn btn-success form-control" ng-show="gameEvents.length == 0" ng-click="startGame()">Start Game</button>
+                <div class="alert alert-success" ng-repeat="event in gameEvents">
+                    {{event.type}} {{event.message}}
+                    Team 1 Score: {{event.team1_score}} Team 2 Score: {{event.team2_score}}
+                    Balls: {{event.balls}}
+                    Strikes: {{event.strikes}}
+                    Outs: {{event.outs}}
+                    Inning: {{event.inning}}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- strike ball foul single double triple home_run out-->
+
+    TEST
+    {{opts}}
+
+
+</div>
+</body>
+
+<% include footer%>
+</html>

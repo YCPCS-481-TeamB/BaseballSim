@@ -1,7 +1,14 @@
-var PlayGameController = App.controller('PlayGameController', function($scope,$interval, $location, UserTokenFactory, GameService, TeamService) {
+var PlayGameController = App.controller('PlayGameController', function($scope,$interval, $location, UserTokenFactory, GameService, TeamService, ApprovalService) {
     var url = $location.absUrl();
     var id = url.substring(url.lastIndexOf('/')+1);
     $scope.game_id = id;
+    $scope.showNextButton = true;
+    $scope.showLineupChooser = false;
+
+    var temp = ['strike','ball','foul','single','double','triple','home_run','out'];
+
+    $scope.opts = {};
+
     $scope.startGame = function(){
         UserTokenFactory.getUserData().then(function(user) {
             GameService.startGameEvent(id).then(function (response) {
@@ -16,25 +23,54 @@ var PlayGameController = App.controller('PlayGameController', function($scope,$i
         });
     }
 
+    $scope.team = [];
+
+    UserTokenFactory.getUserData().then(function(user){
+        GameService.getTeamPlayersByUserId(id, user.id).then(function(team){
+            //console.log(team.data.players);
+            $scope.team = team.data.players;
+        });
+    });
+
     $scope.nextGameEvent = function(){
         UserTokenFactory.getUserData().then(function(user) {
-            GameService.nextGameEvent(id).then(function (data) {
-            }).catch(function (err) {
-                console.log(err);
-                alert(err);
+            ApprovalService.getAll().then(function(approvals){
+                var approvals = approvals.data.approvals;
+                console.log("Approvals: " + approvals);
+                var gameApprovals = approvals.filter(function(item){
+                    return (item.item_type == 'games' && item.item_id == id);
+                });
+                if(gameApprovals.length > 0){
+                    var approval = gameApprovals[0];
+                    ApprovalService.setStatus(approval.id, 'approved').then(function(){
+                        GameService.nextGameEvent(id).then(function (data) {
+
+                        }).catch(function (err) {
+                            console.log(err);
+                            alert(err.data);
+                        });
+                    });
+                }else{
+                    GameService.nextGameEvent(id).then(function (data) {
+
+                    }).catch(function (err) {
+                        console.log(err);
+                        alert(err.data);
+                    });
+                }
             });
+
         });
     }
 
     var checkNextActionPlayable = function(){
         UserTokenFactory.getUserData().then(function(user) {
             GameService.getPlayableState(id).then(function (response) {
-                if (response.data && response.data.filter(function (item) {
-                        return !item.approved == "approved";
-                    }).length == 0) {
-                    $scope.showNextButton = true;
-                } else {
-                    $scope.showNextButton = false;
+                var approvals = response.data.approvals;
+                if (approvals){
+                    $scope.showNextButton = approvals.filter(function (item) {return item.approved != "approved" && item.approver_user_id != user.id;}).length == 0;
+                }else{
+                    console.log("error: ", response);
                 }
             }).catch(function (err) {
                 console.log(err);
@@ -46,7 +82,6 @@ var PlayGameController = App.controller('PlayGameController', function($scope,$i
         UserTokenFactory.getUserData().then(function(user){
             GameService.getLineup(id, user.id).then(function(data){
                 $scope.lineup = data.data;
-                console.log("LINEUP", $scope.lineup);
             }).catch(function(err){
                 console.log(err);
             });
@@ -59,12 +94,19 @@ var PlayGameController = App.controller('PlayGameController', function($scope,$i
         $scope.balls = $scope.gameEvents[0].balls;
         $scope.strikes = $scope.gameEvents[0].strikes;
         $scope.outs = $scope.gameEvents[0].outs;
+        $scope.team_at_bat = $scope.gameEvents[0].team_at_bat;
     }
 
     var updateGameEvents = function(){
         GameService.loadEventsByGameId(id).then(function (response) {
-            $scope.gameEvents = response.data;
+            $scope.gameEvents = response.data.events;
             $scope.gameEvents.reverse();
+
+            for(var i = 0;i<temp.length;i++){
+                $scope.opts[temp[i]] = $scope.gameEvents.filter(function(item){
+                    return item.type == temp[i];
+                }).length;
+            }
         });
     }
 
@@ -76,6 +118,13 @@ var PlayGameController = App.controller('PlayGameController', function($scope,$i
             });
         }
     }
+
+    //$scope.loadPlayerData = function(lineup_item){
+    //    lineup_item.player = {};
+    //    PlayerService.getById(lineup_item.player_id).then(function(player){
+    //
+    //    })
+    //}
 
     updatePlayerPositions();
     checkNextActionPlayable();

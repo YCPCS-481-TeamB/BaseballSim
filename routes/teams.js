@@ -3,12 +3,14 @@ var router = express.Router();
 
 var TeamsController = require('./../Controller/TeamsController');
 var PlayersController = require('./../Controller/PlayersController');
-var PermissionController = require('./../Controller/PermissionController');
+var PermissionModel = require('./../Models/Permission');
+
+var TeamModel = require('./../Models/Team');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-	TeamsController.getTeams().then(function(data) {
-		res.status(200).json({teams: data});
+	TeamModel.getAll().then(function(data) {
+		res.status(200).json({success: true, teams: data});
 	}).catch(function(err){
 		res.status(200).json({success: false, message:""+ err});
 	});
@@ -18,11 +20,11 @@ router.post('/', function(req, res, next){
 	var teamname = req.body.teamname || "Untitled";
 	var league_id = req.body.league_id || 0;
 	TeamsController.buildRandomTeam(teamname, league_id).then(function(response){
-		PermissionController.addPermission('teams', response.id, req.userdata.id).then(function(data){
+		PermissionModel.create(req.userdata.id,response.id,'teams').then(function(data) {
 			res.status(200).json({success: true, teams: response});
 		}).catch(function(err){
-			res.status(200).json({success: false, error:""+ err});
-		})
+			reject(err);
+		});
 	}).catch(function(err){
 		res.status(200).json({success: false, error:""+ err});
 	});
@@ -31,11 +33,10 @@ router.post('/', function(req, res, next){
 router.put('/:id', function(req, res, next){
 	var id = req.params.id;
 	var teamname = req.body.teamname;
-	console.log(teamname);
-	TeamsController.updateTeam(id, teamname).then(function(response){
+	TeamModel.update(id, {name: teamname}).then(function(response){
 		res.status(200).json({success: true, team: response});
 	}).catch(function(err){
-		res.status(200).json({success: false, error: err});
+		res.status(200).json({success: false, error: ""+err});
 	});
 });
 
@@ -45,7 +46,7 @@ router.put('/:id', function(req, res, next){
  */
  router.get('/:id', function(req, res, next){
 	 var id = req.params.id;
-	 TeamsController.getTeamById(id).then(function(data){
+	 TeamModel.getById(id).then(function(data){
 		 res.status(200).json({id: id, team: data});
 	 }).catch(function(err){
 		 res.status(200).json({success: false, id: id, message:""+ err});
@@ -60,11 +61,7 @@ router.put('/:id', function(req, res, next){
 router.delete('/:id', function(req, res, next){
 	var id = req.params.id;
 	TeamsController.deleteTeamById(id).then(function(data){
-		PlayersController.deletePlayerByTeamId(id).then(function(data){
-			res.status(200).json({id: id, message: "Team Deleted"});
-		}).catch(function(err){
-			res.status(200).json(err);
-		});
+		res.status(200).json({id: id, message: "Team Deleted"});
 	}).catch(function(err){
 		res.status(200).json({success: false,id: id, message:""+ err});
 	});
@@ -77,11 +74,12 @@ router.delete('/:id', function(req, res, next){
 
 router.get('/:id/players', function(req, res, next){
 	var id = req.params.id;
-	TeamsController.getPlayersByTeamId(id).then(function(data){
+	TeamModel.getPlayers(id).then(function(data){
 		res.status(200).json({id: id, team: data});
 	}).catch(function(err){
 		res.status(200).json({success: false, id: id, message:""+ err});
 	});
 });
+
 
 module.exports = router;

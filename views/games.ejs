@@ -9,17 +9,60 @@
     <meta name="author" content="">
     <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="stylesheets/style.css">
+    <style>
+        .page {
+            background-color: forestgreen;
+            color: white;
+        }
+        .overlay {
+            color: black;
+            text-align: center;
+            width: 100%;
+            padding-left: 100px;
+            padding-right: 100px;
+        }
+        .canvas {
+            width: 100%;
+            text-align:center;
+        }
+        .h2 {
+            float: left;
+        }
+    </style>
 </head>
-<body ng-app="app">
+<body ng-app="app" class="page">
     <% include navbar%>
 
     <div class="container" ng-controller="GameController">
 
-        <div class="">
+        <div class="canvas">
+
             <canvas id="FieldCanvas" width="200" height="200">
                 Canvas Element Is Not Supported On Your Browser
             </canvas>
+            <h2>Your Games</h2>
         </div>
+
+        <div class="overlay" ng-show="showSelectedGame">
+            <button class="btn btn-danger pull-right" ng-click="showSelectedGame = false">X</button>
+
+        </div>
+        <table class="table table-responsive">
+            <thead>
+            <tr>
+                <th>Watch</th><th>Game Message</th><th>Team 1</th><th>Team 2</th>
+            </tr>
+            </thead>
+            <tbody ng-repeat="game in games">
+                <!--<tr ng-click="showSelectedGame=true" ng-show="game.message">Test</tr>-->
+                <tr ng-init="getGameMessage(game)" ng-click="showSelectedGame=true" >
+                    <td><a href="/games/{{game.id}}"><button class="btn  btn-primary glyphicon glyphicon-play"></button></a></td>
+                    <td>{{game.message}}</td>
+                    <td>{{game.team1_id}}</td>
+                    <td>{{game.team2_id}}</td>
+                </tr>
+            </tbody>
+        </table>
 
         <button class="btn btn-success form-control" ng-click="showCreateGame = true">Create Game</button>
 
@@ -27,37 +70,23 @@
             <button class="btn btn-danger pull-right" ng-click="showCreateGame = false">X</button>
             <h2 class="form-signin-heading">Create Games</h2>
             <form class="form-group">
-                <label for="myTeamSelect">My Team</label>
+                <label for="myTeamSelect">Team 1</label>
+                <br>
                 <select id="myTeamSelect" class="form-control" ng-model="myTeamSelect">
                     <option ng-repeat="team in myTeams track by team.id" value="{{team.id}}">{{team.name}}</option>
                 </select>
-
-                <label for="theirTeamSelect">My Team</label>
+                <br>
+                <label for="theirTeamSelect">Team 2</label>
+                <br>
                 <select id="theirTeamSelect" class="form-control" ng-model="theirTeamSelect">
                     <option ng-repeat="team in theirTeams track by team.id" value="{{team.id}}">{{team.name}}</option>
                 </select>
+                <br>
                 <button class="btn btn-success" ng-click="createNewGame(myTeamSelect, theirTeamSelect); showCreateGame = false">Create Game</button>
             </form>
         </div>
-
-        <div class="overlay" ng-show="showSelectedGame">
-            <button class="btn btn-danger pull-right" ng-click="showSelectedGame = false">X</button>
-
-        </div>
-
-        <table class="table table-responsive table-hover">
-            <thead>
-            <tr>
-                <th>ID</th><th>Team 1</th><th>Team 2</th><th></th>
-            </tr>
-            </thead>
-            <tbody ng-repeat="game in games">
-                <tr ng-click="showSelectedGame=true">
-                    <td><a href="/games/{{game.id}}">{{game.id}}</a></td><td>{{game.team1_id}}</td><td>{{game.team2_id}}</td>
-                </tr>
-            </tbody>
-        </table>
     </div>
+
 </body>
 
 <script>

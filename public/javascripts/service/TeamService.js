@@ -4,6 +4,10 @@ var TeamService = App.service('TeamService', function($http, UserTokenFactory){
         return $http.get('/api/teams', {headers: {"x-access-token" : UserTokenFactory.getToken()}});
     }
 
+    this.getById = function(id){
+        return $http.get('/api/teams/'+id, {headers: {"x-access-token" : UserTokenFactory.getToken()}});
+    }
+
     this.getTeamByUserId = function(user_id){
         return $http.get('/api/users/'+ user_id +'/teams', {headers: {"x-access-token" : UserTokenFactory.getToken()}});
     }

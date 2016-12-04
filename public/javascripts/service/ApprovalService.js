@@ -7,5 +7,4 @@ var ApprovalService = App.service('ApprovalService', function($http, UserTokenFa
     this.setStatus = function(approval_id, status){
         return $http.post("/api/approvals/" + approval_id +"/status", {status: status}, {headers: {"x-access-token" : UserTokenFactory.getToken()}});
     }
-
 });

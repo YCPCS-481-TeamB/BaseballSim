@@ -1,5 +1,7 @@
 var TeamsController = App.controller('TeamsController', function($scope, UserTokenFactory, TeamService){
 
+    $scope.selectedTeam;
+
     UserTokenFactory.getUserData().then(function(user){
         TeamService.getTeamByUserId(user.id).then(function(response){
             console.log("User Teams", response);
@@ -40,4 +42,26 @@ var TeamsController = App.controller('TeamsController', function($scope, UserTok
         });
     }
 
+    $scope.getPlayersByTeamId = function(team) {
+        TeamService.getPlayers(team.id).then(function(response) {
+            console.log(response.data.team);
+            team.players = response.data.team;
+            $scope.players = response.data.team;
+            $scope.selectedTeam = team;
+            console.log($scope.players);
+        }).catch(function(err) {
+            console.log(err);
+        });
+    }
+
+    $scope.loadPlayerAttrs = function(player){
+        console.log("loading players");
+        if(player && player.id) {
+            var attrs = PlayerService.getAttrByPlayerId(player.id).then(function (response) {
+                console.log(response.data.attributes);
+                player.attrs = response.data.attributes;
+            });
+        }
+    }
 });
+

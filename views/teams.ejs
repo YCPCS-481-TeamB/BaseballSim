@@ -9,36 +9,60 @@
     <meta name="author" content="">
     <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="stylesheets/style.css">
+    <style>
+        .page {
+            background-color: forestgreen;
+            color: white;
+        }
+        .page-header {
+            text-align: center;
+        }
+        .modal {
+            color: black;
+        }
+        .form-group {
+            color: black;
+            text-align: center;
+            width: 100%;
+            padding-left: 100px;
+            padding-right: 100px;
+        }
+        .form-control {
+            text-align: center;
+            padding-left: 100px;
+            padding-right: 100px;
+        }
+        .playerTable {
+            font-size: 80%;
+        }
+    </style>
 </head>
-<body ng-app="app">
+<body ng-app="app" class="page">
 <%include navbar %>
 
 <div class="container" ng-controller="TeamsController">
 
-    <button class="btn btn-success form-control" ng-click="showTeamCreate=true;">Create New Team</button>
-
-    <div class="overlay" ng-show="showTeamCreate === true">
-        <button class="btn btn-danger pull-right" ng-click="showTeamCreate=false;">X</button>
-
-        <form class="form-group">
-            <h2 class="form-signin-heading">Create Team</h2>
-            <label for="teamNameInput">Team Name</label>
-            <input type="text" id="teamNameInput" class="form-control" ng-model="teamNameInput" placeholder="Team Name"/>
-            <label for="LeagueIdInput">Team Name</label>
-            <input type="text" id="LeagueIdInput" class="form-control" ng-model="leagueIdInput" placeholder="League Id"/>
-            <button class="btn btn-success form-control" ng-click="createNewTeam(teamNameInput, leagueIdInput); showTeamCreate=false">Create Team</button>
-        </form>
+    <div class="page-header well-sm">
+        <h1>Your Teams</h1>
     </div>
 
     <table class="table table-responsive">
         <thead>
             <tr>
-                <th>ID</th><th>Team Name</th><th>League ID</th><th></th>
+                <th>ID</th><th>Team Name</th><th>Roster</th><th>League ID</th><th>Edit Team</th>
             </tr>
         </thead>
         <tbody ng-repeat="team in teams">
-            <tr ng-if="!team.edit || team.edit == false">
-                <td>{{team.id}}</td><td>{{team.name}}</td><td>{{team.league_id}}</td>
+            <tr ng-if="!team.edit || team.edit == false && !team.view || team.view == false">
+                <td>{{team.id}}</td>
+                <td>{{team.name}}</td>
+                <!-- <td><button class="btn btn-primary" ng-click="showPlayers(team)">
+                        View
+                    </button></td> -->
+                <td>
+                    <button type="button" class="btn btn-primary" ng-click="team.view=!team.view; getPlayersByTeamId(team) ">View</button>
+                </td>
+                <td>{{team.league_id}}</td>
                 <td><button class="btn  btn-primary glyphicon glyphicon-pencil" ng-click="team.edit=!team.edit"></button></td>
             </tr>
             <tr ng-if="team.edit == true">
@@ -47,11 +71,101 @@
                 <td><input type="text" ng-model="team.league_id" ng-bind="team.league_id"></td>
                 <td>
                     <button class="btn  btn-primary glyphicon glyphicon-floppy-disk" ng-click="team.edit=!team.edit; updateTeam(team)"></button>
+                </td>
+                <td>
                     <button class="btn  btn-danger glyphicon glyphicon-trash" ng-click="team.edit=!team.edit; deleteTeam(team)"></button>
                 </td>
             </tr>
+
+            <tr class="playerTable" ng-if="team.view == true">
+                <td>ID</td>
+                <td>Player Name</td>
+                <td>Position</td>
+                <td>Team Name</td>
+                <td>Skills</td>
+                <td>Drop</td>
+            </tr>
+            <tr class="playerTable" ng-repeat="player in team.players">
+                <td ng-if="team.view == true">{{player.id}}</td>
+                <td ng-if="team.view == true">{{player.firstname}} {{player.lastname}}</td>
+                <td ng-if="team.view == true">{{player.position}}</td>
+                <td ng-if="team.view == true">{{team.name}}</td>
+                <td ng-if="team.view == true">
+                    <button type="button" class="btn btn-primary" ng-click="team.view=!team.view; loadPlayerAttrs(player)">Show</button>
+                    <h2 ng-repeat="attr in player.attrs">
+                        {{attr.name}}
+                    </h2>
+                </td>
+                <td ng-if="team.view == true">
+                    <button class="btn  btn-danger glyphicon glyphicon-trash" ng-click="#"></button>
+                </td>
+            </tr>
+
+
         </tbody>
-    </table>
+        </table>
+
+    <button class="btn btn-primary form-control" ng-click="showTeamCreate=true;">Create New Team</button>
+    <div class="overlay" ng-show="showTeamCreate === true">
+        <button class="btn btn-danger pull-right" ng-click="showTeamCreate=false;">X</button>
+
+        <form class="form-group">
+            <h2 class="form-signin-heading">Create Team</h2>
+            <label for="teamNameInput">Team Name</label>
+            <br>
+            <input type="text" id="teamNameInput" class="form-control" ng-model="teamNameInput" placeholder="Team Name"/>
+            <br>
+            <label for="LeagueIdInput">League ID</label>
+            <br>
+            <input type="text" id="LeagueIdInput" class="form-control" ng-model="leagueIdInput" placeholder="League Id"/>
+            <br>
+            <button class="btn btn-success form-control" ng-click="createNewTeam(teamNameInput, leagueIdInput); showTeamCreate=false">Create Team</button>
+        </form>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="myModal" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Roster</h4>
+                </div>
+                <div class="modal-body">
+                    <tr><td>{{selectedTeam.players}}</td></tr>
+                    <tr ng-repeat="player in selectedTeam.players">
+                        <td>{{player.firstname}} {{player.lastname}}</td>
+                        <td>{{player.position}}</td>
+                    </tr>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!--
+    <div class="teamStats well-lg">
+        <h1>Team Stats</h1>
+        <table class="table table-responsive">
+            <thead>
+            <tr>
+                <th>Team</th><th>Wins</th><th>Losses</th><th>Win%</th>
+            </tr>
+            </thead>
+            <tbody ng-repeat="team in teams">
+                <td>{{team.name}}</td>
+                <td>{{team.wins}}</td>
+                <td>{{team.losses}}</td>
+                <td>{{team.winpct}}</td>
+            </tbody>
+        </table>
+    </div>
+    -->
 </div>
 
 </body>
