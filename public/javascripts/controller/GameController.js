@@ -30,6 +30,18 @@ var GameController = App.controller('GameController', function($scope, UserToken
         });
     }
 
+    $scope.getGameMessage = function(game){
+        game.message = "Loading...";
+        TeamService.getById(game.team1_id).then(function(team1){
+            var team1 = team1.data.team[0];
+            TeamService.getById(game.team2_id).then(function(team2){
+                var team2 = team2.data.team[0];
+                game.message = "Game " + game.id + ": "  + team1.name + " against " + team2.name;
+                console.log(game.message);
+            });
+        });
+    }
+
     $scope.createNewGame = function(team1_id, team2_id){
         GameService.create(team1_id, team2_id, 0, 0).then(function(response){
             $scope.games.push(response.data.game);

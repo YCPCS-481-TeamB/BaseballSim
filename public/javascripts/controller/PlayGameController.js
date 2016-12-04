@@ -1,4 +1,4 @@
-var PlayGameController = App.controller('PlayGameController', function($scope,$interval, $location, UserTokenFactory, GameService, TeamService) {
+var PlayGameController = App.controller('PlayGameController', function($scope,$interval, $location, UserTokenFactory, GameService, TeamService, ApprovalService) {
     var url = $location.absUrl();
     var id = url.substring(url.lastIndexOf('/')+1);
     $scope.game_id = id;
@@ -15,7 +15,6 @@ var PlayGameController = App.controller('PlayGameController', function($scope,$i
                 if (typeof response.data == 'object') {
                     $scope.gameEvents.push(response.data);
                 } else {
-                    console.log(response.data);
                     alert(response.data);
                 }
             }).catch(function (err) {
@@ -28,18 +27,39 @@ var PlayGameController = App.controller('PlayGameController', function($scope,$i
 
     UserTokenFactory.getUserData().then(function(user){
         GameService.getTeamPlayersByUserId(id, user.id).then(function(team){
-            console.log(team.data.players);
+            //console.log(team.data.players);
             $scope.team = team.data.players;
         });
     });
 
     $scope.nextGameEvent = function(){
         UserTokenFactory.getUserData().then(function(user) {
-            GameService.nextGameEvent(id).then(function (data) {
-            }).catch(function (err) {
-                console.log(err);
-                alert(err.data);
+            ApprovalService.getAll().then(function(approvals){
+                var approvals = approvals.data.approvals;
+                console.log("Approvals: " + approvals);
+                var gameApprovals = approvals.filter(function(item){
+                    return (item.item_type == 'games' && item.item_id == id);
+                });
+                if(gameApprovals.length > 0){
+                    var approval = gameApprovals[0];
+                    ApprovalService.setStatus(approval.id, 'approved').then(function(){
+                        GameService.nextGameEvent(id).then(function (data) {
+
+                        }).catch(function (err) {
+                            console.log(err);
+                            alert(err.data);
+                        });
+                    });
+                }else{
+                    GameService.nextGameEvent(id).then(function (data) {
+
+                    }).catch(function (err) {
+                        console.log(err);
+                        alert(err.data);
+                    });
+                }
             });
+
         });
     }
 
@@ -48,7 +68,7 @@ var PlayGameController = App.controller('PlayGameController', function($scope,$i
             GameService.getPlayableState(id).then(function (response) {
                 var approvals = response.data.approvals;
                 if (approvals){
-                    $scope.showNextButton = approvals.filter(function (item) {return !item.approved == "approved";}).length == 0;
+                    $scope.showNextButton = approvals.filter(function (item) {return item.approved != "approved" && item.approver_user_id != user.id;}).length == 0;
                 }else{
                     console.log("error: ", response);
                 }
@@ -98,6 +118,13 @@ var PlayGameController = App.controller('PlayGameController', function($scope,$i
             });
         }
     }
+
+    //$scope.loadPlayerData = function(lineup_item){
+    //    lineup_item.player = {};
+    //    PlayerService.getById(lineup_item.player_id).then(function(player){
+    //
+    //    })
+    //}
 
     updatePlayerPositions();
     checkNextActionPlayable();

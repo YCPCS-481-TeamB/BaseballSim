@@ -227,7 +227,7 @@
 
 
 
-                        <button class="btn btn-success" disabled ng-show="showNextButton" ng-click="nextGameEvent()">Next Game Action</button>
+                        <button class="btn btn-success" ng-class="{disabled: !showNextButton}" ng-show="showNextButton" ng-click="nextGameEvent()">Next Game Action</button>
                     </div>
                 </div>
             </div>
