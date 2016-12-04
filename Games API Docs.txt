@@ -1,0 +1,187 @@
+>>>>>-- GAMES --<<<<<
+
+GET - api/games
+params -
+form-data - N/A
+description - returns all games
+
+RETURNS:
+games: {
+
+}
+
+---------------------
+
+POST - api/games
+params - 
+form data - team1_id, team2_id, field_id, league_id
+team1_id - ID for Team 1
+team2_id - ID for Team 2
+field_id - ID for a field (can be set to 0)
+league_id - ID for the League (can be set to 0)
+description - posts the new game
+
+RETURNS:
+games: {
+
+}
+
+---------------------
+
+POST - api/:id/start
+params: 
+	:id - the game_id
+form data - game_id
+description - posts the game's start
+
+RETURNS:
+games: {
+
+}
+
+---------------------
+
+GET - api/events/:event_id/positions
+params:
+	:event_id - the event_id
+description - returns positions of the base runners
+			by the event's ID
+
+RETURNS:
+positions: {
+
+}
+
+
+
+---------------------
+
+GET - api/:id/positions/latest
+params:
+	:id - the game_event ID
+description - returns the lastest positions of 
+			the base runners by the event's ID
+
+RETURNS:
+positions: {
+
+}
+
+---------------------
+
+GET - api/:id/events
+params:
+	:id - the game ID
+description - returns all game events for a game
+
+RETURNS:
+events: {
+
+}
+
+---------------------
+
+GET - api/:id/events/lastest
+params:
+	:id - the game ID
+description - returns the last game event for a game
+
+RETURNS:
+events: {
+
+}
+
+---------------------
+
+GET - api/:id/approvals/state
+params:
+	:id - the game ID
+description - returns the last game event approval
+			for a game
+
+RETURNS:
+events: {
+
+}
+
+---------------------
+
+POST - api/:id/events/next
+params: 
+	:id - the game_id
+form data - game_id, player1_id, player2_id
+game_id - the game ID
+player1_id - the ID of player 1
+player2_id - the ID of player 2
+description - posts the next game action
+
+RETURNS:
+games: {
+
+}
+
+---------------------
+
+GET - api/:id/events/latest
+params:
+	:id - the game ID
+description - returns the last game action
+			for a game
+
+RETURNS:
+events: {
+
+}
+
+
+---------------------
+
+GET - api/:id/teams/:team_id/lineup
+params:
+	:id - the game ID
+	:team_id - the team ID
+description - returns the lineup of the
+			team in the game (batting order)
+
+RETURNS:
+events: {
+
+}
+
+---------------------
+
+GET - api/:id/users/:user_id/lineup
+params:
+	:id - the game ID
+	:user_id - the user ID
+description - returns the lineup of the
+			user in the game (batting order)
+
+RETURNS:
+events: {
+
+}
+
+---------------------
+
+GET - api/:id
+params:
+	:id - the game ID
+description - returns a game by ID
+
+RETURNS:
+events: {
+
+}
+
+---------------------
+
+DELETE - api/:id
+params:
+	:id - the game ID
+description - deletes a game by ID
+
+RETURNS:
+events: {
+
+}
