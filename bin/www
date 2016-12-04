@@ -9,11 +9,13 @@ var ws = require('ws');
 var debug = require('debug')('BaseballSim:server');
 var http = require('http');
 
+var SecurityController = require('./../Controller/SecurityController');
+
 /**
  * Get port from environment and store in Express.
  */
 
-var port = normalizePort(process.env.PORT || '3000');
+var port = 8080;//normalizePort(process.env.PORT || '3000');
 app.set('port', port);
 
 /**
@@ -25,10 +27,33 @@ var server = http.createServer(app);
 /**
  * Create WS Server
  */
-var wss = new ws.Server({server: server, path: "/ws" });
+var wss = require('socket.io').listen(server);
 
-wss.on('connection', function(ws) {
-  console.log("connection");
+wss.use(function(socket, next){
+  //console.log("Query: ", socket.handshake.query.token);
+  // return the result of next() to accept the connection.
+  if (socket.handshake.query.token) {
+    SecurityController.validateToken(socket.handshake.query.token).then(function(tokenData){
+      socket.handshake.query.userdata = tokenData;
+      return next();
+    }).catch(function(err){
+      console.log(err);
+      // call next() with an Error if you need to reject the connection.
+      next(new Error('Authentication error'));
+    });
+  }else{
+    // call next() with an Error if you need to reject the connection.
+    console.log("ERR");
+    next(new Error('Authentication error'));
+  }
+});
+
+wss.on('connection', function(socket) {
+  socket.emit('chat message', "welcome");
+  //console.log("connection: ",socket.handshake.query.userdata.username);
+  socket.on('chat message', function(msg){
+    wss.emit('chat message', socket.handshake.query.userdata.username + ": " + msg);
+  });
 });
 
 /**

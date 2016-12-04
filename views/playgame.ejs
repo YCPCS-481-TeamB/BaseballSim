@@ -78,6 +78,79 @@
         .scrollable{
             overflow-y: scroll;
         }
+
+        .player-select-overlay{
+            position: fixed;
+            top: 0vh;
+            left: 0vw;
+            width: 100vw;
+            height: 100vh;
+            z-index: 20000;
+            background-color: rgba(200,200,200,.9);
+        }
+
+        .player-select{
+            position: absolute;
+            top: 5vh;
+            left: 5vw;
+            width: 90vw;
+            height: 90vh;
+            background-color: green;
+            border-radius: 5px;
+        }
+
+        .lineup-col{
+            border: solid black 1px;
+            border-radius: 2px;
+            height: 95%;
+            width: 40%;
+            margin-left: 7%;
+            margin-top: 1%;
+            overflow-y: scroll;
+        }
+
+        .lineup-item{
+            margin-top: 5px;
+            height: 50px;
+            background-color: darkgreen;
+            border-radius: 3px;
+            color: white;
+            text-align: center;
+            overflow: hidden;
+            /*box-shadow: inset 0 0 10px black, 0 0 10px black;*/
+        }
+
+        .lineup-item .selected{
+            background-color: grey;
+            box-shadow: none;
+        }
+
+        .left-label{
+            height: 100%;
+            float: left;
+            background-color:white;
+            color: green;"
+        }
+
+        .left-label.small{
+            width: 10%;
+        }
+
+        .left-label.med{
+            width: 20%;
+        }
+
+        .left-label.lg{
+            width: 30%;
+        }
+
+        .left-label{
+            display: inline-block;
+        }
+
+        .left-label.disabled{
+            background-color: darkgrey;
+        }
     </style>
 </head>
 <body ng-app="app" class="page">
@@ -149,9 +222,12 @@
             <div class="row">
                 <div class="action">
                     <div class="btn-group btn-group-md" role="group" aria-label="...">
-                        <button type="button" class="btn btn-success">Substitution</button>
+                        <button type="button" class="btn btn-success" ng-click="showLineupChooser = true;">Substitution</button>
                         <button type="button" class="btn btn-success">Toggle Auto Run</button>
-                        <button class="btn btn-success" ng-show="showNextButton" ng-click="nextGameEvent()">Next Game Action</button>
+
+
+
+                        <button class="btn btn-success" disabled ng-show="showNextButton" ng-click="nextGameEvent()">Next Game Action</button>
                     </div>
                 </div>
             </div>
@@ -208,11 +284,27 @@
         </div>
     </div>
 
+    <div ng-show="showLineupChooser" class="player-select-overlay">
+        <div class="player-select">
+            <button class="btn btn-md btn-danger" style="float: right;" ng-click="showLineupChooser = false">X</button>
 
-    <!-- strike ball foul single double triple home_run out-->
-
-    <!-- TEST
-    {{opts}} -->
+            <div class="col-xs-6 lineup-col">
+                <h4>Current Lineup</h4>
+                <div class="lineup-item">Pitcher</div>
+                <div class="lineup-item" ng-repeat="player in lineup">
+                    <div class="left-label small" ng-class="{disabled: player.already_played === true}">{{player.lineup_index}}</div>
+                    <div>{{player.player_id}}</div>
+                </div>
+            </div>
+            <div class="col-xs-6 lineup-col">
+                <h4>Team</h4>
+                <div class="lineup-item" ng-repeat="player in team">
+                    <div class="left-label lg">{{player.position}}</div>
+                    {{player.firstname + " " + player.lastname}}
+                </div>
+            </div>
+        </div>
+    </div>
 
 </div>
 </body>

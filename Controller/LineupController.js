@@ -11,7 +11,7 @@ exports.setDefaultLineup = function(team_id, game_id){
         LineupModel.create(team_id, game_id).then(function(lineup){
             TeamModel.getPlayers(team_id).then(function(players){
                 var promises = [];
-                for(var i = 0;i<players.length;i++){
+                for(var i = 0;i<10;i++){
                     promises.push(LineupModel.setLineupPositon(lineup.id, players[i].id, (i+1)));
                 }
                 Promise.all(promises).then(function(result){

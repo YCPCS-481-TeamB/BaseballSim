@@ -25,8 +25,8 @@ exports.createGameApprovalByLastGameAction = function(game_action_id){
 
 exports.hasNoOutstandingApprovals = function(item_type, item_id){
     return new Promise(function(resolve, reject){
-        ApprovalModel.getAllByTypeAndItemId(item_type, item_id).then(function(approvals){
-            resolve(approvals.length == 0);
+        ApprovalModel.checkApprovalStatusByItemAndId(item_type, item_id).then(function(approvals){
+            resolve(approvals);
         }).catch(function(err){
             reject(err);
         });

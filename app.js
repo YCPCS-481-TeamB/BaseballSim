@@ -32,6 +32,7 @@ app.use('/jquery', express.static('node_modules/jquery/dist'));
 app.use('/angular', express.static('node_modules/angular'));
 app.use('/angular-cookies', express.static('node_modules/angular-cookies'));
 app.use('/angular-route', express.static('node_modules/angular-route'));
+app.use('/socket.io', express.static('node_modules/socket.io/lib'));
 
 app.use('/', routes);
 app.use('/api', api);

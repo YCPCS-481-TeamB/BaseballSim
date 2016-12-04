@@ -3,6 +3,7 @@ var PlayGameController = App.controller('PlayGameController', function($scope,$i
     var id = url.substring(url.lastIndexOf('/')+1);
     $scope.game_id = id;
     $scope.showNextButton = true;
+    $scope.showLineupChooser = false;
 
     var temp = ['strike','ball','foul','single','double','triple','home_run','out'];
 
@@ -22,6 +23,15 @@ var PlayGameController = App.controller('PlayGameController', function($scope,$i
             });
         });
     }
+
+    $scope.team = [];
+
+    UserTokenFactory.getUserData().then(function(user){
+        GameService.getTeamPlayersByUserId(id, user.id).then(function(team){
+            console.log(team.data.players);
+            $scope.team = team.data.players;
+        });
+    });
 
     $scope.nextGameEvent = function(){
         UserTokenFactory.getUserData().then(function(user) {

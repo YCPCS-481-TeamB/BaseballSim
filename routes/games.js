@@ -8,6 +8,7 @@ var TeamsController = require("./../Controller/TeamsController");
 var LineupController = require("./../Controller/LineupController");
 
 var GameModel = require('./../Models/Game');
+var TeamModel = require('./../Models/Team');
 var LineupModel = require('./../Models/Lineup');
 var ApprovalModel = require('./../Models/Approval');
 var PlayerPositionModel = require('./../Models/PlayerPosition');
@@ -175,6 +176,21 @@ router.get("/:id/teams/:team_id/lineup", function(req, res, next){
     }).catch(function(err){
         res.status(500).json("" + err);
     });
+});
+
+router.get("/:id/users/:user_id/team", function(req, res, next){
+    var id = req.params.id;
+    var user_id = req.params.user_id;
+
+    TeamModel.getByGameAndUserId(id, user_id).then(function(team){
+        TeamModel.getPlayers(team.id).then(function(players){
+            res.status(200).json({success: true, players: players});
+        }).catch(function(err){
+            res.status(500).json({success: false, message: "" + err});
+        });
+    }).catch(function(err){
+        res.status(500).json({success: false, message: "" + err});
+    })
 });
 
 router.get("/:id/users/:user_id/lineup", function(req, res, next){

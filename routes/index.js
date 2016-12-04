@@ -29,6 +29,10 @@ router.get('/login',  function(req, res, next) {
   res.render('login', {title: 'BaseballSim Web Login', loggedIn: false});
 });
 
+router.get('/chat', function(req, res,next){
+  res.render('chat', {title: 'Chat', loggedIn: false});
+});
+
 /* GET home page. */
 router.get('/docs', function(req, res, next) {
   res.render('api', { title: 'API Docs' });

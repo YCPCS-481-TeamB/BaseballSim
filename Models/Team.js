@@ -56,6 +56,15 @@ module.exports =  {
             });
         });
     },
+    getByGameAndUserId : function(game_id, user_id){
+        return new Promise(function(resolve, reject){
+            DatabaseController.query("SELECT * from teams WHERE (id IN (SELECT team1_id FROM games WHERE id=$1) OR id IN (SELECT team2_id FROM games WHERE id=$1)) AND id in (SELECT item_id FROM permissions WHERE item_type='teams' AND user_id=$2)", [game_id, user_id]).then(function(data){
+                resolve(data.rows[0]);
+            }).catch(function(err){
+                reject(err);
+            });
+        });
+    },
     deleteById : function(id){
         return new Promise(function(resolve, reject){
             DatabaseController.query("DELETE FROM teams WHERE id = $1 RETURNING *;", [id]).then(function(data) {
