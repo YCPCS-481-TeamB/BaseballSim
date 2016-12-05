@@ -12,7 +12,7 @@ var ApprovalsController = require('./../Controller/ApprovalsController');
 router.get('/', function(req, res, next) {
     var limit = req.query.limit;
     var offset = req.query.offset;
-    ApprovalsController.getApprovals(limit, offset).then(function(data){
+    ApprovalsModel.getAll(limit, offset).then(function(data){
         res.status(200).json({success: true, approvals: data});
     }).catch(function(err){
         res.status(200).json({success: false, message:""+ err});
