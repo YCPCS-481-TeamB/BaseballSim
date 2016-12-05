@@ -52,6 +52,18 @@
             text-align: center;
         }
 
+        .alert > label .right{
+            position: absolute;
+            color: white;
+            top: 0px;
+            right: 0px;
+            height: 100%;
+            width: 10%;
+            background-color: green;
+            border-radius:5px;
+            text-align: center;
+        }
+
         .valign-center{
             transform: translateY(75%);
         }
@@ -225,9 +237,10 @@
                         <button type="button" class="btn btn-success" ng-click="showLineupChooser = true;">Substitution</button>
                         <button type="button" class="btn btn-success">Toggle Auto Run</button>
 
-
-
-                        <button class="btn btn-success" ng-class="{disabled: !showNextButton}" ng-show="showNextButton" ng-click="nextGameEvent()">Next Game Action</button>
+                        <button class="btn btn-success" ng-disabled="!showNextButton" ng-click="nextGameEvent()">
+                            <span ng-if="showNextButton">Next Game Action</span>
+                            <span ng-if="!showNextButton">Waiting...</span>
+                        </button>
                     </div>
                 </div>
             </div>
