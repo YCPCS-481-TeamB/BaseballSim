@@ -94,6 +94,7 @@ var PlayGameController = App.controller('PlayGameController', function($scope,$i
         $scope.balls = $scope.gameEvents[0].balls;
         $scope.strikes = $scope.gameEvents[0].strikes;
         $scope.outs = $scope.gameEvents[0].outs;
+        $scope.inning = $scope.gameEvents[0].inning;
         $scope.team_at_bat = $scope.gameEvents[0].team_at_bat;
     }
 

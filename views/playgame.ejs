@@ -163,6 +163,11 @@
         .left-label.disabled{
             background-color: darkgrey;
         }
+
+        .inning-highlight{
+            background-color: grey;
+            border-radius: 100px;
+        }
     </style>
 </head>
 <body ng-app="app" class="page">
@@ -176,17 +181,20 @@
             <table class="table table-condensed">
                 <tr>
                     <th>Inning</th>
-                    <th>1</th>
-                    <th>2</th>
-                    <th>3</th>
-                    <th>4</th>
-                    <th>5</th>
-                    <th>6</th>
-                    <th>7</th>
-                    <th>8</th>
-                    <th>9</th>
+                    <th ng-repeat="item in [1,2,3,4,5,6,7,8,9]">
+                        <span ng-class="{'inning-highlight': item == inning}">{{item}}</span>
+                    </th>
+                    <!--<th>2</th>-->
+                    <!--<th>3</th>-->
+                    <!--<th>4</th>-->
+                    <!--<th>5</th>-->
+                    <!--<th>6</th>-->
+                    <!--<th>7</th>-->
+                    <!--<th>8</th>-->
+                    <!--<th>9</th>-->
                     <th>Score</th>
                 </tr>
+                <tbody>
                 <tr><th>Team 1</th>
                     <td>0</td>
                     <td>0</td>
@@ -212,6 +220,7 @@
                     <td>0</td>
                     <td>{{team2_score}}</td>
                 </tr>
+                </tbody>
             </table>
         </div>
     </div>

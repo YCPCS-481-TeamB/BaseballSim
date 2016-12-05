@@ -504,21 +504,20 @@ exports.doGameEvent = function(game_id, player1_id, player2_id) {
 
 function doGameEventLogic(game_id, player1_id, player2_id){
     return new Promise(function(resolve, reject){
-        GameActionModel.getLatestByGameId(game_id).then(function(lastGameEvent){
+
+        Promise.all([GameModel.getById(game_id), PlayerModel.getById(player1_id), PlayerModel.getById(player2_id),GameActionModel.getLatestByGameId(game_id)]).spread(function(game, player1, player2, lastGameEvent){
             if (lastGameEvent == undefined) {
                 reject("Game has not been started");
             }else if (lastGameEvent.type == 'end' && lastGameEvent != undefined) {
                 reject("The game has ended");
             }else{
-                basicPlayerEvent(player1_id, player2_id).then(function(result) {
-                    var game_message = "";
-                    generateMessage(player1_id, player2_id, game_id, result).then(function(msg){
-                        game_message = msg;
+                gameAlgorithmController(game, player1, player2).then(function(result) {
+                    var game_message = generateMessage(player1, player2, game, result);
                         GameActionModel.createFromPrevious(game_id, result, game_message).then(function(game_action){
                             PlayerPositionModel.createCopy(lastGameEvent.id, game_action.id).then(function(copyResult){
                                 updatePlayerPositionByEventResult(game_action.id, player1_id, result).then(function(playerPosResult){
                                     updateCountsByEventResult(game_action.id, player1_id, result).then(function(countsResult){
-                                            resolve(game_action);
+                                        resolve(game_action);
                                     }).catch(function(err){
                                         reject("Update Counts: "+ err);
                                     });
@@ -534,13 +533,9 @@ function doGameEventLogic(game_id, player1_id, player2_id){
                     }).catch(function(err){
                         reject(err);
                     })
-
-                }).catch(function(err){
-                    reject("Basic Player Event: "+ err);
-                });
             }
         }).catch(function(err){
-            reject("Get latest game event: "+ err);
+            reject(err);
         });
     });
 }
@@ -557,19 +552,24 @@ function generateMessage(player1_id, player2_id, game_id, game_result){
     });
 }
 
+function generateMessage(player1, player2, game, game_result){
+    var player1_name = player1.firstname + " " + player1.lastname;
+    var player2_name = player2.firstname + " " + player2.lastname;
+
+    return "Player " + player1_name + " got a " + game_result + " against " + player2_name;
+}
+
 /*
  * Different method of doing the basicPlayerEvent, uses game_id instead of only players
  * Not working
  */
-function gameAlgorithmController(game_id, player1_id, player2_id) {
+function gameAlgorithmController(game, player1, player2) {
     return new Promise(function(resolve, reject) {
-        var team2 = game_id.team1_id;
-        var team1 = game_id.team2_id;
-
-        var player1 = player1_id;
-        var player2 = player2_id;
-
-        basicPlayerEvent(player1, player2);
+        Promise.all([PlayerModel.getAttributesById(player1.id),PlayerModel.getAttributesById(player2.id)]).spread(function(player1_stat, player2_stat){
+            resolve(exports.basicPlayerEvent(player1, player1_stat, player2, player2_stat));
+        }).catch(function(err){
+            reject(err);
+        });
     }).catch(function(err){
         reject(err);
     });
@@ -582,119 +582,210 @@ function gameAlgorithmController(game_id, player1_id, player2_id) {
  * @returns {Promise}
  * Calculates outcome based on player attributes
  */
-function basicPlayerEvent(player1_id, player2_id){
-    return new Promise(function(resolve, reject){
-       // console.log(player1_id, player2_id);
-        Promise.all([PlayerModel.getById(player1_id), PlayerModel.getById(player2_id)]).then(function(result){
-            var player1 = result[0];
-            var player2 = result[1];
+//function basicPlayerEvent(player1_id, player2_id){
+//    return new Promise(function(resolve, reject){
+//       // console.log(player1_id, player2_id);
+//        Promise.all([PlayerModel.getById(player1_id), PlayerModel.getById(player2_id)]).then(function(result){
+//            var player1 = result[0];
+//            var player2 = result[1];
+//
+//            var totalattrs;
+//            var max = 100 + totalattrs;
+//            var min = 0;
+//
+//            // Base chance for each outcome
+//
+//            var ball = 25;
+//            var single = 10;
+//            var double = 5;
+//            var triple = 3;
+//            var home_run = 2;
+//
+//            var strike = 25;
+//            var out = 20;
+//            var foul = 20;
+//
+//
+//
+//            Promise.all([PlayerModel.getAttributesById(player1_id),PlayerModel.getAttributesById(player2_id)]).spread(function(player1, player2) {
+//                //console.log("Player 1: ", player1);
+//                //console.log("Player 2: ", player2);
+//
+//                var outcome = ' ';
+//                var options = ['ball', 'single', 'double', 'triple', 'home_run', 'strike', 'out', 'foul', 'strike_out', 'walk'];
+//
+//                // Attributes
+//                var technique = player2.technique;
+//                var pitch_speed = player2.pitch_speed;
+//                var endurance = player2.endurance;
+//
+//                var contact = player1.contact;
+//                var swing_speed = player1.swing_speed;
+//                var bat_power = player1.bat_power;
+//
+//                // Stats
+//                var hits = 0;
+//                var hits_allowed = 0;
+//                var at_bats = 0;
+//                var innings_pitched = 0;
+//                var doubles = 0;
+//                var triples = 0;
+//                var homeruns = 0;
+//
+//                totalattrs = contact + swing_speed + bat_power + technique + pitch_speed
+//                    + endurance;
+//
+//                ball += ((.7 * swing_speed));
+//                single += ((.15 * swing_speed) + (.6 * contact));
+//                double += ((.3 * bat_power) + (.15 * swing_speed) + (.4 * contact));
+//                home_run += (.4 * bat_power);
+//
+//                strike += ((.4 * endurance) + (technique));
+//                out += ((.3 * endurance) + (.5 * pitch_speed));
+//                foul += ((.5 * pitch_speed) + (.3 * endurance));
+//
+//                // Selection of RNG
+//                var rng = 0;
+//                var num = Math.floor(Math.random() * 100 + totalattrs);
+//                //console.log('Choosing Outcome: ' + num);
+//                if (num >= 0 && num < ball) {
+//                    // Returns Ball
+//                    rng = 0;
+//                }
+//                else if (num >= ball && num < ball + single) {
+//                    // Returns Single
+//                    rng = 1;
+//                }
+//                else if (num >= ball + single && num < (ball + single + double)) {
+//                    // Returns Double
+//                    rng = 2;
+//                }
+//                else if (num >= (ball + single + double) && num < (ball + single + double + triple)) {
+//                    // Returns Triple
+//                    rng = 3;
+//                }
+//                else if (num >= (ball + single + double + triple) && num < (ball + single + double + triple + home_run)) {
+//                    // Returns Home Run
+//                    rng = 4;
+//                }
+//                else if (num >= (ball + single + double + triple + home_run) && num < (ball + single + double + triple + home_run + strike)) {
+//                    // Returns Strike
+//                    rng = 5;
+//                }
+//                else if (num >= (ball + single + double + triple + home_run + strike) && num < (ball + single + double + triple + home_run + strike + out)) {
+//                    // Returns Out
+//                    rng = 6;
+//                }
+//                else if (num >= (ball + single + double + triple + home_run + strike + out) && num < (totalattrs + 100)) {
+//                    // Returns Foul
+//                    rng = 7;
+//                }
+//                outcome = options[rng];
+//
+//                // Tracks stats based on outcome
+//                PlayerController.statTracker(player1, player2, options[rng]);
+//               // console.log("OUTCOME", outcome);
+//                resolve(outcome);
+//
+//            }).catch(function(err){
+//                reject(err);
+//            });
+//
+//        }).catch(function(err){
+//            reject(err);
+//        });
+//    });
+//}
 
-            var totalattrs;
-            var max = 100 + totalattrs;
-            var min = 0;
+exports.basicPlayerEvent = function(player1, player1_attr, player2, player2_attr){
+    var totalattrs;
+    var max = 100 + totalattrs;
+    var min = 0;
 
-            // Base chance for each outcome
+    // Base chance for each outcome
 
-            var ball = 25;
-            var single = 10;
-            var double = 5;
-            var triple = 3;
-            var home_run = 2;
+    var ball = 25;
+    var single = 10;
+    var double = 5;
+    var triple = 3;
+    var home_run = 2;
 
-            var strike = 25;
-            var out = 20;
-            var foul = 20;
+    var strike = 25;
+    var out = 20;
+    var foul = 20;
 
+    var outcome = ' ';
+    var options = ['ball', 'single', 'double', 'triple', 'home_run', 'strike', 'out', 'foul', 'strike_out', 'walk'];
 
+    // Attributes
+    var technique = player2_attr.technique;
+    var pitch_speed = player2_attr.pitch_speed;
+    var endurance = player2_attr.endurance;
 
-            Promise.all([PlayerModel.getAttributesById(player1_id),PlayerModel.getAttributesById(player2_id)]).spread(function(player1, player2) {
-                //console.log("Player 1: ", player1);
-                //console.log("Player 2: ", player2);
+    var contact = player1_attr.contact;
+    var swing_speed = player1_attr.swing_speed;
+    var bat_power = player1_attr.bat_power;
 
-                var outcome = ' ';
-                var options = ['ball', 'single', 'double', 'triple', 'home_run', 'strike', 'out', 'foul', 'strike_out', 'walk'];
+    // Stats
+    var hits = 0;
+    var hits_allowed = 0;
+    var at_bats = 0;
+    var innings_pitched = 0;
+    var doubles = 0;
+    var triples = 0;
+    var homeruns = 0;
 
-                // Attributes
-                var technique = player2.technique;
-                var pitch_speed = player2.pitch_speed;
-                var endurance = player2.endurance;
+    totalattrs = contact + swing_speed + bat_power + technique + pitch_speed
+        + endurance;
 
-                var contact = player1.contact;
-                var swing_speed = player1.swing_speed;
-                var bat_power = player1.bat_power;
+    ball += ((.7 * swing_speed));
+    single += ((.15 * swing_speed) + (.6 * contact));
+    double += ((.3 * bat_power) + (.15 * swing_speed) + (.4 * contact));
+    home_run += (.4 * bat_power);
 
-                // Stats
-                var hits = 0;
-                var hits_allowed = 0;
-                var at_bats = 0;
-                var innings_pitched = 0;
-                var doubles = 0;
-                var triples = 0;
-                var homeruns = 0;
+    strike += ((.4 * endurance) + (technique));
+    out += ((.3 * endurance) + (.5 * pitch_speed));
+    foul += ((.5 * pitch_speed) + (.3 * endurance));
 
-                totalattrs = contact + swing_speed + bat_power + technique + pitch_speed
-                    + endurance;
+    // Selection of RNG
+    var rng = 0;
+    var num = Math.floor(Math.random() * 100 + totalattrs);
+    //console.log('Choosing Outcome: ' + num);
+    if (num >= 0 && num < ball) {
+        // Returns Ball
+        rng = 0;
+    }
+    else if (num >= ball && num < ball + single) {
+        // Returns Single
+        rng = 1;
+    }
+    else if (num >= ball + single && num < (ball + single + double)) {
+        // Returns Double
+        rng = 2;
+    }
+    else if (num >= (ball + single + double) && num < (ball + single + double + triple)) {
+        // Returns Triple
+        rng = 3;
+    }
+    else if (num >= (ball + single + double + triple) && num < (ball + single + double + triple + home_run)) {
+        // Returns Home Run
+        rng = 4;
+    }
+    else if (num >= (ball + single + double + triple + home_run) && num < (ball + single + double + triple + home_run + strike)) {
+        // Returns Strike
+        rng = 5;
+    }
+    else if (num >= (ball + single + double + triple + home_run + strike) && num < (ball + single + double + triple + home_run + strike + out)) {
+        // Returns Out
+        rng = 6;
+    }
+    else if (num >= (ball + single + double + triple + home_run + strike + out) && num < (totalattrs + 100)) {
+        // Returns Foul
+        rng = 7;
+    }
+    outcome = options[rng];
 
-                ball += ((.7 * swing_speed));
-                single += ((.15 * swing_speed) + (.6 * contact));
-                double += ((.3 * bat_power) + (.15 * swing_speed) + (.4 * contact));
-                home_run += (.4 * bat_power);
-
-                strike += ((.4 * endurance) + (technique));
-                out += ((.3 * endurance) + (.5 * pitch_speed));
-                foul += ((.5 * pitch_speed) + (.3 * endurance));
-
-                // Selection of RNG
-                var rng = 0;
-                var num = Math.floor(Math.random() * 100 + totalattrs);
-                //console.log('Choosing Outcome: ' + num);
-                if (num >= 0 && num < ball) {
-                    // Returns Ball
-                    rng = 0;
-                }
-                else if (num >= ball && num < ball + single) {
-                    // Returns Single
-                    rng = 1;
-                }
-                else if (num >= ball + single && num < (ball + single + double)) {
-                    // Returns Double
-                    rng = 2;
-                }
-                else if (num >= (ball + single + double) && num < (ball + single + double + triple)) {
-                    // Returns Triple
-                    rng = 3;
-                }
-                else if (num >= (ball + single + double + triple) && num < (ball + single + double + triple + home_run)) {
-                    // Returns Home Run
-                    rng = 4;
-                }
-                else if (num >= (ball + single + double + triple + home_run) && num < (ball + single + double + triple + home_run + strike)) {
-                    // Returns Strike
-                    rng = 5;
-                }
-                else if (num >= (ball + single + double + triple + home_run + strike) && num < (ball + single + double + triple + home_run + strike + out)) {
-                    // Returns Out
-                    rng = 6;
-                }
-                else if (num >= (ball + single + double + triple + home_run + strike + out) && num < (totalattrs + 100)) {
-                    // Returns Foul
-                    rng = 7;
-                }
-                outcome = options[rng];
-
-                // Tracks stats based on outcome
-                PlayerController.statTracker(player1, player2, options[rng]);
-               // console.log("OUTCOME", outcome);
-                resolve(outcome);
-
-            }).catch(function(err){
-                reject(err);
-            });
-
-        }).catch(function(err){
-            reject(err);
-        });
-    });
+    return outcome;
 }
 
 function checkAllForApprovalStatus(approvals){

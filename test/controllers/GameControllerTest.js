@@ -1,29 +1,10 @@
 var GameController = require('../../Controller/GameController');
 
-var team_id1 = 1;
-var team_id2 = 2;
-var field_id = 0;
-var league_id = 0;
-var game_id = 1;
-var player1_id = 1;
-var player2_id = 2;
+var player1 = {"id": 1, "firstname": "Test", "lastname": "John", "position": "first_baseman", "team_id": 1, "date_created": "2016-11-14T16:44:48.045Z"}
 
-//Tests the createGame function
-exports['test_create_game'] = function(test)
+exports['player_event_calc'] = function(test)
 {
-    var game = GameController.createGame(team_id1, team_id2, field_id, league_id);
-    
-    //Asserts that the return value is not null
-    test.notEqual(null, game);
-    //Asserts that it returns a Promise function
-    test.equal(Promise.name, game.constructor.name);
-    
-    test.done();
-};
-
-exports['test_game_event'] = function(test)
-{
-    var event = GameController.doGameEvent(game_id, player1_id, player2_id);
+    var event = GameController.basicPlayerEvent(player1, player1_attr, player2, player2_attr);
 
     // Event is not null
     test.notEqual(null, event);
