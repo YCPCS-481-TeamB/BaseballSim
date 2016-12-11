@@ -20,6 +20,8 @@
             width: 100%;
             padding-left: 100px;
             padding-right: 100px;
+            position: fixed;
+            left : 0px;
         }
         .canvas {
             width: 100%;
@@ -27,6 +29,26 @@
         }
         .h2 {
             float: left;
+        }
+
+        .declined_game{
+            background-color:red;
+        }
+
+        .declined_game td:nth-child(2):before{
+            content: '[rejected] ';
+        }
+
+        .pending_game{
+            background-color:grey;
+        }
+
+        .declined_game td:nth-child(2):before{
+            content: '[Declined] ';
+        }
+
+        .waiting_game td:nth-child(2):before{
+            content: '[Waiting] ';
         }
     </style>
 </head>
@@ -50,16 +72,16 @@
         <table class="table table-responsive">
             <thead>
             <tr>
-                <th>Watch</th><th>Game Message</th><th>Team 1</th><th>Team 2</th>
+                <th>Watch</th><th>Game Message</th><th></th><th></th>
             </tr>
             </thead>
             <tbody ng-repeat="game in games">
-                <!--<tr ng-click="showSelectedGame=true" ng-show="game.message">Test</tr>-->
-                <tr ng-init="getGameMessage(game)" ng-click="showSelectedGame=true" >
-                    <td><a href="/games/{{game.id}}"><button class="btn  btn-primary glyphicon glyphicon-play"></button></a></td>
-                    <td>{{game.message}}</td>
-                    <td>{{game.team1_id}}</td>
-                    <td>{{game.team2_id}}</td>
+                <tr ng-init="getGameMessage(game);loadGameApprovals(game)" ng-class="{declined_game : game.playable_state=='declined', pending_game : game.playable_state=='pending' || game.playable_state == 'waiting', waiting_game: game.playable_state == 'waiting'}" ng-click="showSelectedGame=true" >
+                    <td><a href="/games/{{game.id}}"><button ng-show="game.playable_state!='declined'" class="btn btn-primary glyphicon glyphicon-play"></button></a><button ng-show="game.playable_state=='declined'" ng-click="deleteGame(game)" class="btn btn-primary glyphicon glyphicon-trash"></button></td>
+                    <td ng-if="game.playable_state == 'pending'">{{game.message}}</td>
+                    <td ng-if="game.playable_state != 'pending'" colspan="1">{{game.message}}</td>
+                    <td><button ng-if="game.playable_state =='pending'" title="Approve Game" ng-click="approveGame(game)" class="btn btn-success glyphicon glyphicon-ok"></button></td>
+                    <td><button ng-if="game.playable_state =='pending'" title="Deny Game" ng-click="declineGame(game)" class="btn btn-danger glyphicon glyphicon-remove"></button></td>
                 </tr>
             </tbody>
         </table>

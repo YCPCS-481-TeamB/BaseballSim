@@ -8,8 +8,6 @@ var PlayerService = App.service('PlayerService', function($http, UserTokenFactor
         return $http.get('/api/players/'+id, {headers: {"x-access-token" : UserTokenFactory.getToken()}});
     }
 
-
-
     this.getAttrByPlayerId = function(player_id){
         return $http.get('/api/players/'+player_id+"/attributes", {headers: {"x-access-token" : UserTokenFactory.getToken()}});
     }

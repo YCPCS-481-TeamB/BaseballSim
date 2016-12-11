@@ -163,6 +163,14 @@
         .left-label.disabled{
             background-color: darkgrey;
         }
+
+        .lineup-item:hover{
+            background-color:pink;
+        }
+
+        .selected{
+            background-color: pink;
+        }
     </style>
 </head>
 <body ng-app="app" class="page">
@@ -256,8 +264,9 @@
         <div class="col-sm-2 scrollable" style="height: 250px">
             <table class="table">
                 <tr><th>Lineup</th></tr>
-                <tr ng-repeat="player in lineup" ng-class="{played: player.already_played}">
-                    <td>{{player.player_id}}</td>
+                <tr ng-repeat="player in lineup.players" ng-class="{played: player.already_played}">
+                    <td ng-if="!player.player_data">{{player.player_id}}</td>
+                    <td ng-if="player.player_data">{{player.player_data.firstname + " " + player.player_data.lastname}}</td>
                 </tr>
             </table>
         </div>
@@ -286,7 +295,7 @@
         <div class="col-sm-2 scrollable" style="height: 250px">
             <table class="table">
                 <tr><th>Lineup</th></tr>
-                <tr ng-repeat="player in lineup" ng-class="{played: player.already_played}">
+                <tr ng-repeat="player in other_team_lineup.players" ng-class="{played: player.already_played}">
                     <td>{{player.player_id}}</td>
                 </tr>
             </table>
@@ -297,17 +306,22 @@
         <div class="player-select">
             <button class="btn btn-md btn-danger" style="float: right;" ng-click="showLineupChooser = false">X</button>
 
-            <div class="col-xs-6 lineup-col">
+            <div class="col-xs-5 lineup-col">
                 <h4>Current Lineup</h4>
-                <div class="lineup-item">Pitcher</div>
-                <div class="lineup-item" ng-repeat="player in lineup">
+                <div class="lineup-item" ng-class="{selected : lineup.pitcher.selected}" ng-click="selectLineupPosition(lineup.pitcher)">{{lineup.pitcher.player_data.firstname + " " + lineup.pitcher.player_data.lastname + " (" + lineup.pitcher.player_data.position + ")"}}</div>
+                <div class="lineup-item" ng-class="{selected : player.selected}" ng-init="loadLineupPlayer(lineup.pitcher)" ng-repeat="player in lineup.players" ng-click="selectLineupPosition(player)">
                     <div class="left-label small" ng-class="{disabled: player.already_played === true}">{{player.lineup_index}}</div>
-                    <div>{{player.player_id}}</div>
+                    <div ng-init="loadLineupPlayer(player)">
+                        {{player.player_data.firstname + " " + player.player_data.lastname + " (" + player.player_data.position + ")"}}
+                    </div>
                 </div>
             </div>
-            <div class="col-xs-6 lineup-col">
+            <div class="col-xs-2">
+                <button class="btn btn-success" ng-click="swapSelected()">Swap</button>
+            </div>
+            <div class="col-xs-5 lineup-col">
                 <h4>Team</h4>
-                <div class="lineup-item" ng-repeat="player in team">
+                <div class="lineup-item" ng-class="{selected : player.selected}" ng-repeat="player in team" ng-click="selectTeamPosition(player)">
                     <div class="left-label lg">{{player.position}}</div>
                     {{player.firstname + " " + player.lastname}}
                 </div>

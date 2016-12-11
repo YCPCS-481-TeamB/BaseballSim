@@ -12,6 +12,14 @@ var GameService = App.service('GameService', function($http, UserTokenFactory){
         return $http.get('/api/games/' + id + '/users/' + user_id + '/lineup',{headers: {"x-access-token" : UserTokenFactory.getToken()}});
     }
 
+    this.getLineupByGameAndTeam = function(id, team_id){
+        return $http.get('/api/games/'+id+'/teams/'+team_id+'/lineup',{headers: {"x-access-token" : UserTokenFactory.getToken()}});
+    }
+
+    this.updateLineup = function(id, team_id, lineup){
+        return $http.post('/api/games/'+id+'/teams/'+team_id+"/lineup",{lineup: JSON.stringify(lineup)}, {headers: {"x-access-token" : UserTokenFactory.getToken()}})
+    }
+
     this.loadEventsByGameId = function(game_id){
         return $http.get('/api/games/' + game_id + '/events', {headers: {"x-access-token" : UserTokenFactory.getToken()}});
     }

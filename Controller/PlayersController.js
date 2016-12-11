@@ -1,4 +1,5 @@
 var DatabaseController = require('./DatabaseController');
+var PlayerModel = require('./../Models/Player');
 var bluebird = require('bluebird');
 var Promise = bluebird.Promise;
 
@@ -39,6 +40,26 @@ exports.createRandomPlayer = function(team_id){
             });
         }).catch(function(err){
             reject("" + err);
+        });
+    });
+}
+
+exports.dropPlayerToWaverById = function(id){
+    return new Promise(function(resolve, reject){
+        PlayerModel.update(id, {'team_id' : 0}).then(function(player){
+            resolve(player);
+        }).catch(function(err){
+            reject(err);
+        });
+    });
+}
+
+exports.pickupFromWaverById = function(player_id, team_id){
+    return new Promise(function(resolve, reject){
+        PlayerModel.update(player_id, {'team_id' : team_id}).then(function(player){
+            resolve(player);
+        }).catch(function(err){
+            reject(err);
         });
     });
 }

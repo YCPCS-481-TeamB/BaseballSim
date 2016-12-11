@@ -14,7 +14,7 @@ router.get('/', function(req, res, next) {
     PlayersController.getPlayers(limit, offset).then(function(data){
         res.status(200).json(data);
     }).catch(function(err){
-        res.status(200).json({success: false, message:""+ err});
+        res.status(500).json({success: false, message:""+ err});
     });
 
 });
@@ -29,7 +29,7 @@ router.post('/', function(req, res, next){
     PlayersController.createRandomPlayer(team_id).then(function(data){
         res.status(200).json(data);
     }).catch(function(err){
-       res.status(200).json("" + err);
+       res.status(500).json("" + err);
     });
 });
 
@@ -44,7 +44,7 @@ router.get('/:id', function(req, res, next){
     PlayersController.getPlayersById(id).then(function(data){
         res.status(200).json({id: id, player: data});
     }).catch(function(err){
-        res.status(200).json({success: false,id: id, message:""+ err});
+        res.status(500).json({success: false,id: id, message:""+ err});
     });
 });
 
@@ -58,7 +58,7 @@ router.get('/:id/attributes', function(req, res, next){
     PlayersController.getPlayerAttributesById(id).then(function(data){
         res.status(200).json({id: id, attributes: data});
     }).catch(function(err){
-        res.status(200).json({success: false,id: id, message:""+ err});
+        res.status(500).json({success: false,id: id, message:""+ err});
     });
 });
 
@@ -72,7 +72,7 @@ router.get('/:id/stats', function(req, res, next) {
     PlayersController.getStatsByPlayerId(id).then(function(data) {
         res.status(200).json({id: id, stats: data});
     }).catch(function(err){
-       res.status(200).json({success: false, id: id, message:""+ err});
+       res.status(500).json({success: false, id: id, message:""+ err});
     });
 });
 
@@ -86,7 +86,7 @@ router.delete('/:id', function(req, res, next){
     PlayersController.deletePlayersById(id).then(function(data){
         res.status(200).json({id: id, player: data});
     }).catch(function(err){
-        res.status(200).json({success: false,id: id, message:""+ err});
+        res.status(500).json({success: false,id: id, message:""+ err});
     });
 });
 

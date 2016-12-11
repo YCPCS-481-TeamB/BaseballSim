@@ -13,10 +13,13 @@ module.exports =  {
             });
         });
     },
-    //TODO: Implement
-    update : function(){
+    update : function(id, obj){
         return new Promise(function(resolve, reject){
-
+            DatabaseController.update('players', id, obj).then(function(result){
+                resolve(result.rows[0]);
+            }).catch(function(err){
+                reject(err);
+            })
         });
     },
     getAll : function(limit, offset){

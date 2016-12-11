@@ -73,7 +73,7 @@ router.post('/:id/status', function(req, res, next) {
     var status = req.body.status;
     var id = req.params.id;
 
-    ApprovalsModel.update(id, status).then(function(data){
+    ApprovalsModel.updateStatus(id, status).then(function(data){
         res.status(200).json({success: true, approvals: data});
     }).catch(function(err){
         res.status(200).json({success: false, message:""+ err});

@@ -8,9 +8,9 @@ var PlayerPositionModel = require('./../Models/PlayerPosition');
 var ApprovalModel = require('./../Models/Approval');
 
 var PlayerModel = require('./../Models/Player');
+var PermissionModel = require('./../Models/Permission');
 var PlayerController = require('./PlayersController');
 var ApprovalsController = require('./ApprovalsController');
-var PermissionController = require('./PermissionController');
 var TeamsController = require('./TeamsController');
 var LineupController = require('./LineupController');
 
@@ -19,10 +19,9 @@ exports.createGame = function(team1_id, team2_id, field_id, league_id){
         if(team1_id && team2_id){
             GameModel.create(team1_id,team2_id, field_id, league_id).then(function(game){
                 //console.log(game);
-                Promise.all([PermissionController.getOwnerForItem('teams', team1_id), PermissionController.getOwnerForItem('teams', team2_id)]).then(function(result){
-                    var user1_id = result[0].rows[0].user_id;
-                    var user2_id = result[1].rows[0].user_id;
-                    Promise.all([ApprovalModel.create('games', game.id, user2_id), PermissionController.addPermission('games', game.id, user1_id), PermissionController.addPermission('games', game.id, user2_id)]).then(function(result){
+                Promise.all([PermissionModel.getOwnerForItem('teams', team1_id), PermissionModel.getOwnerForItem('teams', team2_id)]).spread(function(user1_id, user2_id){
+                    console.log(user1_id, user2_id);
+                    Promise.all([ApprovalModel.create('games', game.id, user2_id), PermissionModel.create(user1_id,game.id,'games'), PermissionModel.create(user2_id,game.id,'games')]).then(function(result){
                         resolve(game);
                     }).catch(function(err){
                         reject(err);
@@ -112,15 +111,9 @@ function toggleTeamAtBat(game, game_action){
             newTeamAtBat = game.team1_id;
         }
 
-        PlayerPositionModel.getByGameActionId(game_action.id).then(function(player_position){
-            Promise.each([GameActionModel.update(game_action.id, {team_at_bat: newTeamAtBat}),PlayerPositionModel.clearBasesById(player_position.id)], function(){}).spread(function(game_action_result, clear_bases_position){
-                resolve(game_action_result);
-            }).catch(function(err){
-                console.log(err);
-                reject(err);
-            });
+        Promise.each([GameActionModel.update(game_action.id, {team_at_bat: newTeamAtBat}),PlayerPositionModel.clearBasesByGameActionId(game_action.id)], function(){}).spread(function(game_action_result, clear_bases_position){
+            resolve(game_action_result);
         }).catch(function(err){
-            console.log(err);
             reject(err);
         });
     });
@@ -248,88 +241,6 @@ function updatePlayerPositionByEventResult(game, game_action, player_position, p
     });
 }
 
-//function updatePlayerPositionByEventResult(game_action_id, player_id, game_result){
-//    //'home_run', 'walk', 'triple', 'double', 'single'
-//    return new Promise(function(resolve, reject){
-//        GameActionModel.getById(game_action_id).then(function(game_action){
-//            GameModel.getById(game_action.game_id).then(function(game){
-//                console.log("GAME: ", game);
-//                PlayerPositionModel.getByGameActionId(game_action.id).then(function(player_positions){
-//                    var player_pos_arr = [player_positions.onfirst_id, player_positions.onsecond_id, player_positions.onthird_id];
-//                    var movements = 0;
-//
-//                    if(game_action.team_at_bat == game.team1_id){
-//                        var score = game_action.team1_score;
-//                    }else if(game_action.team_at_bat == game.team2_id){
-//                        var score = game_action.team2_score;
-//                    }else{
-//                        var score = 0;
-//                        console.log("ERRROR IN UPDATE PLAYER POSITION");
-//                    }
-//
-//                    var changeoutplayer = false;
-//
-//                    if(game_result == 'walk' || game_result == 'single'){
-//                        movements = 1;
-//                    }else if(game_result == 'double'){
-//                        movements = 2;
-//                    }else if(game_result == 'triple'){
-//                        movements = 3;
-//                    }else if(game_result == 'home_run'){
-//                        movements = 4;
-//                    }
-//
-//                    //Update Player Positions
-//                    if(movements > 0){
-//                        changeoutplayer = true;
-//                        for(var i = player_pos_arr.length;i>0;i--){
-//                            var index = i-1;
-//                            if(player_pos_arr[index] != 0){
-//                                if((i + movements) > 3){
-//                                    score++;
-//                                    player_pos_arr[index] = 0;
-//                                }else{
-//                                    player_pos_arr[index + movements] = player_pos_arr[index];
-//                                    player_pos_arr[index] = 0;
-//                                }
-//                            }
-//                        }
-//                        if(movements > 3){
-//                            score++;
-//                        }else{
-//                            player_pos_arr[movements-1] = player_id;
-//                        }
-//                    }
-//                    PlayerPositionModel.update(player_positions.id, {onfirst_id: player_pos_arr[0], onsecond_id: player_pos_arr[1], onthird_id: player_pos_arr[2]}).then(function(updated_player_position){
-//                        updateGameScore(game_action_id, score).then(function(data) {
-//                            if (changeoutplayer === true) {
-//                                updateGameLineupByResult(game_action.game_id).then(function(lineup_data){
-//                                    resolve(updated_player_position);
-//                                }).catch(function(err){
-//                                    reject(err);
-//                                });
-//                            } else {
-//                                resolve(updated_player_position);
-//                            }
-//                        }).catch(function(err){
-//                            reject(err);
-//                        });
-//
-//                    }).catch(function(err){
-//                        reject(err);
-//                    });
-//                }).catch(function(err){
-//                    reject(err);
-//                });
-//            }).catch(function(err){
-//                reject(err);
-//            });
-//        }).catch(function(err){
-//            reject(err);
-//        });
-//    });
-//}
-
 exports.calculateCountsByEventResult = function(game, game_action, game_result){
     var returnObj = {
         counts: {
@@ -437,28 +348,6 @@ function updateGameLineupByResult(game_id) {
     });
 }
 
-function createApprovalsForEvent(game_id, event_id){
-   return new Promise(function(resolve, reject){
-       var promises = [];
-       PermissionController.getOwnerForItem('games', game_id).then(function(data){
-           var users = data.rows;
-           for(var i = 0;i<data.rows.length;i++){
-               promises.push(ApprovalModel.create('gameaction', event_id, users[i].user_id));
-           }
-           Promise.all(promises).then(function(data){
-                //console.log(data);
-                resolve(data);
-           }).catch(function(err){
-               reject(err);
-                //console.log(err);
-           });
-       }).catch(function(err){
-           reject(err);
-           //console.log(err);
-       });
-   });
-}
-
 exports.startGame = function(game_id){
     return new Promise(function(resolve, reject){
         if(game_id) {
@@ -502,7 +391,7 @@ exports.doGameEvent = function(game_id){
                         other_team_id = game.team1_id;
                     }
 
-                    Promise.all([LineupController.getNextLineupPlayerByGameAndTeamId(game.id, game_action.team_at_bat), LineupController.getNextLineupPlayerByGameAndTeamId(game.id, other_team_id)]).spread(function(player1, player2){
+                    Promise.all([LineupController.getNextLineupPlayerByGameAndTeamId(game.id, game_action.team_at_bat), LineupController.getLineupPitcherByGameAndTeamId(game.id, other_team_id)]).spread(function(player1, player2){
                         doGameEventLogic(game, game_action, player1, player2).then(function(new_game_action){
                             ApprovalsController.createGameApprovalByLastGameAction(new_game_action.id).then(function(approval){
                                 resolve(new_game_action);

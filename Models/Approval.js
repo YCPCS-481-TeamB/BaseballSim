@@ -13,9 +13,18 @@ module.exports =  {
             });
         });
     },
-    update : function(id, status){
+    updateStatus : function(id, status){
         return new Promise(function(resolve, reject){
             DatabaseController.query("UPDATE approvals SET approved=$2 WHERE id = $1 RETURNING *", [id, status]).then(function(result){
+                resolve(result.rows[0]);
+            }).catch(function(err){
+                reject(err);
+            });
+        });
+    },
+    update : function(id, obj){
+        return new Promise(function(resolve, reject){
+            DatabaseController.update('approvals',id, obj).then(function(result){
                 resolve(result.rows[0]);
             }).catch(function(err){
                 reject(err);
