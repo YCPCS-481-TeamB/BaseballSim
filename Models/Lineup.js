@@ -48,7 +48,7 @@ module.exports = {
     },
     getById : function(id){
         return new Promise(function(resolve, reject){
-            DatabaseController.query("SELECT * FROM lineup_items WHERE lineup_id=$1 ORDER BY lineup_index ASC;", [lineup_id]).then(function(result){
+            DatabaseController.query("SELECT * FROM lineup_items WHERE lineup_id=$1 ORDER BY already_played, lineup_index;", [lineup_id]).then(function(result){
                 resolve(result.rows[0]);
             }).catch(function(err){
                 reject(err);
@@ -66,7 +66,7 @@ module.exports = {
     },
     getLineupPlayersById : function(lineup_id){
         return new Promise(function(resolve, reject){
-            DatabaseController.query("SELECT * FROM lineup_items WHERE lineup_id IN (SELECT id FROM lineups WHERE id = $1 ORDER BY date_created DESC LIMIT 1) AND is_pitcher=false",[lineup_id]).then(function(result){
+            DatabaseController.query("SELECT * FROM lineup_items WHERE lineup_id IN (SELECT id FROM lineups WHERE id = $1 ORDER BY date_created DESC LIMIT 1) AND is_pitcher=false ORDER BY already_played, lineup_index",[lineup_id]).then(function(result){
                 resolve(result.rows);
             }).catch(function(err){
                 reject(err);
@@ -102,7 +102,7 @@ module.exports = {
     },
     getNextLineupPlayerByLineupId : function(lineup_id){
         return new Promise(function(resolve, reject){
-            DatabaseController.query("SELECT * FROM players WHERE id IN (SELECT player_id FROM lineup_items WHERE lineup_id in (SELECT id FROM lineups WHERE id = $1) AND already_played != true ORDER BY lineup_index ASC LIMIT 1)",[lineup_id]).then(function(result){
+            DatabaseController.query("SELECT * FROM players WHERE id IN (SELECT player_id FROM lineup_items WHERE is_pitcher = false AND lineup_id in (SELECT id FROM lineups WHERE id = $1 ORDER BY date_created DESC LIMIT 1) AND already_played != true ORDER BY lineup_index ASC LIMIT 1)",[lineup_id]).then(function(result){
                 if(result.rows.length <= 0){
                     DatabaseController.query("UPDATE lineup_items SET already_played=$2 WHERE lineup_id = $1 RETURNING *", [lineup_id,false]).then(function(result){
                         PlayerModel.getById(result.rows[0].player_id).then(function(player){

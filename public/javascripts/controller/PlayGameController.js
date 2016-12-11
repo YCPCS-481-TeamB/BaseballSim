@@ -124,15 +124,22 @@ var PlayGameController = App.controller('PlayGameController', function($scope,$i
 
         if(selectedLineupPos.length > 0){
             selectedLineupPos = selectedLineupPos[0];
+        }else if($scope.lineup.pitcher.selected === true){
+            var selectedLineupPos = $scope.lineup.pitcher;
         }
 
-        console.log("Team Pos: ", selectedTeamPos);
-        console.log("Lineup Pos: ", selectedLineupPos);
-
-        var temp = $scope.lineup.players[$scope.lineup.players.indexOf(selectedLineupPos)].player_data;
-
-        $scope.lineup.players[$scope.lineup.players.indexOf(selectedLineupPos)].player_id = selectedTeamPos.id;
-        $scope.lineup.players[$scope.lineup.players.indexOf(selectedLineupPos)].player_data = selectedTeamPos;
+        if(!selectedLineupPos.is_pitcher){
+            var temp = $scope.lineup.players[$scope.lineup.players.indexOf(selectedLineupPos)].player_data;
+            temp.selected = false;
+            $scope.lineup.players[$scope.lineup.players.indexOf(selectedLineupPos)].player_id = selectedTeamPos.id;
+            $scope.lineup.players[$scope.lineup.players.indexOf(selectedLineupPos)].selected = false;
+            $scope.lineup.players[$scope.lineup.players.indexOf(selectedLineupPos)].player_data = selectedTeamPos;
+        }else{
+            var temp = $scope.lineup.pitcher.player_data;
+            temp.selected = false;
+            $scope.lineup.pitcher.player_id = selectedTeamPos.id;
+            $scope.lineup.pitcher.player_data = selectedTeamPos;
+        }
 
         $scope.team[$scope.team.indexOf(selectedTeamPos)] = temp;
 

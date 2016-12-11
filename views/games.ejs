@@ -50,6 +50,14 @@
         .waiting_game td:nth-child(2):before{
             content: '[Waiting] ';
         }
+
+        .game_over{
+            background-color:darkgreen;
+        }
+
+        .game_over td:nth-child(2):before{
+            content: '[Game Over] ';
+        }
     </style>
 </head>
 <body ng-app="app" class="page">
@@ -76,7 +84,7 @@
             </tr>
             </thead>
             <tbody ng-repeat="game in games">
-                <tr ng-init="getGameMessage(game);loadGameApprovals(game)" ng-class="{declined_game : game.playable_state=='declined', pending_game : game.playable_state=='pending' || game.playable_state == 'waiting', waiting_game: game.playable_state == 'waiting'}" ng-click="showSelectedGame=true" >
+                <tr ng-init="getGameMessage(game);loadGameApprovals(game)" ng-class="{declined_game : game.playable_state=='declined', pending_game : game.playable_state=='pending' || game.playable_state == 'waiting', waiting_game: game.playable_state == 'waiting', game_over: game.playable_state == 'game_over'}" ng-click="showSelectedGame=true" >
                     <td><a href="/games/{{game.id}}"><button ng-show="game.playable_state!='declined'" class="btn btn-primary glyphicon glyphicon-play"></button></a><button ng-show="game.playable_state=='declined'" ng-click="deleteGame(game)" class="btn btn-primary glyphicon glyphicon-trash"></button></td>
                     <td ng-if="game.playable_state == 'pending'">{{game.message}}</td>
                     <td ng-if="game.playable_state != 'pending'" colspan="1">{{game.message}}</td>

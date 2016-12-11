@@ -44,6 +44,13 @@ var GameController = App.controller('GameController', function($scope, UserToken
                }else{
                    game.playable_state = "pending";
                }
+
+               GameService.getLatestGameAction(game.id).then(function(data){
+                   console.log(data.data.events);
+                   if(data.data.events.type == 'end'){
+                       game.playable_state = "game_over";
+                   }
+               });
            }).catch(function(err){
                 console.log(err);
            });

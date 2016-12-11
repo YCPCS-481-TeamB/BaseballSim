@@ -15,7 +15,8 @@
         }
 
         .played{
-            display: none;
+            background-color:darkgreen;
+            text-decoration: line-through;
         }
 
         .bases {
@@ -184,7 +185,11 @@
             <table class="table table-condensed">
                 <tr>
                     <th>Inning</th>
-                    <th ng-repeat="item in [1,2,3,4,5,6,7,8,9]">
+                    <th ng-if="inning<10" ng-repeat="item in [1,2,3,4,5,6,7,8,9]">
+                        <span ng-class="{'badge': item == inning}">{{item}}</span>
+                    </th>
+
+                    <th ng-if="inning>=10" ng-repeat="item in [10,11,12,13,14,15,16,17,18]">
                         <span ng-class="{'badge': item == inning}">{{item}}</span>
                     </th>
                     <th>Score</th>
@@ -305,28 +310,32 @@
     <div ng-show="showLineupChooser" class="player-select-overlay">
         <div class="player-select">
             <button class="btn btn-md btn-danger" style="float: right;" ng-click="showLineupChooser = false">X</button>
-
-            <div class="col-xs-5 lineup-col">
-                <h4>Current Lineup</h4>
-                <div class="lineup-item" ng-class="{selected : lineup.pitcher.selected}" ng-click="selectLineupPosition(lineup.pitcher)">{{lineup.pitcher.player_data.firstname + " " + lineup.pitcher.player_data.lastname + " (" + lineup.pitcher.player_data.position + ")"}}</div>
-                <div class="lineup-item" ng-class="{selected : player.selected}" ng-init="loadLineupPlayer(lineup.pitcher)" ng-repeat="player in lineup.players" ng-click="selectLineupPosition(player)">
-                    <div class="left-label small" ng-class="{disabled: player.already_played === true}">{{player.lineup_index}}</div>
-                    <div ng-init="loadLineupPlayer(player)">
-                        {{player.player_data.firstname + " " + player.player_data.lastname + " (" + player.player_data.position + ")"}}
+            <div class="row">
+                <div class="col-xs-6 lineup-col">
+                    <h4>Current Lineup</h4>
+                    <div class="lineup-item" ng-class="{selected : lineup.pitcher.selected}" ng-click="selectLineupPosition(lineup.pitcher)">{{lineup.pitcher.player_data.firstname + " " + lineup.pitcher.player_data.lastname + " (" + lineup.pitcher.player_data.position + ")"}}</div>
+                    <div class="lineup-item" ng-class="{selected : player.selected}" ng-init="loadLineupPlayer(lineup.pitcher)" ng-repeat="player in lineup.players" ng-click="selectLineupPosition(player)">
+                        <div class="left-label small" ng-class="{disabled: player.already_played === true}">{{player.lineup_index}}</div>
+                        <div ng-init="loadLineupPlayer(player)">
+                            {{player.player_data.firstname + " " + player.player_data.lastname + " (" + player.player_data.position + ")"}}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-6 lineup-col">
+                    <h4>Team</h4>
+                    <div class="lineup-item" ng-class="{selected : player.selected}" ng-repeat="player in team" ng-click="selectTeamPosition(player)">
+                        <div class="left-label lg">{{player.position}}</div>
+                        {{player.firstname + " " + player.lastname}}
                     </div>
                 </div>
             </div>
-            <div class="col-xs-2">
-                <button class="btn btn-success" ng-click="swapSelected()">Swap</button>
-            </div>
-            <div class="col-xs-5 lineup-col">
-                <h4>Team</h4>
-                <div class="lineup-item" ng-class="{selected : player.selected}" ng-repeat="player in team" ng-click="selectTeamPosition(player)">
-                    <div class="left-label lg">{{player.position}}</div>
-                    {{player.firstname + " " + player.lastname}}
+            <div class="row">
+                <div class="col-xs-12">
+                    <button class="btn btn-success form-control" ng-click="swapSelected()">Swap</button>
                 </div>
             </div>
         </div>
+
     </div>
 
 </div>
