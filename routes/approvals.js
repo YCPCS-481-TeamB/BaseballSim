@@ -27,7 +27,7 @@ router.get('/', function(req, res, next) {
 router.get('/user', function(req, res, next) {
     var limit = req.query.limit;
     var offset = req.query.offset;
-    ApprovalsController.getApprovalByUserId(req.userdata.id).then(function(data){
+    ApprovalsModel.getByUserId(req.userdata.id).then(function(data){
         res.status(200).json({success: true, approvals: data});
     }).catch(function(err){
         res.status(200).json({success: false, message:""+ err});

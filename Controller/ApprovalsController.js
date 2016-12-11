@@ -3,8 +3,6 @@ var ApprovalModel = require('./../Models/Approval');
 var GameActionModel = require('./../Models/GameAction');
 var PermissionModel = require('./../Models/Permission');
 
-
-
 exports.createGameApprovalByLastGameAction = function(game_action_id){
     return new Promise(function(resolve, reject){
         GameActionModel.getById(game_action_id).then(function(game_action){

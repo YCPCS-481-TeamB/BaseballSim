@@ -144,9 +144,9 @@ router.get('/:id/approvals/state', function(req, res, next){
  */
 router.post('/:id/events/next', function(req, res, next){
     var id = req.params.id;
-    var player1_id = req.body.player1_id;
-    var player2_id = req.body.player2_id;
-    GameController.doGameEvent(id, player1_id, player2_id).then(function(data){
+    //var player1_id = req.body.player1_id;
+    //var player2_id = req.body.player2_id;
+    GameController.doGameEvent(id).then(function(data){
         res.status(200).json(data);
     }).catch(function(err){
         res.status(500).json("" + err);
