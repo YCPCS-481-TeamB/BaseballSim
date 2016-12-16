@@ -3,6 +3,7 @@ var router = express.Router();
 
 var TeamsController = require('./../Controller/TeamsController');
 var PlayersController = require('./../Controller/PlayersController');
+var PermissionController = require('./../Controller/PermissionController');
 var PermissionModel = require('./../Models/Permission');
 
 var TeamModel = require('./../Models/Team');
@@ -37,6 +38,44 @@ router.put('/:id', function(req, res, next){
 		res.status(200).json({success: true, team: response});
 	}).catch(function(err){
 		res.status(200).json({success: false, error: ""+err});
+	});
+});
+
+router.post('/:id/players/:player_id/drop', function(req, res, next){
+	var id = req.params.id;
+	var player_id = req.params.player_id;
+
+	PermissionController.executeIfPermissionAcceptable(req.userdata, 'teams', id).then(function(isAllowed){
+		if(isAllowed){
+			PlayersController.dropPlayerToWaverById(player_id).then(function(player){
+				res.status(200).json({success: true, player: player});
+			}).catch(function(err){
+				res.status(500).json({success: false, message: "" + err});
+			});
+		}else{
+			res.status(500).json({success: false, message: "Permission for team id #" + id + " is denied"});
+		}
+	}).catch(function(err){
+		res.status(500).json({success: false, message: "Permission for team id #" + id + " is denied"});
+	});
+});
+
+router.post('/:id/players/:player_id/pickup', function(req, res, next){
+	var id = req.params.id;
+	var player_id = req.params.player_id;
+
+	PermissionController.executeIfPermissionAcceptable(req.userdata, 'teams', id).then(function(isAllowed){
+		if(isAllowed){
+			PlayersController.pickupFromWaverById(player_id, id).then(function(player){
+				res.status(200).json({success: true, player: player});
+			}).catch(function(err){
+				res.status(500).json({success: false,id: id, message:""+ err});
+			});
+		}else{
+			res.status(500).json({success: false, message: "Permission for team id #" + id + " is denied"});
+		}
+	}).catch(function(err){
+		res.status(500).json({success: false, message: "" + err});
 	});
 });
 

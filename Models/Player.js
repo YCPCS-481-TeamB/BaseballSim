@@ -13,11 +13,11 @@ module.exports =  {
             });
         });
     },
-    update : function(id, obj){
-        return new Promise(function(resolve, reject){
-            DatabaseController.update('players', id, obj).then(function(result){
+    update : function(id, obj) {
+        return new Promise(function (resolve, reject) {
+            DatabaseController.update('players', id, obj).then(function (result) {
                 resolve(result.rows[0]);
-            }).catch(function(err){
+            }).catch(function (err) {
                 reject(err);
             });
         });

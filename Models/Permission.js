@@ -30,8 +30,22 @@ module.exports =  {
     getOwnerForItem : function(item_type, item_id){
         return new Promise(function(resolve, reject){
             DatabaseController.query("SELECT user_id FROM permissions WHERE item_type=$1 AND item_id=$2", [item_type, item_id]).then(function(result){
-                console.log(result);
                 resolve(result.rows[0].user_id);
+            }).catch(function(err){
+                reject(err);
+            });
+        });
+    },
+    checkPermission : function(user_id, item_type, item_id, permission_type){
+        return new Promise(function(resolve, reject){
+            var SQL = "SELECT * FROM permissions WHERE user_id=$1 AND item_type=$2 AND item_id=$3";
+            var params = [user_id, item_type, item_id];
+            if(permission_type){
+                SQL += " AND type=$4";
+                params.push(permission_type);
+            }
+            DatabaseController.query(SQL, params).then(function(result){
+                resolve(result.rows.length > 0);
             }).catch(function(err){
                 reject(err);
             });

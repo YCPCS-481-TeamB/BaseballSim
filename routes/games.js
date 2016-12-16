@@ -144,9 +144,7 @@ router.get('/:id/approvals/state', function(req, res, next){
  */
 router.post('/:id/events/next', function(req, res, next){
     var id = req.params.id;
-    var player1_id = req.body.player1_id;
-    var player2_id = req.body.player2_id;
-    GameController.doGameEvent(id, player1_id, player2_id).then(function(data){
+    GameController.doGameEvent(id).then(function(data){
         res.status(200).json(data);
     }).catch(function(err){
         res.status(500).json("" + err);
@@ -169,12 +167,16 @@ router.get("/:id/teams/:team_id/lineup", function(req, res, next){
 
     LineupModel.getByGameAndTeamId(id, team_id).then(function(lineup){
         LineupModel.getLineupPlayersById(lineup.id).then(function(players){
-            res.status(200).json(players);
+            LineupModel.getLineupPitcher(lineup.id).then(function(pitcher){
+                res.status(200).json({pitcher: pitcher, players:players});
+            }).catch(function(err){
+                res.status(500).json(err);
+            });
         }).catch(function(err){
-           reject(err);
+            res.status(500).json("" + err);
         });
     }).catch(function(err){
-        res.status(500).json("" + err);
+        res.status(500).json({players: [], message: "" + err});
     });
 });
 
@@ -199,7 +201,11 @@ router.get("/:id/users/:user_id/lineup", function(req, res, next){
 
     LineupModel.getByGameAndUserId(id, user_id).then(function(lineup){
         LineupModel.getLineupPlayersById(lineup.id).then(function(players){
-            res.status(200).json(players);
+            LineupModel.getLineupPitcher(lineup.id).then(function(pitcher){
+                res.status(200).json({pitcher: pitcher, players:players});
+            }).catch(function(err){
+                res.status(500).json(err);
+            });
         }).catch(function(err){
             res.status(500).json(err);
         });
@@ -245,13 +251,13 @@ router.delete('/:id', function(req, res, next){
     });
 });
 
-router.post('/:id/lineup', function(req, res, next){
+router.post('/:id/teams/:team_id/lineup', function(req, res, next){
     var id = req.params.id;
     var lineup = JSON.parse(req.body.lineup);
-    var team_id = req.body.team_id;
+    var team_id = req.params.team_id;
 
     LineupController.createNewLineupByGameAndTeamId(id, team_id, lineup).then(function(result){
-        res.status(200).json({lineup: result});
+        res.status(200).json({game_id: id, team_id: team_id, lineup: result});
     }).catch(function(err){
         res.status(200).json(err);
     })
