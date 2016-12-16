@@ -168,7 +168,6 @@ function updatePlayerPositionByEventResult(game_action_id, player_id, game_resul
     return new Promise(function(resolve, reject){
         GameActionModel.getById(game_action_id).then(function(game_action){
             GameModel.getById(game_action.game_id).then(function(game){
-                console.log("GAME: ", game);
                 PlayerPositionModel.getByGameActionId(game_action.id).then(function(player_positions){
                     var player_pos_arr = [player_positions.onfirst_id, player_positions.onsecond_id, player_positions.onthird_id];
                     var movements = 0;
@@ -179,7 +178,7 @@ function updatePlayerPositionByEventResult(game_action_id, player_id, game_resul
                         var score = game_action.team2_score;
                     }else{
                         var score = 0;
-                        console.log("ERRROR IN UPDATE PLAYER POSITION");
+                        console.log("ERROR IN UPDATE PLAYER POSITION");
                     }
 
                     var changeoutplayer = false;
@@ -318,18 +317,10 @@ function updateCountsByEventResult(game_action_id, player_id, game_result){
                 if(changeoutplayer === true){
                     updateGameLineupByResult(game_action.game_id).then(function(data){
                         if(gameOver === true){
-                            GameActionModel.createFromPrevious(game_action.game_id, 'end', 'Game Over!').then(function(end_action){
-                                if(toggleAtBat === true){
-                                    toggleTeamAtBat(game_action.id).then(function(at_bat_toggle_action){
-                                        resolve(result);
-                                    }).catch(function(err){
-                                        reject("toggle team: ", err);
-                                    });
-                                }else{
-                                    resolve(result);
-                                }
+                            exports.endGame(game_action.game_id).then(function(game_over_data){
+                                resolve(result);
                             }).catch(function(err){
-                               reject("Create from prev: ", err);
+                                reject(err);
                             });
                         }else{
                             if(gameOver === true) {
@@ -502,6 +493,38 @@ exports.doGameEvent = function(game_id, player1_id, player2_id) {
     });
 }
 
+exports.endGame = function(game_id){
+    return new Promise(function(resolve, reject){
+        GameModel.getById(game_id).then(function(game){
+            GameActionModel.createFromPrevious(game_id, 'end', 'Game Over!').then(function(end_action){
+                GameActionModel.getAllByGameId(game_id).then(function(game_actions){
+
+                    var updatedPlayers = exports.calculateUpdatedTeamStats(game, game_actions);
+
+                    var updatePlayerPromises = [];
+
+                    for(var i = 0;i<updatedPlayers.players.length;i++){
+                        updatePlayerPromises.push(PlayerModel.updateAttributesById(updatedPlayers.players[i].id, updatedPlayers.players[i].attributes));
+                    }
+
+                    Promise.all(updatePlayerPromises).then(function(){
+                        resolve(end_action);
+                    }).catch(function(err){
+                       reject(err);
+                    });
+
+                }).catch(function(err){
+                    reject(err);
+                });
+            }).catch(function(err){
+                reject(err);
+            });
+        }).catch(function(err){
+            reject(err);
+        });
+    });
+}
+
 function doGameEventLogic(game_id, player1_id, player2_id){
     return new Promise(function(resolve, reject){
         GameActionModel.getLatestByGameId(game_id).then(function(lastGameEvent){
@@ -555,6 +578,14 @@ function generateMessage(player1_id, player2_id, game_id, game_result){
             reject(err);
         });
     });
+}
+
+exports.calculateUpdatedTeamStats = function(game, game_actions){
+    var updatedPlayers = {players: []};
+
+
+
+    return updatedPlayers;
 }
 
 /*

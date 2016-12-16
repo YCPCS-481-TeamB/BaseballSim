@@ -13,10 +13,13 @@ module.exports =  {
             });
         });
     },
-    //TODO: Implement
-    update : function(){
+    update : function(id, obj){
         return new Promise(function(resolve, reject){
-
+            DatabaseController.update('players', id, obj).then(function(result){
+                resolve(result.rows[0]);
+            }).catch(function(err){
+                reject(err);
+            });
         });
     },
     getAll : function(limit, offset){
@@ -43,6 +46,28 @@ module.exports =  {
                 resolve(result.rows);
             }).catch(function(err){
                 reject(err);
+            });
+        });
+    },
+    updateAttributesById : function(id, obj){
+        return new Promise(function(resolve, reject){
+            var keys = Object.keys(obj);
+            var sql = "UPDATE attributes SET ";
+            var values = [];
+            for(var i = 0;i<keys.length;i++){
+                sql += keys[i] + "=$"+(i+1);
+                values.push(obj[keys[i]]);
+                if(i != keys.length-1){
+                    sql += ",";
+                }
+            }
+
+            sql += " WHERE player_id="+id+" RETURNING *";
+
+            DatabaseController.query(sql, values).then(function(result){
+                resolve(result.rows[0]);
+            }).catch(function(err){
+               reject(err);
             });
         });
     },
