@@ -310,7 +310,7 @@ function updateCountsByEventResult(game, game_action, game_result){
             }
 
             if(newCounts.game_over === true){
-                actions.push(GameActionModel.createFromPrevious(game_action.game_id,'end', 'Game Over!'));
+                actions.push(exports.endGame(game_action.game_id));
             }
 
             if(newCounts.toggle_at_bat === true){
@@ -424,23 +424,13 @@ exports.doGameEvent = function(game_id){
 exports.endGame = function(game_id){
     return new Promise(function(resolve, reject){
         GameModel.getById(game_id).then(function(game){
-            GameActionModel.createFromPrevious(game_id, 'end', 'Game Over!').then(function(end_action){
+            GameActionModel.createFromPrevious(game_id, 'end', 'Game Over!', 0, 0).then(function(end_action){
                 GameActionModel.getAllByGameId(game_id).then(function(game_actions){
-
-                    var updatedPlayers = exports.calculateUpdatedTeamStats(game, game_actions);
-
-                    var updatePlayerPromises = [];
-
-                    for(var i = 0;i<updatedPlayers.players.length;i++){
-                        updatePlayerPromises.push(PlayerModel.updateAttributesById(updatedPlayers.players[i].id, updatedPlayers.players[i].attributes));
-                    }
-
-                    Promise.all(updatePlayerPromises).then(function(){
+                    exports.updateAllPlayerStats(game_actions).then(function(updatedPlayers){
                         resolve(end_action);
                     }).catch(function(err){
-                       reject(err);
+                        reject(err);
                     });
-
                 }).catch(function(err){
                     reject(err);
                 });
@@ -462,7 +452,7 @@ function doGameEventLogic(game, last_game_action, player1, player2){
         }else{
             gameAlgorithmController(game, player1, player2).then(function(action_result){
                 var game_message = generateMessage(player1, player2, game, action_result);
-                GameActionModel.createFromPrevious(game.id, action_result, game_message).then(function(game_action){
+                GameActionModel.createFromPrevious(game.id, action_result, game_message, player1.id, player2.id).then(function(game_action){
                     PlayerPositionModel.createCopy(last_game_action.id, game_action.id).then(function(player_position){
                         Promise.each([updatePlayerPositionByEventResult(game, game_action, player_position, player1, action_result),updateCountsByEventResult(game, game_action, action_result)], function(){}).then(function(result){
                             resolve(game_action);
@@ -489,12 +479,82 @@ function generateMessage(player1, player2, game, game_result){
     return "Player " + player1_name + " got a " + game_result + " against " + player2_name;
 }
 
-exports.calculateUpdatedTeamStats = function(game, game_actions){
-    var updatedPlayers = {players: []};
+exports.updateAllPlayerStats = function(game_actions){
+    return new Promise(function(resolve, reject){
 
+        //Updated Player Attribute Data
+        var player_data = {players : []};
 
+        var batter_ids = game_actions.map(function(item){
+            return item.player1_id;
+        });
 
-    return updatedPlayers;
+        var pitcher_ids = game_actions.map(function(item){
+            return item.player2_id;
+        });
+
+        var player_ids = batter_ids.concat(pitcher_ids).filter(function(item, index, array){
+            return array.indexOf(item) === index && item != 0;
+        });
+
+        Promise.each(player_ids, function(item, index, length){
+            return new Promise(function(resolve, reject){
+                PlayerModel.getAttributesById(item).then(function(attributes){
+                    //console.log("Original: ", attributes);
+                    var player_stats = exports.updatePlayerStats(game_actions, attributes);
+                    //console.log("Updated: ", player_stats.attributes);
+                    PlayerModel.updateAttributesById(player_stats.id, player_stats.attributes).then(function(result){
+                        //console.log("DB: ", result);
+                        resolve(result);
+                    }).catch(function(err){
+                       reject(err);
+                    });
+                }).catch(function(err){
+                    reject(err);
+                });
+            });
+        }).then(function(result){
+            resolve(player_data);
+        }).catch(function(err){
+            reject(err);
+        });
+    });
+}
+
+exports.updatePlayerStats = function(game_actions, attributes){
+    var updatedPlayer = {id: attributes.player_id, attributes: attributes};
+
+    //Player 1 attrs (batter)
+    //contact, swing_speed, bat_power
+
+    //Player 2 stats (pitcher)
+    //technique, pitch_speed, endurance
+
+    //Pitcher Calculations
+    var player_actions_pitcher = game_actions.filter(function(item){
+        return item.player2_id == attributes.player_id;
+    });
+
+    var strikes = player_actions_pitcher.filter(function(item){return item.type == 'strike'}).length;
+    var outs = player_actions_pitcher.filter(function(item){return item.type == 'out'}).length;
+    var balls = player_actions_pitcher.filter(function(item){return item.type == 'ball'}).length;
+
+    var total_points = balls + strikes + outs; //4 + 10 + ~54
+    var total_points = (strikes + outs) - (balls);
+
+    updatedPlayer.attributes.technique += 1;//Math.floor((5 * (strikes / player_actions_pitcher.length)));
+    updatedPlayer.attributes.pitch_speed += 1;//Math.floor((2 * (strikes / player_actions_pitcher.length)));
+
+    //Batter Calculations
+    var player_actions_batter = game_actions.filter(function(item){
+        return item.player1_id == attributes.player_id;
+    });
+
+    updatedPlayer.attributes.bat_power += 1;//(singles + (doubles * 2)  + (triples *3) + (home_runs * 4)) / 100;
+    updatedPlayer.attributes.contact += 1;//Math.floor(5 * (player_actions_batter.length - (strikes / 100))/100);
+    updatedPlayer.attributes.swing_speed += 1;//(1 * home_runs);
+
+    return updatedPlayer;
 }
 
 /*
