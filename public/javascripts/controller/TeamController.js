@@ -1,4 +1,4 @@
-var TeamsController = App.controller('TeamsController', function($scope, UserTokenFactory, TeamService){
+var TeamsController = App.controller('TeamsController', function($scope, UserTokenFactory, TeamService, PlayerService){
 
     $scope.selectedTeam;
 
@@ -62,6 +62,20 @@ var TeamsController = App.controller('TeamsController', function($scope, UserTok
                 player.attrs = response.data.attributes;
             });
         }
+    }
+
+    $scope.createPlayer = function(){
+        PlayerService.create().then(function(response){
+            console.log("Response", response);
+            $scope.players.push(response.data);
+        });
+    }
+
+    $scope.deletePlayer = function(player){
+        PlayerService.deleteById(player.id).then(function(response){
+            var index = $scope.players.indexOf(player);
+            $scope.players.splice(index, 1);
+        });
     }
 });
 

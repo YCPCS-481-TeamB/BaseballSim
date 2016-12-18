@@ -67,6 +67,15 @@ module.exports =  {
             });
         });
     },
+    clearBasesByGameActionId : function(game_action_id){
+        return new Promise(function(resolve, reject){
+            DatabaseController.query("UPDATE game_player_positions SET onfirst_id = 0, onsecond_id = 0, onthird_id=0 WHERE game_action_id=$1 RETURNING *", [game_action_id]).then(function(result){
+                resolve(result.rows[0]);
+            }).catch(function(err){
+                reject(err);
+            });
+        });
+    },
     deleteById : function(id){
         return new Promise(function(resolve, reject){
             DatabaseController.query("DELETE FROM game_player_positions WHERE id = $1 RETURNING *;", [id]).then(function(data){

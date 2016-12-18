@@ -111,13 +111,13 @@ module.exports =  {
             }
         });
     },
-    createFromPrevious : function(game_id, result, game_message){
+    createFromPrevious : function(game_id, result, game_message, player1_id, player2_id){
         return new Promise(function(resolve, reject){
             DatabaseController.query("SELECT * FROM game_action WHERE game_id=$1 ORDER BY date_created DESC LIMIT 1;", [game_id]).then(function(data){
                 var event = data.rows[0];
 
-                DatabaseController.query("INSERT INTO game_action (game_id, team_at_bat,team1_score,team2_score, balls, strikes, outs, type, message, inning)" +
-                    "VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *", [game_id, event.team_at_bat, event.team1_score, event.team2_score, event.balls, event.strikes, event.outs, result, game_message, event.inning]).then(function(result){
+                DatabaseController.query("INSERT INTO game_action (game_id, team_at_bat,team1_score,team2_score, balls, strikes, outs, type, message, inning, player1_id, player2_id)" +
+                    "VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10,$11, $12) RETURNING *", [game_id, event.team_at_bat, event.team1_score, event.team2_score, event.balls, event.strikes, event.outs, result, game_message, event.inning, player1_id, player2_id]).then(function(result){
                     //console.log("NEW GAME ACTION: ", result.rows[0]);
                     resolve(result.rows[0]);
                 }).catch(function(err){

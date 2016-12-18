@@ -42,7 +42,6 @@ router.post('/', function(req, res, next){
     });
 });
 
-
 /**
  * Retrieves the field from the database with the given id value
  * @params id - The id of the field

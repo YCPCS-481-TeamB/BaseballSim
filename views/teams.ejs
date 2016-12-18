@@ -35,6 +35,9 @@
         .playerTable {
             font-size: 80%;
         }
+        .statsTable {
+            text-align: left;
+        }
     </style>
 </head>
 <body ng-app="app" class="page">
@@ -90,17 +93,61 @@
                 <td ng-if="team.view == true">{{player.firstname}} {{player.lastname}}</td>
                 <td ng-if="team.view == true">{{player.position}}</td>
                 <td ng-if="team.view == true">{{team.name}}</td>
+                <br>
                 <td ng-if="team.view == true">
-                    <button type="button" class="btn btn-primary" ng-click="team.view=!team.view; loadPlayerAttrs(player)">Show</button>
-                    <h2 ng-repeat="attr in player.attrs">
-                        {{attr.name}}
-                    </h2>
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal" ng-click="loadPlayerAttrs(player);">Show </button>
+                    <!-- Modal -->
+                    <div class="modal fade" id="myModal" role="dialog">
+                        <div class="modal-dialog">
+
+                            <!-- Modal content-->
+                            <div class="modal-content">
+
+                                    <!--<button class="btn btn-danger pull-right" ng-click="showAttribs=false;">X</button>-->
+                                    <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                        <h4 class="modal-title">Player Attributes for {{player.firstname}} {{player.lastname}}</h4>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="statsTable">
+                                            <table>
+                                                <thead>
+
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <h2>TNQ: {{player.attrs.technique}}</h2>
+                                                        <h2>PSP: {{player.attrs.pitch_speed}}</h2>
+                                                        <h2>END: {{player.attrs.endurance}}</h2>
+                                                        <h2>CNT: {{player.attrs.contact}}</h2>
+                                                        <h2>SWS: {{player.attrs.swing_speed}}</h2>
+                                                        <h2>POW: {{player.attrs.bat_power}}</h2>
+                                                        <h2>CTH: {{player.attrs.catching}}</h2>
+                                                        <h2>TRW: {{player.attrs.throwing}}</h2>
+                                                        <h2>AWR: {{player.attrs.awareness}}</h2>
+                                                        <h2>SPD: {{player.attrs.speed}}</h2>
+                                                        <h2>CLT: {{player.attrs.clutch}}</h2>
+                                                        <h2>ARM: {{player.attrs.arm}}</h2>                                        </tr>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
                 </td>
                 <td ng-if="team.view == true">
-                    <button class="btn  btn-danger glyphicon glyphicon-trash" ng-click="#"></button>
+                    <button class="btn btn-danger" ng-click="deletePlayer(player); $event.stopPropagation()">X</button>
                 </td>
             </tr>
-
+            <tr>
+                <button class="btn btn-success form-control" ng-click="createPlayer()">Add Player</button>
+            </tr>
 
         </tbody>
         </table>
@@ -123,30 +170,6 @@
         </form>
     </div>
 
-    <!-- Modal -->
-    <div class="modal fade" id="myModal" role="dialog">
-        <div class="modal-dialog">
-
-            <!-- Modal content-->
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title">Roster</h4>
-                </div>
-                <div class="modal-body">
-                    <tr><td>{{selectedTeam.players}}</td></tr>
-                    <tr ng-repeat="player in selectedTeam.players">
-                        <td>{{player.firstname}} {{player.lastname}}</td>
-                        <td>{{player.position}}</td>
-                    </tr>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                </div>
-            </div>
-
-        </div>
-    </div>
 
     <!--
     <div class="teamStats well-lg">

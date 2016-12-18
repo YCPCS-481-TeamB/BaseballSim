@@ -59,7 +59,7 @@ CREATE TABLE schedule_item (id SERIAL, schedule_id INTEGER, start_time TIMESTAMP
 
 --GAMES STUFF
 CREATE TABLE games (id SERIAL, team1_id INTEGER, team2_id INTEGER, field_id INTEGER, league_id INTEGER, date_created TIMESTAMP DEFAULT NOW());
-CREATE TABLE game_action (id SERIAL, game_id INTEGER, team_at_bat INTEGER, team1_score INTEGER DEFAULT 0, team2_score INTEGER DEFAULT 0, balls INTEGER DEFAULT 0, strikes INTEGER DEFAULT 0, outs INTEGER DEFAULT 0, inning INTEGER DEFAULT 1, type game_action_type, message VARCHAR(255), date_created TIMESTAMP DEFAULT NOW());
+CREATE TABLE game_action (id SERIAL, game_id INTEGER, team_at_bat INTEGER, team1_score INTEGER DEFAULT 0, team2_score INTEGER DEFAULT 0, player1_id INTEGER DEFAULT 0, player2_id INTEGER DEFAULT 0, balls INTEGER DEFAULT 0, strikes INTEGER DEFAULT 0, outs INTEGER DEFAULT 0, inning INTEGER DEFAULT 1, type game_action_type, message VARCHAR(255), date_created TIMESTAMP DEFAULT NOW());
 --TODO: Finish player position table
 CREATE TABLE game_player_positions (id SERIAL, game_action_id INTEGER, onfirst_id INTEGER DEFAULT 0, onsecond_id INTEGER DEFAULT 0, onthird_id INTEGER DEFAULT 0, date_created TIMESTAMP DEFAULT NOW());
 

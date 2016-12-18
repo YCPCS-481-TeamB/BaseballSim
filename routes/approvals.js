@@ -12,7 +12,7 @@ var ApprovalsController = require('./../Controller/ApprovalsController');
 router.get('/', function(req, res, next) {
     var limit = req.query.limit;
     var offset = req.query.offset;
-    ApprovalsController.getApprovals(limit, offset).then(function(data){
+    ApprovalsModel.getAll(limit, offset).then(function(data){
         res.status(200).json({success: true, approvals: data});
     }).catch(function(err){
         res.status(200).json({success: false, message:""+ err});
@@ -25,9 +25,7 @@ router.get('/', function(req, res, next) {
  * @query offset - offset on pulling items
  */
 router.get('/user', function(req, res, next) {
-    var limit = req.query.limit;
-    var offset = req.query.offset;
-    ApprovalsController.getApprovalByUserId(req.userdata.id).then(function(data){
+    ApprovalsModel.getAllByUserId(req.userdata.id).then(function(data){
         res.status(200).json({success: true, approvals: data});
     }).catch(function(err){
         res.status(200).json({success: false, message:""+ err});
@@ -73,7 +71,7 @@ router.post('/:id/status', function(req, res, next) {
     var status = req.body.status;
     var id = req.params.id;
 
-    ApprovalsModel.update(id, status).then(function(data){
+    ApprovalsModel.updateStatus(id, status).then(function(data){
         res.status(200).json({success: true, approvals: data});
     }).catch(function(err){
         res.status(200).json({success: false, message:""+ err});

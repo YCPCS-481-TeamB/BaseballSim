@@ -8,7 +8,7 @@ var SecurityController = require('./SecurityController');
 exports.deleteUserById = function(id){
     return new Promise(function(resolve, reject){
         DatabaseController.query("DELETE FROM users WHERE id = $1 RETURNING *;", [id]).then(function(data){
-            resolve({player: data.rows});
+            resolve(data.rows);
         }).catch(function(err){
             reject(err);
         });
