@@ -192,35 +192,35 @@
                     <th ng-if="inning>=10" ng-repeat="item in [10,11,12,13,14,15,16,17,18]">
                         <span ng-class="{'badge': item == inning}">{{item}}</span>
                     </th>
-                    <th>Score</th>
+                    <!--<th>Score</th>-->
                 </tr>
-                <tbody>
-                <tr><th>Team 1</th>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>{{team1_score}}</td>
-                </tr>
-                <tr>
-                    <th>Team 2</th>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>{{team2_score}}</td>
-                </tr>
-                </tbody>
+                <!--<tbody>-->
+                <!--<tr><th>Team 1 Score</th>-->
+                    <!--&lt;!&ndash;<td>0</td>&ndash;&gt;-->
+                    <!--&lt;!&ndash;<td>0</td>&ndash;&gt;-->
+                    <!--&lt;!&ndash;<td>0</td>&ndash;&gt;-->
+                    <!--&lt;!&ndash;<td>0</td>&ndash;&gt;-->
+                    <!--&lt;!&ndash;<td>0</td>&ndash;&gt;-->
+                    <!--&lt;!&ndash;<td>0</td>&ndash;&gt;-->
+                    <!--&lt;!&ndash;<td>0</td>&ndash;&gt;-->
+                    <!--&lt;!&ndash;<td>0</td>&ndash;&gt;-->
+                    <!--&lt;!&ndash;<td>0</td>&ndash;&gt;-->
+                    <!--<td colspan="8">{{team1_score}}</td>-->
+                <!--</tr>-->
+                <!--<tr>-->
+                    <!--<th>Team 2 Score</th>-->
+                    <!--&lt;!&ndash;<td>0</td>&ndash;&gt;-->
+                    <!--&lt;!&ndash;<td>0</td>&ndash;&gt;-->
+                    <!--&lt;!&ndash;<td>0</td>&ndash;&gt;-->
+                    <!--&lt;!&ndash;<td>0</td>&ndash;&gt;-->
+                    <!--&lt;!&ndash;<td>0</td>&ndash;&gt;-->
+                    <!--&lt;!&ndash;<td>0</td>&ndash;&gt;-->
+                    <!--&lt;!&ndash;<td>0</td>&ndash;&gt;-->
+                    <!--&lt;!&ndash;<td>0</td>&ndash;&gt;-->
+                    <!--&lt;!&ndash;<td>0</td>&ndash;&gt;-->
+                    <!--<td colspan="8">{{team2_score}}</td>-->
+                <!--</tr>-->
+                <!--</tbody>-->
             </table>
         </div>
     </div>
@@ -228,11 +228,11 @@
             <!--<div class="container-fluid">-->
         <div class="col-sm-3 scoreboard">
             <table class="table table-condensed">
+                <tr><th>Home Team Score ({{game.team1_id}}):  </th><td>{{team1_score}}</td></tr>
+                <tr><th>Away Team Score ({{game.team2_id}}):</th><td>{{team2_score}}</td></tr>
                 <tr><th>Balls: </th><td>{{balls}}</td></tr>
                 <tr><th>Strikes: </th><td>{{strikes}}</td></tr>
                 <tr><th>Outs: </th><td>{{outs}}</td></tr>
-                <tr><th>Pitcher Name: </th><td>Pitcher</td></tr>
-                <tr><th>Last Play: </th><td>{{gameEvents.type}}</td></tr>
             </table>
         </div>
                 <!--<div class="gameScreen">-->

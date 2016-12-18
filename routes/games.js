@@ -251,16 +251,31 @@ router.delete('/:id', function(req, res, next){
     });
 });
 
+function IsJsonString(str) {
+    try {
+        JSON.parse(str);
+    } catch (e) {
+        return false;
+    }
+    return true;
+}
+
 router.post('/:id/teams/:team_id/lineup', function(req, res, next){
     var id = req.params.id;
-    var lineup = JSON.parse(req.body.lineup);
-    var team_id = req.params.team_id;
+    if(IsJsonString(req.body.lineup)){
+      var lineup = JSON.parse(req.body.lineup);
+      var team_id = req.params.team_id;
 
-    LineupController.createNewLineupByGameAndTeamId(id, team_id, lineup).then(function(result){
-        res.status(200).json({game_id: id, team_id: team_id, lineup: result});
-    }).catch(function(err){
-        res.status(200).json(err);
-    })
+      LineupController.createNewLineupByGameAndTeamId(id, team_id, lineup).then(function(result){
+          res.status(200).json({game_id: id, team_id: team_id, lineup: result});
+      }).catch(function(err){
+          res.status(200).json(err);
+      })
+    }else{
+      res.status(500).json("Invalid JSON DATA");
+    }
+
+
 
 });
 

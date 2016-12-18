@@ -30,7 +30,7 @@ var NavbarController = App.controller('NavbarController', function($scope, $inte
         ApprovalService.setStatus(approval.id, 'approved').then(function(data){
             console.log(data.data.approvals);
             if(data.data.approvals.item_type === 'games'){
-                alert("RELOCATE");
+                //alert("RELOCATE");
                 window.location.assign("/games/"+data.data.approvals.item_id);
             }
         }).catch(function(err){

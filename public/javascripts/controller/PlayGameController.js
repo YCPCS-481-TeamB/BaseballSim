@@ -23,6 +23,11 @@ var PlayGameController = App.controller('PlayGameController', function($scope,$i
         });
     }
 
+    GameService.getById($scope.game_id).then(function(game){
+        console.log(game);
+        $scope.game = game.data.game;
+    });
+
     $scope.team = [];
 
     UserTokenFactory.getUserData().then(function(user){
